@@ -3,7 +3,7 @@ from functools import wraps
 from flask_jwt_extended import get_jwt_identity
 from ..models.user import User
 
-
+# Decorador para verificar el rol del usuario
 def role_required(required_role):
     def wrapper(fn):
         @wraps(fn)

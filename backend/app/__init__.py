@@ -7,6 +7,7 @@ import os
 
 load_dotenv()
 
+# Configuración de logging
 logging.basicConfig(
     level=logging.INFO,  # Usar WARNING en producción
     format='%(asctime)s - %(levelname)s - %(message)s'
@@ -22,7 +23,7 @@ def create_app():
     app.config["JWT_BLACKLIST_ENABLED"] = True
     app.config["JWT_BLACKLIST_TOKEN_CHECKS"] = ["access"]
 
-    # MONGODB config
+    # MongoDB config
     app.config["MONGO_URI"] = "mongodb://localhost:27017/db_plataforma_donaciones"
 
     # Inicializa extensiones
@@ -44,14 +45,10 @@ def create_app():
 #------------------------------------------------------------------------------------------------------------
 #TODO
 
-# 🪙 Integración de wallet / Hardhat / Metamask para facilitar donaciones reales.
-# Usar librerías como web3.py o ethers.js para interactuar con contratos inteligentes.
-# Usar libreria de terceros como Coinbase Commerce 
-
+# CAMBIAR ENFOQUE DEL PROYECTO. LOS USUARIOS DONARAN DIRECTAMENTE A LOS CREADORES, NO A LA PLATAFORMA.
 
 # Revisitar datos de /register tras crear frontend
 
-# Validación más robusta (opcional)
 # Usar librerías como pydantic, marshmallow o Cerberus para validar payloads
 
 # Tests básicos (opcional pero recomendado):
@@ -67,3 +64,12 @@ def create_app():
 # puedes usar Flask-Mail o un servicio como SendGrid, Mailgun, o SMTP.
 
 # Como registrar followers y creadores? (En Frontend)
+
+
+
+# ¿qué funcionalidad te gustaría implementar a continuación en el backend? Podemos continuar con alguna de las siguientes opciones:
+# Integración con un servicio de correo para la recuperación de contraseña.
+# Sistema de notificaciones para usuarios (por ejemplo, cuando alguien hace una donación).
+# Gestión de pagos de criptomonedas (integración con un servicio de pagos de criptomonedas, como Coinbase, Binance, etc.).
+# Dashboard de estadísticas para los creadores (con gráficas de ingresos, seguidores, etc.).
+# Optimización de rendimiento (mejoras en consultas a la base de datos, caché, etc.).

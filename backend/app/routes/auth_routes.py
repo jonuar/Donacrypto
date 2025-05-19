@@ -129,7 +129,7 @@ def reset_password():
 @auth_bp.route("/me", methods=["GET"])
 @jwt_required()
 def get_profile():
-    """"Devuelve perfil del ususario logueado"""
+    """"Devuelve perfil del usuario logueado"""
     try:
         email = get_jwt_identity()
         user = User.find_by_email(email)
@@ -143,17 +143,6 @@ def get_profile():
             return jsonify({"error": "Usuario no encontrado"}), 404
     except Exception as e:
         current_app.logger.error(f"[get_profile] Error: {e}")
-        return jsonify({"error": "Error interno del servidor"}), 500
-
-@auth_bp.route("/creators", methods=["GET"])
-def get_creators():
-    """Devuelve todos los creadores"""
-    try:
-        creators = mongo.db.users.find({"role": "creator"}, {"_id": 0, "username": 1, "email": 1})
-        creator_list = list(creators)
-        return jsonify(creator_list), 200
-    except Exception as e:
-        current_app.logger.error(f"[get_creators] Error: {e}")
         return jsonify({"error": "Error interno del servidor"}), 500
 
 @auth_bp.route("/logout", methods=["POST"])
@@ -182,7 +171,7 @@ def user_feed():
     
 @auth_bp.route("/creators", methods=["GET"])
 @jwt_required()
-def get_all_creators():
+def get_creators():
     """Directorio de creadores"""
     try:
         creators_data = mongo.db.users.find({"role": "creator"}, {"_id": 0, "username": 1, "email": 1})

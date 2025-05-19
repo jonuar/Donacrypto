@@ -2,16 +2,25 @@ from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from ..models.donation import Donation
 from ..extensions import mongo
+from dotenv import load_dotenv
+import os
+import requests
+
+load_dotenv()
 
 donation_bp = Blueprint("donation_bp", __name__)
 
+COINDROP_API_KEY = os.gentenv('COINDROP_API_URL', 'https://api.coindrop.io/v1')
+COINDROP_API_URL = os.getenv("COINDROP_API_KEY", 'API_KEY')
 
 @donation_bp.route("/donate", methods=["POST"])
 @jwt_required()
 def donate():
+    '''Procesa y registra una donación'''
     try:
+        # Validación de datos de entrada
         data = request.get_json()
-        required_fields = ("receiver_email", "amount", "tx_hash")
+        required_fields = ("receiver_email", "amount")
         if not data or not all(f in data for f in required_fields):
             return jsonify({"error": "Datos incompletos"}), 400
 
@@ -19,20 +28,52 @@ def donate():
         if data["amount"] <= 0:
             return jsonify({"error": "Cantidad no válida"}), 400
 
-        sender_email = (
-            get_jwt_identity()
-        )  # Obtener el email del usuario actual (token JWT)
+        # Obtener email (JWT) del usuario que hace la donación y demás datos
+        sender_email = get_jwt_identity()
+        amount = data["amount"]
+        receiver_email = data["reveiver_email"]
 
+        # Calcular comisión (10% para la plataforma y 90% para el creador)
+        platform_fee = round(amount * 0.10, 2)
+        creator_amount = round(amount * 0.90, 2)
+
+        # Prepara payload para la solicitud a Coindrop
+        payload = {
+            "amount": amount,
+            "currency": data.get("currency", "ETH"),
+            "metadata": {
+                "sender_email": sender_email,
+                "receiver_email": receiver_email,
+                "platform_fee": platform_fee,
+                "creator_amount": creator_amount,
+            }
+            # Agregar otros parámetros requeridos por la API de Coindrop si es necesario
+        }
+
+        # Headers para autenticación y tipo de contenido
+        headers = {
+            "Autorization": "Bearer {}".format(COINDROP_API_KEY),
+            "Content-Type": "application/json"
+        }
+
+        # Realiza la solicitud a la API de Coindrop
+        response = request.post("{}/payments".format(COINDROP_API_URL), json=payload, headers=headers)
+        response.raise_for_status() # Lanza un error si la respuesta no es 200
+        payment_data = response.json() # Se espera un 'tx_hash' que identifique la transacción
+
+        # Registrar donación en la base de datos
         donation = Donation(
             sender_email=sender_email,
-            receiver_email=data["receiver_email"],
-            amount=data["amount"],
-            tx_hash=data["tx_hash"],
-            currency=data.get("currency", "ETH"),
+            receiver_email=receiver_email,
+            amount=amount,
+            tx_hash=payment_data["tx_hash"], # tx_hash devuelto por Coindrop
+            currency=data.get("currency", "ETH")
         )
 
         if donation.save_to_db():
-            return jsonify({"message": "Donación registrada con éxito"}), 201
+            return jsonify({"message": "Donación registrada con éxito",
+                            "payment_data": payment_data
+                    }), 201
         else:
             return jsonify({"error": "Error al guardar donación"}), 500
 
@@ -101,7 +142,7 @@ def get_received_donations():
         )
         
         # Total de donaciones recibidas
-        total = mongo.db.donations.count_documents({"sender_email": user_email})
+        total = mongo.db.donations.count_documents({"receiver_email": user_email})
 
         return jsonify({
                     "donations": list(donations),
