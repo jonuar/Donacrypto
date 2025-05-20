@@ -1,24 +1,26 @@
 from flask import jsonify, current_app
 from functools import wraps
-from flask_jwt_extended import get_jwt_identity
-from ..models.user import User
+from flask_jwt_extended import verify_jwt_in_request, get_jwt
 
-# Decorador para verificar el rol del usuario
+# Decorador optimizado para verificar el rol del usuario usando solo JWT
 def role_required(required_role):
     def wrapper(fn):
         @wraps(fn)
         def decorated(*args, **kwargs):
             try:
-                # Obtener email desde el JWT
-                identity = get_jwt_identity()
-                current_app.logger.info(f"JWT Identity: {identity}")
-
-                # Buscar usuario por email
-                user = User.find_by_email(identity)
-                current_app.logger.info(f"User found: {user.username if user else 'None'}, Role: {user.role if user else 'None'}")
-
+                # Verificar que existe un JWT válido (esto reemplaza a @jwt_required())
+                verify_jwt_in_request()
+                
+                # Obtener el claim 'role' directamente del JWT
+                claims = get_jwt()
+                user_role = claims.get("role")
+                print(f"JWT Claims: {claims}")
+                print(f"JWT Role: {user_role}")
+                
+                current_app.logger.info(f"JWT Role: {user_role}")
+                
                 # Validar rol
-                if not user or user.role != required_role:
+                if not user_role or user_role != required_role:
                     return jsonify({"error": "No tienes permisos para acceder a esta ruta"}), 403
 
                 return fn(*args, **kwargs)
