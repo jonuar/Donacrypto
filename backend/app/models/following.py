@@ -1,25 +1,26 @@
 from datetime import datetime
-from typing import Dict, Any, List
+from typing import Dict, Any, Optional
 
 class Following:
-    """Modelo para gestionar la lista de creadores seguidos por cada follower"""
+    """Modelo para gestionar la relación de seguimiento entre follower y creator"""
 
-    def __init__(self, follower_email: str, creator_list: List[Dict[str, Any]] = None) -> None:
+    def __init__(self, follower_email: str, creator_email: str, created_at: Optional[datetime] = None) -> None:
         """
         Args:
             follower_email: Email del usuario con role='follower'
-            creator_list: Lista de creadores seguidos
+            creator_email: Email del usuario con role='creator' que es seguido
+            created_at: Fecha de creación de la relación (opcional)
         """
         self.follower_email: str = follower_email
-        self.creator_list: List[Dict[str, Any]] = creator_list or []
-        self.updated_at: datetime = datetime.now()
+        self.creator_email: str = creator_email
+        self.created_at: datetime = created_at or datetime.now()
 
     def to_dict(self) -> Dict[str, Any]:
         """Convierte el objeto a diccionario para persistencia"""
         return {
             "follower_email": self.follower_email,
-            "creator_list": self.creator_list,
-            "updated_at": self.updated_at
+            "creator_email": self.creator_email,
+            "created_at": self.created_at
         }
 
     @classmethod
@@ -27,5 +28,6 @@ class Following:
         """Crea una instancia desde un diccionario"""
         return cls(
             follower_email=data["follower_email"],
-            creator_list=data.get("creator_list", [])
+            creator_email=data["creator_email"],
+            created_at=data.get("created_at", datetime.now())
         )

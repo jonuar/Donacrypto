@@ -308,8 +308,11 @@ def get_following() -> Tuple[Any, int]:
 @user_bp.route("/follow", methods=["POST"])
 @role_required("follower")
 def follow_creator() -> Tuple[Any, int]:
-    """Sigue a un creador
+    """
+    Sigue a un nuevo creador
+    
     Requiere: JWT válido en cabecera, creator_email en el cuerpo
+    Retorna: confirmación o error
     """
     try:
         data: Dict[str, Any] = request.get_json()
@@ -338,14 +341,15 @@ def follow_creator() -> Tuple[Any, int]:
         if existing:
             return jsonify({"message": "Ya sigues a este creador"}), 200
             
-        # Crea la relación de seguimiento usando el modelo
-        follow_data: Dict[str, Any] = {
-            "follower_email": follower_email,
-            "creator_email": creator_email,
-            "created_at": datetime.now()
-        }
+        # Crear la relación de seguimiento usando el modelo Following
+        following = Following(
+            follower_email=follower_email,
+            creator_email=creator_email
+        )
         
-        mongo.db.followings.insert_one(follow_data)
+        # Guardar en la base de datos
+        mongo.db.followings.insert_one(following.to_dict())
+        
         return jsonify({"message": f"Ahora sigues a {creator_data['username']}"}), 201
     except Exception as e:
         current_app.logger.error(f"[follow_creator] Error: {e}")
@@ -370,16 +374,22 @@ def unfollow_creator() -> Tuple[Any, int]:
             
         follower_email: str = get_jwt_identity()
         
-        # Elimina la relación de seguimiento
-        result = mongo.db.followings.delete_one({
+        # Buscar la relación de seguimiento
+        following_data = mongo.db.followings.find_one({
             "follower_email": follower_email,
             "creator_email": creator_email
         })
         
-        if result.deleted_count > 0:
-            return jsonify({"message": "Has dejado de seguir a este creador"}), 200
-        else:
+        if not following_data:
             return jsonify({"message": "No estabas siguiendo a este creador"}), 404
+            
+        # Eliminar la relación de seguimiento
+        mongo.db.followings.delete_one({
+            "follower_email": follower_email,
+            "creator_email": creator_email
+        })
+        
+        return jsonify({"message": "Has dejado de seguir a este creador"}), 200
     except Exception as e:
         current_app.logger.error(f"[unfollow_creator] Error: {e}")
         return jsonify({"error": "Error interno del servidor"}), 500
@@ -494,27 +504,39 @@ def public_creator_profile(username: str) -> Tuple[Any, int]:
         current_app.logger.error(f"[public_creator_profile] Error: {e}")
         return jsonify({"error": "Error al obtener el perfil"}), 500
     
-# ARREGLAR DATOS DE DASHBOARD
+# TODO ARREGLAR DATOS DE DASHBOARD
 @user_bp.route("/creator/dashboard", methods=["GET"])
 @role_required("creator")
 def creator_dashboard() -> Tuple[Any, int]:
-    """Panel del creador: ver estadísticas"""
+    """Panel del creador: ver donaciones y estadísticas"""
     try:
-        email = get_jwt_identity()
+        email: str = get_jwt_identity()
 
-        # Calcular estadísticas:
+        # Obtener donaciones recibidas
+        donations = list(mongo.db.donations.find(
+            {"receiver_email": email},
+            {"_id": 0}
+        ))
+
+        # Calcular estadísticas
+        total_amount: float = sum(d.get("amount", 0) for d in donations)
+        total_donations: int = len(donations)
+
+        # Incluir:
         # - Número de seguidores
-        # - Likes en posts, etc.
+        followers_count: int = mongo.db.followings.count_documents({"creator_email": email})
+        # - Posts publicados
+        posts_count: int = mongo.db.posts.count_documents({"creator_email": email})
 
         return jsonify({
-            # "stats": {
-            #     "total_donations": total_donations,
-            #     "total_received": total_amount,
-            #     "followers_count": followers_count,
-            #     "posts_count": posts_count
-            # }
+            "donations": donations,
+            "stats": {
+                "total_donations": total_donations,
+                "total_received": total_amount,
+                "followers_count": followers_count,
+                "posts_count": posts_count
+            }
         }), 200
-
     except Exception as e:
         current_app.logger.error(f"[creator_dashboard] Error: {e}")
         return jsonify({"error": "Error al obtener el panel del creador"}), 500
@@ -718,4 +740,304 @@ def add_creator_wallet() -> Tuple[Any, int]:
     except Exception as e:
         current_app.logger.error(f"[add_creator_wallet] Error: {e}")
         return jsonify({"error": "Error al añadir wallet"}), 500
+
+
+@user_bp.route("/wallets", methods=["GET"])
+@role_required("creator")
+def get_creator_wallets() -> Tuple[Any, int]:
+    """
+    Obtiene todas las direcciones de wallet del creador autenticado
+    
+    Requiere: JWT válido en cabecera, rol creator
+    Retorna: lista de wallets configuradas
+    """
+    try:
+        email: str = get_jwt_identity()
+        
+        # Buscar wallets del creador
+        wallets_cursor = mongo.db.creator_wallets.find({"creator_email": email})
+        
+        # Formatear respuesta
+        wallets: List[Dict[str, Any]] = []
+        for wallet in wallets_cursor:
+            # Convertir ObjectId a string para JSON
+            if "_id" in wallet:
+                wallet["_id"] = str(wallet["_id"])
+            wallets.append(wallet)
+        
+        if not wallets:
+            return jsonify({
+                "message": "No tienes wallets configuradas",
+                "wallets": []
+            }), 200
+            
+        return jsonify({
+            "message": "Wallets recuperadas con éxito",
+            "wallets": wallets
+        }), 200
+    except Exception as e:
+        current_app.logger.error(f"[get_creator_wallets] Error: {e}")
+        return jsonify({"error": "Error al obtener las wallets"}), 500
+
+
+@user_bp.route("/wallets/<currency_type>", methods=["GET"])
+@role_required("creator")
+def get_creator_wallet(currency_type: str) -> Tuple[Any, int]:
+    """
+    Obtiene una wallet específica por tipo de moneda
+    
+    Requiere: JWT válido en cabecera, rol creator
+              currency_type en la URL
+    Retorna: datos de la wallet o error
+    """
+    try:
+        email: str = get_jwt_identity()
+        
+        # Validar que la moneda sea soportada
+        if currency_type not in CreatorWallet.SUPPORTED_CURRENCIES:
+            return jsonify({
+                "error": f"Tipo de moneda no soportada. Use: {CreatorWallet.SUPPORTED_CURRENCIES}"
+            }), 400
+        
+        # Buscar la wallet específica
+        wallet = mongo.db.creator_wallets.find_one({
+            "creator_email": email,
+            "currency_type": currency_type
+        })
+        
+        if not wallet:
+            return jsonify({
+                "error": f"No tienes una wallet configurada para {currency_type}"
+            }), 404
+            
+        # Convertir ObjectId a string para JSON
+        if "_id" in wallet:
+            wallet["_id"] = str(wallet["_id"])
+            
+        return jsonify({
+            "message": f"Wallet de {currency_type} recuperada",
+            "wallet": wallet
+        }), 200
+    except Exception as e:
+        current_app.logger.error(f"[get_creator_wallet] Error: {e}")
+        return jsonify({"error": "Error al obtener la wallet"}), 500
+
+
+@user_bp.route("/wallets/<currency_type>", methods=["PUT"])
+@role_required("creator")
+def update_creator_wallet(currency_type: str) -> Tuple[Any, int]:
+    """
+    Actualiza una wallet existente del creador
+    
+    Requiere: JWT válido en cabecera, rol creator
+              currency_type en la URL
+              wallet_address en el cuerpo
+    Retorna: confirmación o error
+    """
+    try:
+        email: str = get_jwt_identity()
+        data: Dict[str, Any] = request.get_json()
+        
+        # Validar datos
+        if not data or "wallet_address" not in data:
+            return jsonify({"error": "Dirección de wallet requerida"}), 400
+            
+        # Validar que la moneda sea soportada
+        if currency_type not in CreatorWallet.SUPPORTED_CURRENCIES:
+            return jsonify({
+                "error": f"Tipo de moneda no soportada. Use: {CreatorWallet.SUPPORTED_CURRENCIES}"
+            }), 400
+            
+        # Verificar que la wallet existe
+        existing = mongo.db.creator_wallets.find_one({
+            "creator_email": email,
+            "currency_type": currency_type
+        })
+        
+        if not existing:
+            return jsonify({
+                "error": f"No tienes una wallet configurada para {currency_type}"
+            }), 404
+            
+        # Actualizar dirección de wallet
+        result = mongo.db.creator_wallets.update_one(
+            {
+                "creator_email": email,
+                "currency_type": currency_type
+            },
+            {
+                "$set": {
+                    "wallet_address": data["wallet_address"],
+                    "updated_at": datetime.now()
+                }
+            }
+        )
+        
+        if result.modified_count > 0:
+            return jsonify({
+                "message": f"Wallet de {currency_type} actualizada con éxito"
+            }), 200
+        else:
+            return jsonify({
+                "message": "No se realizaron cambios en la wallet"
+            }), 200
+    except Exception as e:
+        current_app.logger.error(f"[update_creator_wallet] Error: {e}")
+        return jsonify({"error": "Error al actualizar la wallet"}), 500
+
+
+@user_bp.route("/wallets/<currency_type>", methods=["DELETE"])
+@role_required("creator")
+def delete_creator_wallet(currency_type: str) -> Tuple[Any, int]:
+    """
+    Elimina una wallet del creador
+    
+    Requiere: JWT válido en cabecera, rol creator
+              currency_type en la URL
+    Retorna: confirmación o error
+    """
+    try:
+        email: str = get_jwt_identity()
+        
+        # Validar que la moneda sea soportada
+        if currency_type not in CreatorWallet.SUPPORTED_CURRENCIES:
+            return jsonify({
+                "error": f"Tipo de moneda no soportada. Use: {CreatorWallet.SUPPORTED_CURRENCIES}"
+            }), 400
+            
+        # Verificar que la wallet existe
+        existing = mongo.db.creator_wallets.find_one({
+            "creator_email": email,
+            "currency_type": currency_type
+        })
+        
+        if not existing:
+            return jsonify({
+                "error": f"No tienes una wallet configurada para {currency_type}"
+            }), 404
+            
+        # Eliminar wallet
+        result = mongo.db.creator_wallets.delete_one({
+            "creator_email": email,
+            "currency_type": currency_type
+        })
+        
+        if result.deleted_count > 0:
+            return jsonify({
+                "message": f"Wallet de {currency_type} eliminada con éxito"
+            }), 200
+        else:
+            return jsonify({
+                "error": "No se pudo eliminar la wallet"
+            }), 500
+    except Exception as e:
+        current_app.logger.error(f"[delete_creator_wallet] Error: {e}")
+        return jsonify({"error": "Error al eliminar la wallet"}), 500
+
+
+@user_bp.route("/wallets/set-default/<currency_type>", methods=["PUT"])
+@role_required("creator")
+def set_default_wallet(currency_type: str) -> Tuple[Any, int]:
+    """
+    Establece una wallet como predeterminada para el creador
+    
+    Requiere: JWT válido en cabecera, rol creator
+              currency_type en la URL
+    Retorna: confirmación o error
+    """
+    try:
+        email: str = get_jwt_identity()
+        
+        # Validar que la moneda sea soportada
+        if currency_type not in CreatorWallet.SUPPORTED_CURRENCIES:
+            return jsonify({
+                "error": f"Tipo de moneda no soportada. Use: {CreatorWallet.SUPPORTED_CURRENCIES}"
+            }), 400
+            
+        # Verificar que la wallet existe
+        existing = mongo.db.creator_wallets.find_one({
+            "creator_email": email,
+            "currency_type": currency_type
+        })
+        
+        if not existing:
+            return jsonify({
+                "error": f"No tienes una wallet configurada para {currency_type}"
+            }), 404
+            
+        # Primero, desmarcar cualquier wallet predeterminada actual
+        mongo.db.creator_wallets.update_many(
+            {"creator_email": email},
+            {"$set": {"is_default": False}}
+        )
+        
+        # Marcar la wallet seleccionada como predeterminada
+        result = mongo.db.creator_wallets.update_one(
+            {
+                "creator_email": email,
+                "currency_type": currency_type
+            },
+            {"$set": {"is_default": True}}
+        )
+        
+        if result.modified_count > 0:
+            return jsonify({
+                "message": f"Wallet de {currency_type} establecida como predeterminada"
+            }), 200
+        else:
+            return jsonify({
+                "error": "No se pudo establecer la wallet como predeterminada"
+            }), 500
+    except Exception as e:
+        current_app.logger.error(f"[set_default_wallet] Error: {e}")
+        return jsonify({"error": "Error al establecer la wallet predeterminada"}), 500
+
+
+@user_bp.route("/creator/<username>/donation-info", methods=["GET"])
+def get_creator_donation_info(username: str) -> Tuple[Any, int]:
+    """
+    Obtiene información pública sobre las wallets de un creador para donaciones
+    
+    Requiere: username del creador en la URL
+    Retorna: información de donación, incluyendo wallets disponibles
+    """
+    try:
+        # Buscar creador por username
+        creator = mongo.db.users.find_one(
+            {"username": username, "role": "creator"},
+            {"_id": 0, "password": 0, "email": 1, "username": 1, "bio": 1, "avatar_url": 1}
+        )
+        
+        if not creator:
+            return jsonify({"error": "Creador no encontrado"}), 404
+            
+        # Buscar wallets del creador
+        wallets_cursor = mongo.db.creator_wallets.find(
+            {"creator_email": creator["email"]},
+            {"_id": 0, "creator_email": 0}  # No exponer el email del creador
+        )
+        
+        wallets = list(wallets_cursor)
+        
+        # Obtener wallet predeterminada si existe
+        default_wallet = next((w for w in wallets if w.get("is_default")), None)
+        if not default_wallet and wallets:
+            default_wallet = wallets[0]  # Si no hay predeterminada, usar la primera
+            
+        # Crear lista de métodos de donación disponibles
+        available_currencies = [w["currency_type"] for w in wallets]
+        
+        # Eliminar el email del creador de la respuesta por seguridad
+        if "email" in creator:
+            del creator["email"]
+            
+        return jsonify({
+            "creator": creator,
+            "wallets": wallets,
+            "default_wallet": default_wallet,
+            "available_currencies": available_currencies
+        }), 200
+    except Exception as e:
+        current_app.logger.error(f"[get_creator_donation_info] Error: {e}")
+        return jsonify({"error": "Error al obtener información de donación"}), 500
 
