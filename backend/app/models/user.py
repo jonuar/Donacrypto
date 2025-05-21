@@ -1,6 +1,7 @@
 from datetime import datetime
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 from werkzeug.security import generate_password_hash, check_password_hash
+from ..extensions import mongo
 
 class User:
     """Modelo de usuario"""

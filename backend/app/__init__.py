@@ -33,11 +33,9 @@ def create_app():
 
     # Importa y registra Blueprints
     from .routes.auth_routes import auth_bp
-    from .routes.donation_routes import donation_bp
-    from .routes.creator_routes import creator_bp
+    from .routes.user_routes import user_bp
     app.register_blueprint(auth_bp, url_prefix="/auth")
-    app.register_blueprint(donation_bp, url_prefix="/donations")
-    app.register_blueprint(creator_bp)
+    app.register_blueprint(user_bp, url_prefix='/user')
 
     return app
 
@@ -45,7 +43,11 @@ def create_app():
 #------------------------------------------------------------------------------------------------------------
 #TODO
 
-# CAMBIAR ENFOQUE DEL PROYECTO. LOS USUARIOS DONARAN DIRECTAMENTE A LOS CREADORES, NO A LA PLATAFORMA.
+# ARREGLAR DATOS DE DASHBOARD CREATOR
+
+# Probar la API con Postman o Thunder Client
+
+# Configurar CORS para permitir peticiones desde el frontend
 
 # Revisitar datos de /register tras crear frontend
 
