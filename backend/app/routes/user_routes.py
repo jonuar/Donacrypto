@@ -399,11 +399,11 @@ def unfollow_creator() -> Tuple[Any, int]:
 @role_required("follower")
 def explore_creators() -> Tuple[Any, int]:
     """
-    Muestra una lista de creadores para explorar
+    Muestra la lista de creadores que el follower está siguiendo
     
     Requiere: JWT válido en cabecera
-    Query params opcionales: page, limit, sort (popular, newest)
-    Retorna: lista paginada de creadores
+    Query params opcionales: page, limit, sort (popular, recent)
+    Retorna: lista paginada de creadores seguidos
     """
     try:
         email: str = get_jwt_identity()
@@ -413,26 +413,44 @@ def explore_creators() -> Tuple[Any, int]:
         limit: int = int(request.args.get("limit", 10))
         skip: int = (page - 1) * limit
         
-        # Ordenación: popular o más nuevo
-        sort_by: str = request.args.get("sort", "popular")
+        # Ordenación: popular o más reciente
+        sort_by: str = request.args.get("sort", "recent")
         
-        # Query principal: todos los creadores
-        query = {"role": "creator"}
+        # 1. Obtener los emails de los creadores que sigue el usuario
+        following_data = list(mongo.db.followings.find(
+            {"follower_email": email},
+            {"_id": 0, "creator_email": 1, "created_at": 1}
+        ))
         
-        # Contar total de creadores
-        total_creators = mongo.db.users.count_documents(query)
+        # Extraer la lista de emails de creadores
+        creator_emails: List[str] = [item["creator_email"] for item in following_data]
+        
+        if not creator_emails:
+            return jsonify({
+                "creators": [],
+                "message": "No sigues a ningún creador. ¡Explora nuevos creadores!",
+                "page": page,
+                "limit": limit,
+                "total": 0,
+                "pages": 0
+            }), 200
+        
+        # 2. Contar total de creadores seguidos
+        total_creators: int = len(creator_emails)
+        
+        # 3. Preparar la búsqueda con los emails recolectados
+        query = {"email": {"$in": creator_emails}, "role": "creator"}
         
         # Determinar el ordenamiento
-        sort_criteria = []
         if sort_by == "popular":
-            # Para ordenar por popularidad, podríamos considerar el número de seguidores
-            # Esto requeriría una operación de agregación más compleja
-            # Por simplificar, ordenaremos por username alfabéticamente
-            sort_criteria = [("username", 1)]
-        else:  # newest
-            sort_criteria = [("created_at", -1)]
+            # Ordenar por popularidad (número de seguidores)
+            # Necesitamos añadir esta información después de obtener los datos
+            sort_criteria = [("username", 1)]  # Por defecto ordenamos por nombre
+        else:  # recent - ordenar por fecha de seguimiento
+            # Aquí necesitamos procesar manualmente después de obtener los datos
+            sort_criteria = [("username", 1)]  # Ordenamos temporalmente por nombre
             
-        # Obtener datos
+        # Obtener datos de los creadores seguidos
         creators_cursor = mongo.db.users.find(
             query,
             {"_id": 0, "password": 0}
@@ -440,28 +458,35 @@ def explore_creators() -> Tuple[Any, int]:
         
         creators: List[Dict[str, Any]] = []
         for creator in creators_cursor:
-            # Para cada creador, podemos obtener datos adicionales como número de seguidores
+            # Para cada creador, obtener datos adicionales como número de seguidores
             followers_count = mongo.db.followings.count_documents({"creator_email": creator["email"]})
             creator["followers_count"] = followers_count
             
-            # Verificar si el usuario actual sigue a este creador
-            creator["following"] = mongo.db.followings.find_one({
-                "follower_email": email,
-                "creator_email": creator["email"]
-            }) is not None
+            # Añadir fecha de seguimiento 
+            follow_info = next((item for item in following_data if item["creator_email"] == creator["email"]), None)
+            if follow_info and "created_at" in follow_info:
+                creator["followed_at"] = follow_info["created_at"]
+            
+            # El usuario siempre sigue a estos creadores
+            creator["following"] = True
             
             creators.append(creator)
             
+        # Ordenar por fecha de seguimiento si se solicitó "recent"
+        if sort_by == "recent" and creators:
+            creators.sort(key=lambda x: x.get("followed_at", datetime.min), reverse=True)
+        
         return jsonify({
             "creators": creators,
             "page": page,
             "limit": limit,
             "total": total_creators,
-            "pages": (total_creators + limit - 1) // limit
+            "pages": (total_creators + limit - 1) // limit,
+            "message": f"Mostrando {len(creators)} de {total_creators} creadores que sigues"
         }), 200
     except Exception as e:
         current_app.logger.error(f"[explore_creators] Error: {e}")
-        return jsonify({"error": "Error al explorar creadores"}), 500
+        return jsonify({"error": "Error al obtener creadores seguidos"}), 500
 
 
 # RUTAS PARA CREATORS
