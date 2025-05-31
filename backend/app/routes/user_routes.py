@@ -395,7 +395,7 @@ def unfollow_creator() -> Tuple[Any, int]:
         return jsonify({"error": "Error interno del servidor"}), 500
 
 
-@user_bp.route("/explorers/creators", methods=["GET"])
+@user_bp.route("/creators-list", methods=["GET"])
 @role_required("follower")
 def explore_creators() -> Tuple[Any, int]:
     """
