@@ -7,11 +7,13 @@ Una alternativa descentralizada donde los creadores pueden recibir donaciones di
 ## ⚙️ Tecnologías Usadas
 
 - **Backend:** Flask + PyMongo
-- **Frontend:** Vue.js + SASS
+- **Frontend:** Vue.js 3 + Composition API + Pinia
 - **Base de datos:** MongoDB
 - **Autenticación:** JWT (Json Web Tokens)
 - **Criptografía:** bcrypt
 - **Logs:** Python Logging
+- **Router:** Vue Router 4
+- **HTTP Client:** Axios
 
 ---
 
@@ -22,12 +24,20 @@ Una alternativa descentralizada donde los creadores pueden recibir donaciones di
 - Inicio de sesión con JWT (`POST /auth/login`)
 - Protección de rutas privadas con `@jwt_required`
 - Middleware de roles (`role_required`)
+- Store de autenticación con Pinia (frontend)
 
 ### 👤 Gestión de Usuarios y Creadores
 - Obtener perfil actual (`GET /auth/me`)
 - Gestión de wallets del creador (`POST /creator/wallets`)
 - Lista de creadores seguidos (`GET /following/list`)
 - Seguir creador (`POST /following/add`)
+
+### 🎨 Frontend
+- Aplicación Vue.js 3 configurada
+- Sistema de rutas con Vue Router
+- Store global de autenticación
+- Diseño responsivo con SASS
+- Inicialización automática de autenticación
 
 ### 🧑‍🎨 Panel de Creador (Pendiente)
 - Vista general de métricas
@@ -37,7 +47,9 @@ Una alternativa descentralizada donde los creadores pueden recibir donaciones di
 
 ---
 
-## 📁 Estructura del Proyecto (backend)
+## 📁 Estructura del Proyecto
+
+### Backend
 ```
 backend/
 ├── app.py
@@ -57,7 +69,42 @@ backend/
 │       └── role_required.py
 ```
 
-## 🧪 Pruebas con Thunder Client / Postman (Pendiente)
+### Frontend
+```
+frontend/
+├── src/
+│   ├── App.vue
+│   ├── main.js
+│   ├── router/
+│   │   └── index.js
+│   ├── stores/
+│   │   └── auth.js
+│   ├── views/
+│   ├── components/
+│   └── assets/
+├── package.json
+└── vite.config.js
+```
+
+---
+
+## 🚀 Instalación y Configuración
+
+### Backend
+```bash
+cd backend
+pip install -r requirements.txt
+python app.py
+```
+
+### Frontend
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+---
 
 ### Auth
 ```http
@@ -82,17 +129,5 @@ POST /following/add
 DELETE /following/remove
 ```
 
----
 
-## 🏗️ Próximos Pasos
-- Integración con wallet (Metamask)
-- Sistema de comentarios en posts
-- Frontend Vue + diseño responsive
-- Feed personalizado por seguidos
-- Notificaciones por correo
-
----
-
-## 📜 Licencia
-MIT
 
