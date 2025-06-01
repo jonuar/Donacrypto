@@ -224,7 +224,7 @@
           </div>
           
           <div v-else class="followers-info">
-            <p>Tienes {{ estadisticas.followers_count }} seguidores siguiendo tu contenido.</p>
+            <p>Tienes {{ estadisticas.followers_count }} seguidores de tu contenido.</p>
             <!-- Lista de seguidores -->
           </div>
         </section>

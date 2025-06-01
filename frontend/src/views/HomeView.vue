@@ -1,24 +1,18 @@
 <template>
   <div class="home-page">
-    <nav class="navbar">
+    <nav class="navbar" v-if="!authStore.estaAutenticado">
       <div class="nav-container">
         <div class="nav-brand">
           <span class="brand-icon">💜</span>
-          <span class="brand-text">Decentralized Donations</span>
+          <span class="brand-text">DonaCrypto</span>
         </div>
         <div class="nav-actions">
-          <router-link v-if="!authStore.estaAutenticado" to="/login" class="btn btn-ghost">
+          <router-link to="/login" class="btn btn-ghost">
             Iniciar Sesión
           </router-link>
-          <router-link v-if="!authStore.estaAutenticado" to="/register" class="btn btn-primary">
+          <router-link to="/register" class="btn btn-primary">
             Registrarse
           </router-link>
-          <router-link v-if="authStore.estaAutenticado && authStore.esCreador" to="/dashboard" class="btn btn-secondary">
-            Mi Dashboard
-          </router-link>
-          <button v-if="authStore.estaAutenticado" @click="handleLogout" class="btn btn-ghost">
-            Cerrar Sesión
-          </button>
         </div>
       </div>
     </nav>
@@ -91,7 +85,7 @@
     </main>
 
     <footer class="footer">
-      <p>&copy; 2025 Decentralized Donations. Todos los derechos reservados.</p>
+      <p>&copy; 2025 DonaCrypto. Todos los derechos reservados.</p>
     </footer>
   </div>
 </template>

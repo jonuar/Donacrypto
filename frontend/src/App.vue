@@ -2,11 +2,14 @@
   <div id="app">
     <nav class="app-nav" v-if="usuario">
       <div class="nav-content">
-        <router-link to="/" class="nav-brand">DonaCrypto</router-link>
+        <router-link to="/" class="nav-brand">
+          <span class="brand-icon">💜</span>
+          <span class="brand-text">DonaCrypto</span>
+        </router-link>
         <div class="nav-links">
-          <router-link v-if="usuario.role === 'creator'" to="/dashboard" class="nav-link">Dashboard</router-link>
+          <router-link v-if="usuario.role === 'creator' && route.path !== '/dashboard'" to="/dashboard" class="btn btn-primary btn-sm">Dashboard</router-link>
           <router-link v-if="usuario.role === 'follower'" to="/feed" class="nav-link">Feed</router-link>
-          <button @click="logout" class="btn btn-outline btn-sm">Cerrar Sesión</button>
+          <button @click="logout" class="btn btn-ghost btn-sm">Cerrar Sesión</button>
         </div>
       </div>
     </nav>
@@ -17,13 +20,14 @@
 <script>
 import { computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 
 export default {
   name: 'App',
   setup() {
     const authStore = useAuthStore()
     const router = useRouter()
+    const route = useRoute()
     
     const usuario = computed(() => authStore.usuarioActual)
     
@@ -34,7 +38,8 @@ export default {
     
     return {
       usuario,
-      logout
+      logout,
+      route
     }
   },
   async created() {
@@ -70,10 +75,21 @@ export default {
 }
 
 .nav-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
   font-size: var(--font-size-lg);
   font-weight: 700;
   color: var(--color-primary);
   text-decoration: none;
+}
+
+.brand-icon {
+  font-size: var(--font-size-xl);
+}
+
+.brand-text {
+  color: var(--color-primary);
 }
 
 .nav-links {

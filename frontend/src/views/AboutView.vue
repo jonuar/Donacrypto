@@ -4,7 +4,7 @@
       <div class="nav-container">
         <router-link to="/" class="nav-brand">
           <span class="brand-icon">💜</span>
-          <span class="brand-text">Decentralized Donations</span>
+          <span class="brand-text">DonaCrypto</span>
         </router-link>
         <div class="nav-actions">
           <router-link to="/dashboard" v-if="authStore?.estaAutenticado && authStore?.esCreador" class="btn btn-secondary">
