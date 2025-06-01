@@ -12,25 +12,14 @@ export default {
   async created() {
     // Inicializar autenticación al cargar la app
     const authStore = useAuthStore()
-    await authStore.initialize()
+    await authStore.inicializar()
   }
 }
 </script>
 
-<style lang="scss" scoped>
-// Estilos globales
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: 'Inter', sans-serif;
-  background-color: #f8fafc;
-}
-
+<style>
 #app {
   min-height: 100vh;
+  width: 100%;
 }
 </style>

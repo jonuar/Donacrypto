@@ -45,33 +45,28 @@ def create_app():
 
 # ARREGLAR DATOS DE DASHBOARD CREATOR
 
-# Probar la API con Postman o Thunder Client
-
 # Configurar CORS para permitir peticiones desde el frontend
 
 # Revisitar datos de /register tras crear frontend
 
 # Usar librerías como pydantic, marshmallow o Cerberus para validar payloads
 
-# Tests básicos (opcional pero recomendado):
-# Usar pytest o unittest para probar login, registro, donaciones
+# Tests básicos
 
-# Documentación de la API:
-# Agrega documentación tipo Swagger (usando Flask-Swagger o Postman exportado)
-# O simplemente crea un README.md con todos los endpoints
+# Documentación de la API
 
-# 📧 Recuperación de contraseña con token temporal o vía correo:
-# Cómo enviar correo de recuperación?
-# (Opcional) Integración con un servicio de correo o frontend para mostrar un modal
-# puedes usar Flask-Mail o un servicio como SendGrid, Mailgun, o SMTP.
+# Recuperación de contraseña con token temporal o vía correo
+
+# Usar Flask-Mail o un servicio como SendGrid, Mailgun, o SMTP.
 
 # Como registrar followers y creadores? (En Frontend)
 
 
+# {
+#   "email": "joshuanunezarcila@gmail.com",
+#   "password": "password123"
+# }
 
-# ¿qué funcionalidad te gustaría implementar a continuación en el backend? Podemos continuar con alguna de las siguientes opciones:
-# Integración con un servicio de correo para la recuperación de contraseña.
-# Sistema de notificaciones para usuarios (por ejemplo, cuando alguien hace una donación).
-# Gestión de pagos de criptomonedas (integración con un servicio de pagos de criptomonedas, como Coinbase, Binance, etc.).
-# Dashboard de estadísticas para los creadores (con gráficas de ingresos, seguidores, etc.).
-# Optimización de rendimiento (mejoras en consultas a la base de datos, caché, etc.).
+# {
+#   "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc0ODQ3ODUzMCwianRpIjoiNjhmM2Q5M2YtZTc2Yy00ZDQ2LTkxZDYtYWQxM2IzNGIxMmRjIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6Impvc2h1YW51bmV6YXJjaWxhQGdtYWlsLmNvbSIsIm5iZiI6MTc0ODQ3ODUzMCwiY3NyZiI6IjI0MmJmODBhLTA3ZjAtNGJiNS1hMjViLTk5Y2FjZTFjYjQ4YSIsImV4cCI6MTc0ODU2NDkzMCwicm9sZSI6ImZvbGxvd2VyIn0.Yc3o3fuen2Xnc-IiRw-Rh1KakQrUiPtX85M1C_4Ytow"
+# }

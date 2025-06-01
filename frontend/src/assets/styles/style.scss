@@ -1,0 +1,394 @@
+/* ===== ESTILOS GLOBALES DEL SISTEMA BENTO UI ===== */
+/* Importación de fuentes desde Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* ===== VARIABLES CSS GLOBALES ===== */
+:root {
+  /* === PALETA DE COLORES - ESTILO BENTO === */
+  /* Color principal púrpura */
+  --color-primary: #8B5CF6;      
+  --color-primary-dark: #7C3AED;  /* Púrpura oscuro */
+  --color-primary-light: #A78BFA; /* Púrpura claro */
+  
+  /* Colores de fondo */
+  --color-background: #F5F5F5;   /* Whitesmoke - fondo principal */
+  --color-surface: #FFFFFF;      /* Blanco para tarjetas */
+  --color-surface-dark: #F8F9FA; /* Gris muy claro */
+  
+  /* Colores de texto */
+  --color-text: #1F2937;         /* Texto principal - gris oscuro */
+  --color-text-secondary: #6B7280; /* Texto secundario */
+  --color-text-muted: #9CA3AF;   /* Texto deshabilitado */
+  
+  /* Colores de bordes */
+  --color-border: #E5E7EB;       /* Borde estándar */
+  --color-border-light: #F3F4F6; /* Borde claro */
+  
+  /* Colores de estado */
+  --color-success: #10B981;      /* Verde para éxito */
+  --color-error: #EF4444;        /* Rojo para errores */
+  --color-warning: #F59E0B;      /* Amarillo para advertencias */
+  
+  /* === SOMBRAS - ESTILO BENTO === */
+  /* Sombras sutiles para efectos de profundidad */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);    /* Sombra pequeña */
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Sombra media */
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Sombra grande */
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); /* Sombra extra grande */
+  
+  /* === RADIO DE BORDES - ESTILO BENTO === */
+  --radius-sm: 8px;   /* Radio pequeño */
+  --radius-md: 12px;  /* Radio medio */
+  --radius-lg: 16px;  /* Radio grande */
+  --radius-xl: 20px;  /* Radio extra grande */
+  
+  /* === ESPACIADO === */
+  /* Espaciado consistente para márgenes y padding */
+  --spacing-xs: 4px;   /* Extra pequeño */
+  --spacing-sm: 8px;   /* Pequeño */
+  --spacing-md: 16px;  /* Medio */
+  --spacing-lg: 24px;  /* Grande */
+  --spacing-xl: 32px;  /* Extra grande */
+  --spacing-2xl: 48px; /* Doble extra grande */
+  
+  /* === TIPOGRAFÍA === */
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-size-xs: 12px;   /* Texto extra pequeño */
+  --font-size-sm: 14px;   /* Texto pequeño */
+  --font-size-base: 16px; /* Texto base */
+  --font-size-lg: 18px;   /* Texto grande */
+  --font-size-xl: 20px;   /* Texto extra grande */
+  --font-size-2xl: 24px;  /* Títulos secundarios */
+  --font-size-3xl: 30px;  /* Títulos principales */
+  --font-size-4xl: 36px;  /* Títulos de héroe */
+  
+  /* === TRANSICIONES === */
+  --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); /* Transición suave estándar */
+}
+
+/* ===== RESET Y ESTILOS BASE ===== */
+/* Eliminación de márgenes y padding por defecto */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box; /* Incluye padding y border en el ancho/alto */
+}
+
+/* Scroll suave en toda la página */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Estilos base del body */
+body {
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  line-height: 1.6; /* Interlineado legible */
+  color: var(--color-text);
+  background-color: var(--color-background);
+  -webkit-font-smoothing: antialiased; /* Suavizado de fuentes en WebKit */
+  -moz-osx-font-smoothing: grayscale;  /* Suavizado de fuentes en Firefox */
+}
+
+/* ===== COMPONENTE TARJETA BENTO ===== */
+/* Tarjeta base con estilo Bento */
+.bento-card {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--color-border-light);
+  transition: var(--transition);
+  
+  /* Efecto hover con elevación */
+  &:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px); /* Efecto de levantamiento */
+  }
+}
+
+/* Variaciones de tamaño de tarjetas */
+.bento-card-large {
+  padding: var(--spacing-xl); /* Padding grande */
+}
+
+.bento-card-medium {
+  padding: var(--spacing-lg); /* Padding medio */
+}
+
+.bento-card-small {
+  padding: var(--spacing-md); /* Padding pequeño */
+}
+
+/* ===== ESTILOS DE BOTONES - BENTO ===== */
+/* Botón base con flexbox y estilos comunes */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+  
+  /* Estado deshabilitado */
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+/* Botón principal (color primario) */
+.btn-primary {
+  background: var(--color-primary);
+  color: white;
+  
+  &:hover:not(:disabled) {
+    background: var(--color-primary-dark);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-lg);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+/* Botón secundario (con borde) */
+.btn-secondary {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  
+  &:hover:not(:disabled) {
+    background: var(--color-surface-dark);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+}
+
+/* Botón fantasma (sin fondo) */
+.btn-ghost {
+  background: transparent;
+  color: var(--color-text-secondary);
+  
+  &:hover:not(:disabled) {
+    background: var(--color-surface-dark);
+    color: var(--color-primary);
+  }
+}
+
+/* Variaciones de tamaño de botones */
+.btn-sm {
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: var(--font-size-sm);
+}
+
+.btn-lg {
+  padding: var(--spacing-lg) var(--spacing-xl);
+  font-size: var(--font-size-lg);
+}
+
+/* ===== ESTILOS DE INPUTS - BENTO ===== */
+/* Grupo contenedor de input con label */
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+/* Etiqueta del input */
+.input-label {
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+/* Campo de entrada base */
+.input-field {
+  padding: var(--spacing-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  background: var(--color-surface);
+  transition: var(--transition);
+  
+  /* Estado de foco */
+  &:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+  }
+  
+  /* Placeholder */
+  &::placeholder {
+    color: var(--color-text-muted);
+  }
+  
+  /* Estado deshabilitado */
+  &:disabled {
+    background: var(--color-surface-dark);
+    opacity: 0.7;
+  }
+}
+
+/* Input con error */
+.input-error {
+  border-color: var(--color-error);
+  
+  &:focus {
+    border-color: var(--color-error);
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+  }
+}
+
+/* Texto de error */
+.input-error-text {
+  font-size: var(--font-size-xs);
+  color: var(--color-error);
+  margin-top: var(--spacing-xs);
+}
+
+/* ===== SPINNER DE CARGA ===== */
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* Animación de rotación */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ===== BOTÓN VOLVER AL INICIO ===== */
+/* Botón para navegar de vuelta a la página principal desde auth */
+.back-to-home {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  border-radius: var(--radius-md);
+  transition: var(--transition);
+  margin-bottom: var(--spacing-md);
+  
+  /* Ícono de flecha hacia atrás */
+  .back-icon {
+    font-size: var(--font-size-lg);
+    transition: var(--transition);
+  }
+  
+  /* Efecto hover */
+  &:hover {
+    color: var(--color-primary);
+    background: var(--color-surface-dark);
+    
+    .back-icon {
+      transform: translateX(-2px); /* Movimiento de la flecha */
+    }
+  }
+  
+  /* Efecto activo */
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+/* Responsive para móviles */
+@media (max-width: 768px) {
+  .back-to-home {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--font-size-xs);
+  }
+}
+
+/* ===== RESPONSIVE ===== */
+/* Estilos para dispositivos móviles */
+@media (max-width: 768px) {
+  .bento-card-large {
+    padding: var(--spacing-lg);
+  }
+  
+  .bento-card-medium {
+    padding: var(--spacing-md);
+  }
+  
+  .btn {
+    width: 100%;
+  }
+}
+
+/* ===== CLASES UTILITARIAS ===== */
+/* Alineación de texto */
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+
+/* Peso de fuente */
+.font-light { font-weight: 300; }
+.font-normal { font-weight: 400; }
+.font-medium { font-weight: 500; }
+.font-semibold { font-weight: 600; }
+.font-bold { font-weight: 700; }
+
+/* Tamaños de texto */
+.text-xs { font-size: var(--font-size-xs); }
+.text-sm { font-size: var(--font-size-sm); }
+.text-base { font-size: var(--font-size-base); }
+.text-lg { font-size: var(--font-size-lg); }
+.text-xl { font-size: var(--font-size-xl); }
+.text-2xl { font-size: var(--font-size-2xl); }
+.text-3xl { font-size: var(--font-size-3xl); }
+.text-4xl { font-size: var(--font-size-4xl); }
+
+/* Colores de texto */
+.text-primary { color: var(--color-primary); }
+.text-secondary { color: var(--color-text-secondary); }
+.text-muted { color: var(--color-text-muted); }
+.text-error { color: var(--color-error); }
+.text-success { color: var(--color-success); }
+
+/* Márgenes inferiores */
+.mb-xs { margin-bottom: var(--spacing-xs); }
+.mb-sm { margin-bottom: var(--spacing-sm); }
+.mb-md { margin-bottom: var(--spacing-md); }
+.mb-lg { margin-bottom: var(--spacing-lg); }
+.mb-xl { margin-bottom: var(--spacing-xl); }
+
+/* Márgenes superiores */
+.mt-xs { margin-top: var(--spacing-xs); }
+.mt-sm { margin-top: var(--spacing-sm); }
+.mt-md { margin-top: var(--spacing-md); }
+.mt-lg { margin-top: var(--spacing-lg); }
+.mt-xl { margin-top: var(--spacing-xl); }
+
+/* Dimensiones */
+.w-full { width: 100%; }
+.h-full { height: 100%; }
+.min-h-screen { min-height: 100vh; }
+
+/* Flexbox */
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.gap-sm { gap: var(--spacing-sm); }
+.gap-md { gap: var(--spacing-md); }
+.gap-lg { gap: var(--spacing-lg); }

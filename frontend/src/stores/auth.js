@@ -3,79 +3,78 @@ import api from '@/services/api'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    user: null,
-    token: localStorage.getItem('access_token'),
-    isAuthenticated: false,
-    loading: false
+    usuarioActual: null,
+    tokenAcceso: localStorage.getItem('access_token'),
+    estaAutenticado: false,
+    cargandoDatos: false
   }),
 
   getters: {
-    isCreator: (state) => state.user?.role === 'creator',
-    isFollower: (state) => state.user?.role === 'follower',
-    userRole: (state) => state.user?.role
+    esCreador: (state) => state.usuarioActual?.role === 'creator',
+    esSeguidor: (state) => state.usuarioActual?.role === 'follower',
+    rolUsuario: (state) => state.usuarioActual?.role
   },
-
   actions: {
-    async login(credentials) {
-      this.loading = true
+    async iniciarSesion(credenciales) {
+      this.cargandoDatos = true
       try {
-        const response = await api.post('/auth/login', credentials)
-        const { access_token } = response.data
+        const respuesta = await api.post('/auth/login', credenciales)
+        const { access_token } = respuesta.data
         
-        this.token = access_token
+        this.tokenAcceso = access_token
         localStorage.setItem('access_token', access_token)
         
         // Obtener información del usuario
-        await this.fetchUserProfile()
+        await this.obtenerPerfilUsuario()
         
-        this.isAuthenticated = true
+        this.estaAutenticado = true
         return { success: true }
-      } catch (error) {
+      } catch (errorRespuesta) {
         return { 
           success: false, 
-          error: error.response?.data?.error || 'Error de conexión' 
+          error: errorRespuesta.response?.data?.error || 'Error de conexión' 
         }
       } finally {
-        this.loading = false
+        this.cargandoDatos = false
       }
     },
 
-    async register(userData) {
-      this.loading = true
+    async registrarUsuario(datosUsuario) {
+      this.cargandoDatos = true
       try {
-        await api.post('/auth/register', userData)
+        await api.post('/auth/register', datosUsuario)
         return { success: true }
-      } catch (error) {
+      } catch (errorRespuesta) {
         return { 
           success: false, 
-          error: error.response?.data?.error || 'Error de registro' 
+          error: errorRespuesta.response?.data?.error || 'Error de registro' 
         }
       } finally {
-        this.loading = false
+        this.cargandoDatos = false
       }
     },
 
-    async fetchUserProfile() {
+    async obtenerPerfilUsuario() {
       try {
-        const response = await api.get('/user/profile')
-        this.user = response.data
-        this.isAuthenticated = true
-      } catch (error) {
-        this.logout()
+        const respuesta = await api.get('/user/profile')
+        this.usuarioActual = respuesta.data
+        this.estaAutenticado = true
+      } catch (errorRespuesta) {
+        this.cerrarSesion()
       }
     },
 
-    logout() {
-      this.user = null
-      this.token = null
-      this.isAuthenticated = false
+    cerrarSesion() {
+      this.usuarioActual = null
+      this.tokenAcceso = null
+      this.estaAutenticado = false
       localStorage.removeItem('access_token')
     },
 
     // Inicializar store al cargar la app
-    async initialize() {
-      if (this.token) {
-        await this.fetchUserProfile()
+    async inicializar() {
+      if (this.tokenAcceso) {
+        await this.obtenerPerfilUsuario()
       }
     }
   }

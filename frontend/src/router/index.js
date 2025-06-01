@@ -3,16 +3,7 @@ import { useAuthStore } from '@/stores/auth'
 
 // Vistas principales
 import HomeView from '@/views/HomeView.vue'
-import LoginView from '@/views/auth/LoginView.vue'
-import RegisterView from '@/views/auth/RegisterView.vue'
-
-// Vistas del Creator
-import CreatorDashboard from '@/views/creator/DashboardView.vue'
-import CreatorProfile from '@/views/creator/ProfileView.vue'
-
-// Vistas del Follower
-import FollowerFeed from '@/views/follower/FeedView.vue'
-import ExploreCreators from '@/views/follower/ExploreView.vue'
+import AboutView from '@/views/AboutView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -23,44 +14,21 @@ const router = createRouter({
       component: HomeView
     },
     {
+      path: '/about',
+      name: 'about',
+      component: AboutView
+    },
+    {
       path: '/login',
       name: 'login',
-      component: LoginView,
+      component: () => import('@/views/auth/LoginView.vue'),
       meta: { requiresGuest: true }
     },
     {
       path: '/register',
       name: 'register',
-      component: RegisterView,
+      component: () => import('@/views/auth/RegisterView.vue'),
       meta: { requiresGuest: true }
-    },
-    
-    // Rutas del Creator
-    {
-      path: '/creator/dashboard',
-      name: 'creator-dashboard',
-      component: CreatorDashboard,
-      meta: { requiresAuth: true, role: 'creator' }
-    },
-    {
-      path: '/creator/profile',
-      name: 'creator-profile',
-      component: CreatorProfile,
-      meta: { requiresAuth: true, role: 'creator' }
-    },
-    
-    // Rutas del Follower
-    {
-      path: '/feed',
-      name: 'follower-feed',
-      component: FollowerFeed,
-      meta: { requiresAuth: true, role: 'follower' }
-    },
-    {
-      path: '/explore',
-      name: 'explore-creators',
-      component: ExploreCreators,
-      meta: { requiresAuth: true, role: 'follower' }
     }
   ]
 })
@@ -70,22 +38,17 @@ router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
   
   // Inicializar store si hay token
-  if (!authStore.isAuthenticated && authStore.token) {
-    await authStore.initialize()
+  if (!authStore.estaAutenticado && authStore.tokenAcceso) {
+    await authStore.inicializar()
   }
   
   const requiresAuth = to.meta.requiresAuth
   const requiresGuest = to.meta.requiresGuest
-  const requiredRole = to.meta.role
   
-  if (requiresAuth && !authStore.isAuthenticated) {
+  if (requiresAuth && !authStore.estaAutenticado) {
     next('/login')
-  } else if (requiresGuest && authStore.isAuthenticated) {
-    // Redirigir según el rol
-    const redirectPath = authStore.isCreator ? '/creator/dashboard' : '/feed'
-    next(redirectPath)
-  } else if (requiredRole && authStore.userRole !== requiredRole) {
-    // Rol incorrecto
+  } else if (requiresGuest && authStore.estaAutenticado) {
+    // Redirigir a home si ya está autenticado
     next('/')
   } else {
     next()

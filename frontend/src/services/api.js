@@ -12,28 +12,28 @@ const api = axios.create({
 
 // Interceptor para agregar token automáticamente
 api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('access_token')
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
+  (configuracion) => {
+    const tokenAcceso = localStorage.getItem('access_token')
+    if (tokenAcceso) {
+      configuracion.headers.Authorization = `Bearer ${tokenAcceso}`
     }
-    return config
+    return configuracion
   },
-  (error) => {
-    return Promise.reject(error)
+  (errorRespuesta) => {
+    return Promise.reject(errorRespuesta)
   }
 )
 
 // Interceptor para manejar errores de autenticación
 api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
+  (respuesta) => respuesta,
+  (errorRespuesta) => {
+    if (errorRespuesta.response?.status === 401) {
       // Token expirado o inválido
       localStorage.removeItem('access_token')
       window.location.href = '/login'
     }
-    return Promise.reject(error)
+    return Promise.reject(errorRespuesta)
   }
 )
 
