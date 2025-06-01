@@ -58,26 +58,26 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--spacing-lg);
+  padding: var(--spacing-md); /* Reducimos padding para más espacio */
 }
 
 /* Contenedor principal con diseño en grid de dos columnas */
 .auth-container {
-  background: var(--color-surface);
+  background: var(--fondo-tarjeta);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-xl);
-  border: 1px solid var(--color-border-light);
+  border: 1px solid var(--borde-claro);
   overflow: hidden;
   display: grid;
   grid-template-columns: 1fr 1fr; /* Dos columnas iguales */
-  max-width: 1000px;
+  max-width: 1100px; /* Aumentamos el ancho máximo del contenedor */
   width: 100%;
   min-height: 600px;
 }
 
 /* Sección de branding con gradiente púrpura */
 .auth-branding {
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+  background: linear-gradient(135deg, var(--morado-principal) 0%, var(--morado-hover) 100%);
   color: white;
   padding: var(--spacing-2xl);
   display: flex;
@@ -169,10 +169,11 @@
   justify-content: center;
 }
 
-/* Contenedor del formulario con ancho máximo */
+/* Contenedor del formulario con ancho máximo mejorado */
 .auth-form-container {
   width: 100%;
-  max-width: 400px; /* Limitamos el ancho para mejor legibilidad */
+  max-width: 480px; /* Aumentamos el ancho para mejor usabilidad con form-row */
+  padding: 0 var(--spacing-sm); /* Añadimos padding interno para evitar overflow */
 }
 
 /* Animación flotante para el efecto de fondo */
@@ -191,7 +192,8 @@
   /* Cambiar a una sola columna en móviles */
   .auth-container {
     grid-template-columns: 1fr;
-    max-width: 400px;
+    max-width: 480px; /* Ancho más amplio en móvil */
+    margin: 0 var(--spacing-md); /* Márgenes laterales en móvil */
   }
 
   /* Reducir padding y altura del branding */

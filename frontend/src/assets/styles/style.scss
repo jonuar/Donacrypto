@@ -391,4 +391,90 @@ body {
 .justify-between { justify-content: space-between; }
 .gap-sm { gap: var(--spacing-sm); }
 .gap-md { gap: var(--spacing-md); }
-.gap-lg { gap: var(--spacing-lg); }
+
+/* ===== VARIABLES EN ESPAÑOL PARA COMPATIBILIDAD ===== */
+/* Variables adicionales con nombres intuitivos en español */
+:root {
+  /* === COLORES BASE === */
+  --fondo-aplicacion: var(--color-background);     /* Fondo principal */
+  --fondo-tarjeta: var(--color-surface);           /* Fondo de tarjetas */
+  --fondo-suave: var(--color-surface-dark);        /* Fondo suave */
+  
+  /* === COLORES MORADO PRINCIPAL === */
+  --morado-principal: var(--color-primary);        /* Morado principal */
+  --morado-hover: var(--color-primary-dark);       /* Morado hover */
+  --morado-claro: var(--color-primary-light);      /* Morado claro */
+  
+  /* === COLORES DE TEXTO === */
+  --texto-principal: var(--color-text);            /* Texto principal */
+  --texto-secundario: var(--color-text-secondary); /* Texto secundario */
+  --texto-deshabilitado: var(--color-text-muted);  /* Texto deshabilitado */
+  
+  /* === COLORES DE BORDE === */
+  --borde-suave: var(--color-border);              /* Borde suave */
+  --borde-claro: var(--color-border-light);        /* Borde claro */
+  
+  /* === COLORES DE ESTADO === */
+  --verde-exito: var(--color-success);             /* Verde éxito */
+  --rojo-error: var(--color-error);                /* Rojo error */
+  --amarillo-advertencia: var(--color-warning);    /* Amarillo advertencia */
+}
+
+/* ===== SOLUCIÓN ESPECÍFICA PARA INPUTS EN GRID ===== */
+/* Estilos para formularios con layout de grid (nombre y apellido en fila) */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+  width: 100%;
+}
+
+.form-row .input-group {
+  width: 100%;
+  min-width: 0; /* Importante: permite que el input se contraiga */
+}
+
+.form-row .input-field {
+  width: 100%;
+  min-width: 0; /* Importante: permite que el input se contraiga */
+  box-sizing: border-box;
+}
+
+/* Asegurar que los inputs en grid no se desborden */
+.form-row .input-group:nth-child(1) .input-field,
+.form-row .input-group:nth-child(2) .input-field {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Para móviles, convertir el grid a columna única */
+@media (max-width: 768px) {
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+  }
+}
+
+/* ===== CONTENEDOR DE FORMULARIO DE AUTENTICACIÓN ===== */
+/* Asegurar que el contenedor padre tenga el ancho correcto */
+.auth-form-container {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.register-form,
+.login-form {
+  width: 100%;
+}
+
+.register-form .form,
+.login-form .form {
+  width: 100%;
+}
+
+.register-form .form .input-group,
+.login-form .form .input-group {
+  width: 100%;
+}

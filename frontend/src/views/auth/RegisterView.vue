@@ -400,7 +400,7 @@ export default {
 
 .form-row {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  // grid-template-columns: 1fr 1fr;
   gap: var(--spacing-md);
 }
 
