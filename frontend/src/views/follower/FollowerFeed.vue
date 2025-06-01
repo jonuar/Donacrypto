@@ -229,10 +229,20 @@ export default {
         }
       }
     }
-
+    
     const formatearTiempo = (fecha) => {
+      if (!fecha) {
+        return 'Fecha no disponible'
+      }
+      
       const ahora = new Date()
       const fechaPost = new Date(fecha)
+      
+      // Verificar si la fecha es válida
+      if (isNaN(fechaPost.getTime())) {
+        return 'Fecha inválida'
+      }
+      
       const diff = ahora - fechaPost
       
       const minutos = Math.floor(diff / (1000 * 60))

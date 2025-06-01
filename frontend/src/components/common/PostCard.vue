@@ -72,11 +72,20 @@ export default {
       default: false
     }
   },
-  emits: ['delete', 'like'],
-  methods: {
+  emits: ['delete', 'like'],  methods: {
     formatearFecha(fecha) {
+      if (!fecha) {
+        return 'Fecha no disponible'
+      }
+      
       const now = new Date()
       const postDate = new Date(fecha)
+      
+      // Verificar si la fecha es válida
+      if (isNaN(postDate.getTime())) {
+        return 'Fecha inválida'
+      }
+      
       const diffTime = Math.abs(now - postDate)
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
       

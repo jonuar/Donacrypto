@@ -32,8 +32,8 @@ export default {
     const usuario = computed(() => authStore.usuarioActual)
     
     const logout = async () => {
-      await authStore.logout()
-      router.push('/login')
+      await authStore.cerrarSesion()
+      router.push('/')
     }
     
     return {

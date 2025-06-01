@@ -16,6 +16,35 @@ user_bp = Blueprint("user_bp", __name__)
 
 # FUNCIONES AUXILIARES
 
+def convert_bson_dates_to_iso(data):
+    """Convierte fechas BSON de MongoDB a strings ISO para JSON"""
+    if isinstance(data, dict):
+        if "$date" in data:
+            # Es una fecha BSON, convertir a ISO string
+            return data["$date"]
+        else:
+            # Es un diccionario normal, procesar recursivamente
+            return {key: convert_bson_dates_to_iso(value) for key, value in data.items()}
+    elif isinstance(data, list):
+        # Es una lista, procesar cada elemento
+        return [convert_bson_dates_to_iso(item) for item in data]
+    elif isinstance(data, datetime):
+        # Es un objeto datetime de Python
+        return data.isoformat() + "Z"
+    else:
+        # Es un valor primitivo, retornar tal como está
+        return data
+
+def process_post_for_json(post_dict):
+    """Procesa un post para serialización JSON correcta"""
+    # Convertir ObjectId a string
+    post_dict["_id"] = str(post_dict["_id"])
+    
+    # Convertir fechas BSON a ISO strings
+    post_dict = convert_bson_dates_to_iso(post_dict)
+    
+    return post_dict
+
 def find_by_email(email: str) -> Optional[Dict[str, Any]]:
     """
     Busca un usuario por su correo electrónico en la base de datos
@@ -227,8 +256,7 @@ def follower_feed() -> Tuple[Any, int]:
                 "pages": 0,
                 "total": 0
             }), 200
-            
-        # Obtener posts de los creadores seguidos
+              # Obtener posts de los creadores seguidos
         total_posts = mongo.db.posts.count_documents({"creator_email": {"$in": creator_emails}})
         
         posts_cursor = mongo.db.posts.find({"creator_email": {"$in": creator_emails}}) \
@@ -238,20 +266,21 @@ def follower_feed() -> Tuple[Any, int]:
         
         posts: List[Dict[str, Any]] = []
         for post in posts_cursor:
-            # Convertir ObjectId a string para serialización JSON
-            post["_id"] = str(post["_id"])
+            # Convertir fechas y ObjectId para JSON
+            post_dict = dict(post)
+            post_dict = process_post_for_json(post_dict)
             
             # Obtener información básica del creador
             creator = mongo.db.users.find_one(
-                {"email": post["creator_email"]},
+                {"email": post_dict["creator_email"]},
                 {"_id": 0, "username": 1, "avatar_url": 1}
             )
             
             if creator:
-                post["creator_username"] = creator["username"]
-                post["creator_avatar"] = creator.get("avatar_url", "")
+                post_dict["creator_username"] = creator["username"]
+                post_dict["creator_avatar"] = creator.get("avatar_url", "")
                 
-            posts.append(post)
+            posts.append(post_dict)
             
         return jsonify({
             "posts": posts,
@@ -708,12 +737,11 @@ def get_creator_posts(username: str) -> Tuple[Any, int]:
 
         # Obtener posts del creador - CORREGIDO: creator_email en lugar de author_email
         posts_cursor = mongo.db.posts.find({"creator_email": email}).sort("created_at", -1).skip(skip).limit(limit)
-        
-        # Convertir el cursor a lista y formatear ObjectId - CORREGIDO: manipulación correcta
+          # Convertir el cursor a lista y formatear ObjectId - CORREGIDO: manipulación correcta
         posts: List[Dict[str, Any]] = []
         for post in posts_cursor:
             post_dict = dict(post)
-            post_dict["_id"] = str(post_dict["_id"])
+            post_dict = process_post_for_json(post_dict)
             posts.append(post_dict)
         
         return jsonify({

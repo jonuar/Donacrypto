@@ -4,6 +4,9 @@ from .extensions import mongo, jwt
 import logging
 from dotenv import load_dotenv
 import os
+import json
+from datetime import datetime
+from bson import ObjectId
 
 load_dotenv()
 
@@ -16,6 +19,19 @@ logger = logging.getLogger(__name__)
 
 def create_app():
     app = Flask(__name__)
+
+    # Configurar encoder JSON personalizado para manejar datetime y ObjectId
+    from flask.json.provider import DefaultJSONProvider
+    
+    class CustomJSONProvider(DefaultJSONProvider):
+        def default(self, obj):
+            if isinstance(obj, datetime):
+                return obj.isoformat()
+            if isinstance(obj, ObjectId):
+                return str(obj)
+            return super().default(obj)
+    
+    app.json = CustomJSONProvider(app)
 
     # Config seguridad
     app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "clave-secreta-development") #Quitar segundo parámetro para producción

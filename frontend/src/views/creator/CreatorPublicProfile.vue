@@ -228,9 +228,20 @@ export default {
         toast.error('No se pudo copiar la dirección')
       }
     }
-
+    
     const formatearFecha = (fecha) => {
-      return new Date(fecha).toLocaleDateString('es-ES', {
+      if (!fecha) {
+        return 'Fecha no disponible'
+      }
+      
+      const postDate = new Date(fecha)
+      
+      // Verificar si la fecha es válida
+      if (isNaN(postDate.getTime())) {
+        return 'Fecha inválida'
+      }
+      
+      return postDate.toLocaleDateString('es-ES', {
         year: 'numeric',
         month: 'long',
         day: 'numeric'
