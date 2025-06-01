@@ -130,11 +130,10 @@
         </section>
 
         <!-- Gestión de Perfil -->
-        <section class="dashboard-section">
-          <div class="section-header">
+        <section class="dashboard-section">          <div class="section-header">
             <h2 class="section-title">Mi Perfil</h2>
             <button @click="toggleEditarPerfil" class="btn btn-secondary btn-sm">
-              {{ editandoPerfil ? 'Cancelar' : 'Editar' }}
+              Editar
             </button>
           </div>
           
@@ -178,11 +177,9 @@
             
             <div v-if="erroresFormulario.general" class="error-message">
               {{ erroresFormulario.general }}
-            </div>
-            
-            <div class="form-actions">
-              <button type="submit" :disabled="editandoPerfil" class="btn btn-primary">
-                {{ editandoPerfil ? 'Guardando...' : 'Guardar Cambios' }}
+            </div>            <div class="form-actions">
+              <button type="submit" :disabled="cargandoPerfil" class="btn btn-primary">
+                {{ cargandoPerfil ? 'Guardando...' : 'Guardar Cambios' }}
               </button>
               <button type="button" @click="cancelarEdicionPerfil" class="btn btn-outline">
                 Cancelar
@@ -333,14 +330,13 @@ export default {
       username: '',
       bio: '',
       avatar_url: ''
-    })
-
-    // Computed properties
+    })    // Computed properties
     const estadisticas = computed(() => dashboardStore.estadisticas)
     const donaciones = computed(() => dashboardStore.donaciones)
     const wallets = computed(() => dashboardStore.wallets)
     const cargandoDatos = computed(() => dashboardStore.cargandoDatos)
     const cargandoWallets = computed(() => dashboardStore.cargandoWallets)
+    const cargandoPerfil = computed(() => dashboardStore.editandoPerfil)
     const erroresFormulario = computed(() => dashboardStore.erroresFormulario)
     const usuarioActual = computed(() => authStore.usuarioActual)
     const monedasSoportadas = computed(() => dashboardStore.monedasSoportadas)
@@ -499,13 +495,13 @@ export default {
       walletFormulario,
       editandoPerfil,
       perfilFormulario,
-      
-      // Computed
+        // Computed
       estadisticas,
       donaciones,
       wallets,
       cargandoDatos,
       cargandoWallets,
+      cargandoPerfil,
       erroresFormulario,
       usuarioActual,
       monedasDisponibles,
