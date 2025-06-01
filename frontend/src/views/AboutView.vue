@@ -7,6 +7,9 @@
           <span class="brand-text">Decentralized Donations</span>
         </router-link>
         <div class="nav-actions">
+          <router-link to="/dashboard" v-if="authStore?.estaAutenticado && authStore?.esCreador" class="btn btn-secondary">
+            Mi Dashboard
+          </router-link>
           <router-link to="/" class="btn btn-ghost">Volver al Inicio</router-link>
         </div>
       </div>
@@ -31,6 +34,21 @@
     </main>
   </div>
 </template>
+
+<script>
+import { useAuthStore } from '@/stores/auth'
+
+export default {
+  name: 'AboutView',
+  setup() {
+    const authStore = useAuthStore()
+    
+    return {
+      authStore
+    }
+  }
+}
+</script>
 
 <style lang="scss" scoped>
 .about-page {

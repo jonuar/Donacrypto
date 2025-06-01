@@ -13,6 +13,9 @@
           <router-link v-if="!authStore.estaAutenticado" to="/register" class="btn btn-primary">
             Registrarse
           </router-link>
+          <router-link v-if="authStore.estaAutenticado && authStore.esCreador" to="/dashboard" class="btn btn-secondary">
+            Mi Dashboard
+          </router-link>
           <button v-if="authStore.estaAutenticado" @click="handleLogout" class="btn btn-ghost">
             Cerrar Sesión
           </button>

@@ -160,7 +160,7 @@ export default {
           
           // Redirigir según el rol del usuario
           if (authStore.esCreador) {
-            router.push('/creator/dashboard')
+            router.push('/dashboard')
           } else if (authStore.esSeguidor) {
             router.push('/feed')
           } else {

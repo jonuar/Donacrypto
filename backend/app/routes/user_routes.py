@@ -567,6 +567,61 @@ def creator_dashboard() -> Tuple[Any, int]:
         return jsonify({"error": "Error al obtener el panel del creador"}), 500
     
 
+@user_bp.route("/creator/followers", methods=["GET"])
+@role_required("creator")
+def get_creator_followers() -> Tuple[Any, int]:
+    """
+    Obtiene la lista de seguidores del creador autenticado
+    
+    Requiere: JWT válido en cabecera, rol creator
+    Retorna: lista de seguidores con información básica
+    """
+    try:
+        creator_email: str = get_jwt_identity()
+        
+        # Paginación
+        page: int = int(request.args.get("page", 1))
+        limit: int = int(request.args.get("limit", 20))
+        skip: int = (page - 1) * limit
+        
+        # Obtener total de seguidores
+        total_followers = mongo.db.followings.count_documents({"creator_email": creator_email})
+        
+        # Obtener emails de seguidores con paginación
+        followers_cursor = mongo.db.followings.find(
+            {"creator_email": creator_email},
+            {"_id": 0, "follower_email": 1, "created_at": 1}
+        ).sort("created_at", -1).skip(skip).limit(limit)
+        
+        followers_data = list(followers_cursor)
+        
+        # Obtener información de los usuarios seguidores
+        followers_list = []
+        for follow_record in followers_data:
+            follower = mongo.db.users.find_one(
+                {"email": follow_record["follower_email"]},
+                {"_id": 0, "email": 0, "password": 0, "role": 0}  # Excluir información sensible
+            )
+            if follower:
+                followers_list.append({
+                    "username": follower.get("username", "Usuario"),
+                    "avatar_url": follower.get("avatar_url", ""),
+                    "followed_at": follow_record["created_at"]
+                })
+        
+        return jsonify({
+            "followers": followers_list,
+            "page": page,
+            "limit": limit,
+            "total": total_followers,
+            "pages": (total_followers + limit - 1) // limit
+        }), 200
+        
+    except Exception as e:
+        current_app.logger.error(f"[get_creator_followers] Error: {e}")
+        return jsonify({"error": "Error al obtener los seguidores"}), 500
+
+
 @user_bp.route("/creator/update-profile", methods=["PUT"])
 @role_required("creator")
 def update_creator_profile() -> Tuple[Any, int]:

@@ -29,6 +29,12 @@ const router = createRouter({
       name: 'register',
       component: () => import('@/views/auth/RegisterView.vue'),
       meta: { requiresGuest: true }
+    },
+    {
+      path: '/dashboard',
+      name: 'dashboard',
+      component: () => import('@/views/creator/CreatorDashboard.vue'),
+      meta: { requiresAuth: true, role: 'creator' }
     }
   ]
 })
@@ -44,11 +50,15 @@ router.beforeEach(async (to, from, next) => {
   
   const requiresAuth = to.meta.requiresAuth
   const requiresGuest = to.meta.requiresGuest
+  const requiredRole = to.meta.role
   
   if (requiresAuth && !authStore.estaAutenticado) {
     next('/login')
   } else if (requiresGuest && authStore.estaAutenticado) {
     // Redirigir a home si ya está autenticado
+    next('/')
+  } else if (requiredRole && authStore.usuarioActual?.role !== requiredRole) {
+    // Verificar rol específico
     next('/')
   } else {
     next()

@@ -70,3 +70,9 @@ def create_app():
 # {
 #   "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc0ODQ3ODUzMCwianRpIjoiNjhmM2Q5M2YtZTc2Yy00ZDQ2LTkxZDYtYWQxM2IzNGIxMmRjIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6Impvc2h1YW51bmV6YXJjaWxhQGdtYWlsLmNvbSIsIm5iZiI6MTc0ODQ3ODUzMCwiY3NyZiI6IjI0MmJmODBhLTA3ZjAtNGJiNS1hMjViLTk5Y2FjZTFjYjQ4YSIsImV4cCI6MTc0ODU2NDkzMCwicm9sZSI6ImZvbGxvd2VyIn0.Yc3o3fuen2Xnc-IiRw-Rh1KakQrUiPtX85M1C_4Ytow"
 # }
+
+
+# Creator: 
+# email: nunezarcilajoshua@gmail.com
+# username: hungry_artist
+# password: password123
