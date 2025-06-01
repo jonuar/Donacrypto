@@ -6,17 +6,23 @@ export const useDashboardStore = defineStore('dashboard', {
     // Estado de carga
     cargandoDatos: false,
     cargandoWallets: false,
-    cargandoSeguidores: false,
-      // Datos del dashboard
+    cargandoSeguidores: false,    // Datos del dashboard
     estadisticas: {
       followers_count: 0,
       posts_count: 0
     },
     wallets: [],
-    seguidores: [],
+    seguidores: [],    posts: [],
+    
+    // Paginación de posts
+    paginaActualPosts: 1,
+    totalPostsPaginas: 0,
+    totalPostsCount: 0,
+    postsPorPagina: 5,
     
     // Estado del perfil
     editandoPerfil: false,
+    cargandoPosts: false,
     erroresFormulario: {}
   }),
 
@@ -209,14 +215,13 @@ export const useDashboardStore = defineStore('dashboard', {
     // Limpiar errores del formulario
     limpiarErrores() {
       this.erroresFormulario = {}
-    },
-
-    // Inicializar dashboard (cargar todos los datos)
+    },    // Inicializar dashboard (cargar todos los datos)
     async inicializarDashboard() {
       const resultados = await Promise.allSettled([
         this.obtenerDatosDashboard(),
         this.obtenerWallets(),
-        this.obtenerSeguidores()
+        this.obtenerSeguidores(),
+        this.obtenerPosts()
       ])
 
       // Verificar si alguna falló
@@ -227,6 +232,84 @@ export const useDashboardStore = defineStore('dashboard', {
       }
 
       return { success: true }
+    },
+
+    // GESTIÓN DE POSTS    // Obtener posts del creador
+    async obtenerPosts(page = 1) {
+      this.cargandoPosts = true
+      try {
+        // Primero necesitamos obtener el username del usuario actual
+        const perfilResponse = await api.get('/user/profile')
+        const username = perfilResponse.data.username
+        
+        const respuesta = await api.get(`/user/creator/posts/${username}`, {
+          params: { 
+            page, 
+            limit: this.postsPorPagina 
+          }
+        })
+        
+        this.posts = respuesta.data.posts
+        this.paginaActualPosts = respuesta.data.page || page
+        this.totalPostsPaginas = respuesta.data.pages || Math.ceil(respuesta.data.total / this.postsPorPagina)
+        this.totalPostsCount = respuesta.data.total || respuesta.data.posts.length
+        
+        return { success: true }
+      } catch (error) {
+        console.error('Error al obtener posts:', error)
+        return { 
+          success: false, 
+          error: error.response?.data?.error || 'Error al cargar posts' 
+        }
+      } finally {
+        this.cargandoPosts = false
+      }
+    },
+
+    // Cargar página específica de posts
+    async cargarPaginaPosts(page) {
+      return await this.obtenerPosts(page)
+    },
+
+    // Crear nuevo post
+    async crearPost(datosPost) {
+      this.cargandoPosts = true
+      this.erroresFormulario = {}
+      try {
+        await api.post('/user/creator/create-post', datosPost)
+        await this.obtenerPosts() // Recargar lista
+        await this.obtenerDatosDashboard() // Actualizar estadísticas
+        return { success: true }
+      } catch (error) {
+        const errorResponse = error.response?.data
+        if (errorResponse?.error) {
+          this.erroresFormulario.general = errorResponse.error
+        }
+        return { 
+          success: false, 
+          error: errorResponse?.error || 'Error al crear post' 
+        }
+      } finally {
+        this.cargandoPosts = false
+      }
+    },
+
+    // Eliminar post
+    async eliminarPost(postId) {
+      this.cargandoPosts = true
+      try {
+        await api.delete(`/user/creator/delete-post/${postId}`)
+        await this.obtenerPosts() // Recargar lista
+        await this.obtenerDatosDashboard() // Actualizar estadísticas
+        return { success: true }
+      } catch (error) {
+        return { 
+          success: false, 
+          error: error.response?.data?.error || 'Error al eliminar post' 
+        }
+      } finally {
+        this.cargandoPosts = false
+      }
     }
   }
 })

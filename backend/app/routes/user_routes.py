@@ -529,35 +529,26 @@ def public_creator_profile(username: str) -> Tuple[Any, int]:
         current_app.logger.error(f"[public_creator_profile] Error: {e}")
         return jsonify({"error": "Error al obtener el perfil"}), 500
     
-# TODO ARREGLAR DATOS DE DASHBOARD
+# RUTAS PARA CREADORES
+
 @user_bp.route("/creator/dashboard", methods=["GET"])
 @role_required("creator")
 def creator_dashboard() -> Tuple[Any, int]:
-    """Panel del creador: ver donaciones y estadísticas"""
+    """
+    Panel del creador: estadísticas de seguidores y posts
+    
+    Requiere: JWT válido en cabecera, rol creator
+    Retorna: estadísticas del creador (seguidores, posts)
+    """
     try:
         email: str = get_jwt_identity()
 
-        # Obtener donaciones recibidas
-        donations = list(mongo.db.donations.find(
-            {"receiver_email": email},
-            {"_id": 0}
-        ))
-
-        # Calcular estadísticas
-        total_amount: float = sum(d.get("amount", 0) for d in donations)
-        total_donations: int = len(donations)
-
-        # Incluir:
-        # - Número de seguidores
+        # Estadísticas del creador
         followers_count: int = mongo.db.followings.count_documents({"creator_email": email})
-        # - Posts publicados
         posts_count: int = mongo.db.posts.count_documents({"creator_email": email})
 
         return jsonify({
-            "donations": donations,
             "stats": {
-                "total_donations": total_donations,
-                "total_received": total_amount,
                 "followers_count": followers_count,
                 "posts_count": posts_count
             }
@@ -1081,11 +1072,10 @@ def get_creator_donation_info(username: str) -> Tuple[Any, int]:
     Requiere: username del creador en la URL
     Retorna: información de donación, incluyendo wallets disponibles
     """
-    try:
-        # Buscar creador por username
+    try:        # Buscar creador por username
         creator = mongo.db.users.find_one(
             {"username": username, "role": "creator"},
-            {"_id": 0, "password": 0, "email": 1, "username": 1, "bio": 1, "avatar_url": 1}
+            {"_id": 0, "password": 0}  # Solo excluir campos sensibles
         )
         
         if not creator:

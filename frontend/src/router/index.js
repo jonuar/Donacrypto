@@ -35,6 +35,18 @@ const router = createRouter({
       name: 'dashboard',
       component: () => import('@/views/creator/CreatorDashboard.vue'),
       meta: { requiresAuth: true, role: 'creator' }
+    },
+    {
+      path: '/creator/:username',
+      name: 'creator-profile',
+      component: () => import('@/views/creator/CreatorPublicProfile.vue'),
+      props: true
+    },
+    {
+      path: '/feed',
+      name: 'feed',
+      component: () => import('@/views/follower/FollowerFeed.vue'),
+      meta: { requiresAuth: true, role: 'follower' }
     }
   ]
 })

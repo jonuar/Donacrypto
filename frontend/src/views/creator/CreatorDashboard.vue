@@ -227,6 +227,62 @@
             <p>Tienes {{ estadisticas.followers_count }} seguidores siguiendo tu contenido.</p>
             <!-- Lista de seguidores -->
           </div>
+        </section>
+
+        <!-- Gestión de Posts -->
+        <section class="dashboard-section posts-section">
+          <div class="section-header">
+            <h2 class="section-title">Mis Posts ({{ estadisticas.posts_count || 0 }})</h2>
+            <button @click="abrirFormularioPost" class="btn btn-primary btn-sm">
+              + Crear Post
+            </button>
+          </div>
+          
+          <div v-if="cargandoPosts" class="loading-container">
+            <div class="loading-spinner small"></div>
+            <p>Cargando posts...</p>
+          </div>
+          
+          <div v-else-if="posts.length === 0" class="empty-state">
+            <div class="empty-icon">📝</div>
+            <h3>No tienes posts publicados</h3>
+            <p>Crea tu primer post para empezar a compartir contenido con tus seguidores</p>
+            <button @click="abrirFormularioPost" class="btn btn-primary">
+              Crear Primer Post
+            </button>
+          </div>          <div v-else class="posts-list">
+            <PostCard 
+              v-for="post in posts" 
+              :key="post._id" 
+              :post="post"
+              :show-actions="true"
+              @delete="eliminarPost"
+            />
+            
+            <!-- Paginación de posts -->
+            <div v-if="totalPostsPaginas > 1" class="posts-pagination">
+              <button 
+                @click="cargarPaginaPosts(paginaActualPosts - 1)"
+                :disabled="paginaActualPosts === 1 || cargandoPosts"
+                class="btn btn-outline btn-sm"
+              >
+                ← Anterior
+              </button>
+              
+              <div class="page-info">
+                Página {{ paginaActualPosts }} de {{ totalPostsPaginas }}
+                <span class="posts-count">({{ totalPostsCount }} posts total)</span>
+              </div>
+              
+              <button 
+                @click="cargarPaginaPosts(paginaActualPosts + 1)"
+                :disabled="paginaActualPosts === totalPostsPaginas || cargandoPosts"
+                class="btn btn-outline btn-sm"
+              >
+                Siguiente →
+              </button>
+            </div>
+          </div>
         </section> 
       </div>
     </div>
@@ -278,6 +334,54 @@
             </button>
             <button type="button" @click="cerrarFormularioWallet" class="btn btn-outline">
               Cancelar
+            </button>          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal para Crear Post -->
+    <div v-if="mostrarFormularioPost" class="modal-overlay" @click="cerrarFormularioPost">
+      <div class="modal-content" @click.stop>
+        <div class="modal-header">
+          <h3>Crear Nuevo Post</h3>
+          <button @click="cerrarFormularioPost" class="btn-close">×</button>
+        </div>
+        
+        <form @submit.prevent="crearPost" class="post-form">
+          <div class="form-group">
+            <label for="post_title">Título del Post</label>
+            <input 
+              id="post_title"
+              v-model="postFormulario.title" 
+              type="text" 
+              class="form-input"
+              placeholder="Título de tu post..."
+              required
+            >
+          </div>
+          
+          <div class="form-group">
+            <label for="post_content">Contenido</label>
+            <textarea 
+              id="post_content"
+              v-model="postFormulario.content" 
+              class="form-textarea"
+              placeholder="Escribe el contenido de tu post..."
+              rows="6"
+              required
+            ></textarea>
+          </div>
+          
+          <div v-if="erroresFormulario.general" class="error-message">
+            {{ erroresFormulario.general }}
+          </div>
+          
+          <div class="form-actions">
+            <button type="submit" :disabled="cargandoPosts" class="btn btn-primary">
+              {{ cargandoPosts ? 'Publicando...' : 'Publicar Post' }}
+            </button>
+            <button type="button" @click="cerrarFormularioPost" class="btn btn-outline">
+              Cancelar
             </button>
           </div>
         </form>
@@ -291,9 +395,13 @@ import { ref, reactive, computed, onMounted, nextTick } from 'vue'
 import { useDashboardStore } from '@/stores/dashboard'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from 'vue-toastification'
+import PostCard from '@/components/common/PostCard.vue'
 
 export default {
   name: 'CreatorDashboard',
+  components: {
+    PostCard
+  },
   setup() {
     const dashboardStore = useDashboardStore()
     const authStore = useAuthStore()
@@ -312,15 +420,26 @@ export default {
       avatar_url: ''
     })
 
-    // Computed properties
+    const mostrarFormularioPost = ref(false)
+    const postFormulario = reactive({
+      title: '',
+      content: ''
+    })    // Computed properties
     const estadisticas = computed(() => dashboardStore.estadisticas)
     const wallets = computed(() => dashboardStore.wallets)
+    const posts = computed(() => dashboardStore.posts)
     const cargandoDatos = computed(() => dashboardStore.cargandoDatos)
     const cargandoWallets = computed(() => dashboardStore.cargandoWallets)
+    const cargandoPosts = computed(() => dashboardStore.cargandoPosts)
     const cargandoPerfil = computed(() => dashboardStore.editandoPerfil)
     const erroresFormulario = computed(() => dashboardStore.erroresFormulario)
     const usuarioActual = computed(() => authStore.usuarioActual)
     const monedasSoportadas = computed(() => dashboardStore.monedasSoportadas)
+    
+    // Pagination computed properties
+    const paginaActualPosts = computed(() => dashboardStore.paginaActualPosts)
+    const totalPostsPaginas = computed(() => dashboardStore.totalPostsPaginas)
+    const totalPostsCount = computed(() => dashboardStore.totalPostsCount)
 
     const monedasDisponibles = computed(() => {
       const monedasUsadas = wallets.value.map(w => w.currency_type)
@@ -433,8 +552,62 @@ export default {
         editandoPerfil.value = false
         await authStore.obtenerPerfilUsuario() // Actualizar datos en el store de auth
       } else {
+        toast.error(resultado.error)      }
+    }
+
+    // Gestión de posts
+    const abrirFormularioPost = () => {
+      mostrarFormularioPost.value = true
+      postFormulario.title = ''
+      postFormulario.content = ''
+      dashboardStore.limpiarErrores()
+    }
+
+    const cerrarFormularioPost = () => {
+      mostrarFormularioPost.value = false
+      postFormulario.title = ''
+      postFormulario.content = ''
+      dashboardStore.limpiarErrores()
+    }
+
+    const crearPost = async () => {
+      const resultado = await dashboardStore.crearPost(postFormulario)
+      
+      if (resultado.success) {
+        toast.success('Post creado con éxito')
+        cerrarFormularioPost()      } else {
         toast.error(resultado.error)
       }
+    }
+
+    const eliminarPost = async (postId) => {
+      if (!confirm('¿Estás seguro de eliminar este post?')) return
+
+      const resultado = await dashboardStore.eliminarPost(postId)
+      if (resultado.success) {
+        toast.success('Post eliminado')
+      } else {
+        toast.error(resultado.error)
+      }
+    }
+
+    const cargarPaginaPosts = async (page) => {
+      if (page >= 1 && page <= totalPostsPaginas.value && page !== paginaActualPosts.value) {
+        const resultado = await dashboardStore.cargarPaginaPosts(page)
+        if (!resultado.success) {
+          toast.error(resultado.error)
+        }
+      }
+    }
+
+    const formatearFechaPost = (fecha) => {
+      return new Date(fecha).toLocaleDateString('es-ES', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })
     }
 
     // Generar códigos QR para las wallets
@@ -461,9 +634,7 @@ export default {
       } catch (error) {
         console.warn('No se pudo cargar la librería QRCode:', error)
       }
-    }
-
-    // Lifecycle
+    }    // Lifecycle
     onMounted(async () => {
       await dashboardStore.inicializarDashboard()
       await generarCodigosQR()
@@ -475,15 +646,23 @@ export default {
       walletEditando,
       walletFormulario,
       editandoPerfil,
-      perfilFormulario,      // Computed
+      perfilFormulario,
+      mostrarFormularioPost,
+      postFormulario,
+      
+      // Computed
       estadisticas,
       wallets,
+      posts,
       cargandoDatos,
       cargandoWallets,
-      cargandoPerfil,
-      erroresFormulario,
+      cargandoPosts,
+      cargandoPerfil,      erroresFormulario,
       usuarioActual,
       monedasDisponibles,
+      paginaActualPosts,
+      totalPostsPaginas,
+      totalPostsCount,
       
       // Métodos
       actualizarDatos,
@@ -497,7 +676,13 @@ export default {
       establecerPredeterminada,
       toggleEditarPerfil,
       cancelarEdicionPerfil,
-      guardarPerfil
+      guardarPerfil,
+      abrirFormularioPost,
+      cerrarFormularioPost,
+      crearPost,
+      eliminarPost,
+      cargarPaginaPosts,
+      formatearFechaPost
     }
   }
 }
@@ -982,6 +1167,127 @@ export default {
   line-height: 1.4;
 }
 
+/* Estilos para Posts */
+.posts-section {
+  grid-column: 1 / -1; /* Ocupa todo el ancho del grid */
+}
+
+.posts-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.post-card {
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-lg);
+  background: var(--color-background);
+  transition: all 0.2s ease;
+  
+  &:hover {
+    box-shadow: var(--shadow-sm);
+    border-color: var(--color-border);
+  }
+}
+
+.post-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-md);
+}
+
+.post-title {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0;
+  flex: 1;
+}
+
+.post-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.post-content {
+  margin-bottom: var(--spacing-md);
+}
+
+.post-content p {
+  color: var(--color-text);
+  line-height: 1.6;
+  margin: 0;
+  white-space: pre-wrap; /* Preserve line breaks */
+}
+
+.post-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: var(--spacing-sm);
+  border-top: 1px solid var(--color-border-light);
+}
+
+.post-date {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-light);
+}
+
+.post-likes {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-light);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.post-form {
+  padding: var(--spacing-lg);
+}
+
+.post-form .form-textarea {
+  min-height: 120px;
+}
+
+/* Pagination Styles */
+.posts-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: var(--spacing-lg);
+  padding: var(--spacing-md);
+  background: var(--color-surface);
+  border-radius: var(--border-radius-md);
+  border: 1px solid var(--color-border-light);
+}
+
+.page-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+  font-weight: 500;
+}
+
+.posts-count {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-light);
+  font-weight: normal;
+}
+
+.posts-pagination .btn {
+  min-width: 100px;
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
 @media (max-width: 768px) {
   .dashboard-page {
     padding: var(--spacing-md);
@@ -999,10 +1305,20 @@ export default {
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
   }
-  
-  .profile-display {
+    .profile-display {
     flex-direction: column;
     text-align: center;
+  }
+  
+  .posts-pagination {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    text-align: center;
+  }
+  
+  .posts-pagination .btn {
+    min-width: auto;
+    flex: 1;
   }
 }
 </style>
