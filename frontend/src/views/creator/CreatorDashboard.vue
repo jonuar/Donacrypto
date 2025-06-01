@@ -4,7 +4,7 @@
     <div class="dashboard-header">
       <div class="header-content">
         <div class="header-info">
-          <h1 class="page-title">Panel de Creador</h1>
+          <h1 class="page-title">PANEL DE CREADOR</h1>
           <p class="page-subtitle">Gestiona tu perfil, wallets y ve tus estadísticas</p>
         </div>
         <div class="header-actions">
@@ -27,22 +27,7 @@
     <div v-else class="dashboard-content">
       <!-- Estadísticas Principales -->
       <section class="stats-section">
-        <h2 class="section-title">Estadísticas</h2>
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-icon">💰</div>
-            <div class="stat-info">
-              <span class="stat-value">{{ estadisticas.total_received || 0 }}</span>
-              <span class="stat-label">Total Recibido</span>
-            </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon">🎁</div>
-            <div class="stat-info">
-              <span class="stat-value">{{ estadisticas.total_donations || 0 }}</span>
-              <span class="stat-label">Donaciones</span>
-            </div>
-          </div>
+        <h2 class="section-title">Estadísticas</h2>        <div class="stats-grid">
           <div class="stat-card">
             <div class="stat-icon">👥</div>
             <div class="stat-info">
@@ -56,6 +41,31 @@
               <span class="stat-value">{{ estadisticas.posts_count || 0 }}</span>
               <span class="stat-label">Posts</span>
             </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🪙</div>
+            <div class="stat-info">
+              <span class="stat-value">{{ wallets.length || 0 }}</span>
+              <span class="stat-label">Wallets Configuradas</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🔒</div>
+            <div class="stat-info">
+              <span class="stat-value">100%</span>
+              <span class="stat-label">Donaciones Directas</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Información sobre donaciones directas -->
+        <div class="info-banner">
+          <div class="info-content">
+            <h3>🔒 Donaciones Descentralizadas</h3>
+            <p>
+              Las donaciones van directamente a tus wallets de criptomonedas. 
+              <strong>Sin intermediarios, sin comisiones, con privacidad total.</strong>
+            </p>
           </div>
         </div>
       </section>
@@ -201,9 +211,7 @@
               <p class="profile-bio">{{ usuarioActual?.bio || 'Sin biografía configurada' }}</p>
             </div>
           </div>
-        </section>
-
-        <!-- Seguidores -->
+        </section>        <!-- Seguidores -->
         <section class="dashboard-section">
           <div class="section-header">
             <h2 class="section-title">Seguidores ({{ estadisticas.followers_count || 0 }})</h2>
@@ -217,35 +225,9 @@
           
           <div v-else class="followers-info">
             <p>Tienes {{ estadisticas.followers_count }} seguidores siguiendo tu contenido.</p>
-            <!-- En el futuro aquí se puede mostrar la lista de seguidores -->
+            <!-- Lista de seguidores -->
           </div>
-        </section>
-
-        <!-- Donaciones Recientes -->
-        <section class="dashboard-section">
-          <div class="section-header">
-            <h2 class="section-title">Donaciones Recientes</h2>
-          </div>
-          
-          <div v-if="donaciones.length === 0" class="empty-state">
-            <div class="empty-icon">💸</div>
-            <h3>No tienes donaciones aún</h3>
-            <p>Configura tus wallets y comparte tu perfil para recibir donaciones</p>
-          </div>
-          
-          <div v-else class="donations-list">
-            <div v-for="donacion in donaciones.slice(0, 5)" :key="donacion.id" class="donation-item">
-              <div class="donation-info">
-                <span class="donation-amount">{{ donacion.amount }} {{ donacion.currency }}</span>
-                <span class="donation-date">{{ formatearFecha(donacion.created_at) }}</span>
-              </div>
-            </div>
-            
-            <div v-if="donaciones.length > 5" class="see-more">
-              <a href="#" class="link">Ver todas las donaciones ({{ donaciones.length }})</a>
-            </div>
-          </div>
-        </section>
+        </section> 
       </div>
     </div>
 
@@ -315,9 +297,7 @@ export default {
   setup() {
     const dashboardStore = useDashboardStore()
     const authStore = useAuthStore()
-    const toast = useToast()
-
-    // Estados reactivos
+    const toast = useToast()    // Estados reactivos
     const mostrarFormularioWallet = ref(false)
     const walletEditando = ref(null)
     const walletFormulario = reactive({
@@ -330,9 +310,10 @@ export default {
       username: '',
       bio: '',
       avatar_url: ''
-    })    // Computed properties
+    })
+
+    // Computed properties
     const estadisticas = computed(() => dashboardStore.estadisticas)
-    const donaciones = computed(() => dashboardStore.donaciones)
     const wallets = computed(() => dashboardStore.wallets)
     const cargandoDatos = computed(() => dashboardStore.cargandoDatos)
     const cargandoWallets = computed(() => dashboardStore.cargandoWallets)
@@ -494,10 +475,8 @@ export default {
       walletEditando,
       walletFormulario,
       editandoPerfil,
-      perfilFormulario,
-        // Computed
+      perfilFormulario,      // Computed
       estadisticas,
-      donaciones,
       wallets,
       cargandoDatos,
       cargandoWallets,
@@ -940,6 +919,67 @@ export default {
   gap: var(--spacing-sm);
   justify-content: flex-end;
   margin-top: var(--spacing-lg);
+}
+
+.info-banner {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  margin-top: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+  color: white;
+}
+
+.info-content h3 {
+  margin: 0 0 var(--spacing-sm) 0;
+  font-size: var(--font-size-lg);
+}
+
+.info-content p {
+  margin: 0;
+  opacity: 0.9;
+  line-height: 1.5;
+}
+
+.decentralized-benefits {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.benefit-card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+  background: var(--color-surface);
+  border-radius: var(--border-radius-md);
+  border: 1px solid var(--color-border-light);
+  transition: all 0.2s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+}
+
+.benefit-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.benefit-content h4 {
+  margin: 0 0 var(--spacing-xs) 0;
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.benefit-content p {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-light);
+  line-height: 1.4;
 }
 
 @media (max-width: 768px) {

@@ -32,7 +32,7 @@
           </h1>
           <p class="hero-subtitle">
             Conecta directamente con tus creadores favoritos y apóyalos 
-            de manera transparente y segura usando tecnología blockchain.
+            de manera transparente y segura.
           </p>
           <div class="hero-actions">
             <router-link to="/register" class="btn btn-primary btn-lg">
@@ -67,24 +67,24 @@
         <h2 class="section-title">¿Por qué elegirnos?</h2>
         <div class="features-grid">
           <div class="feature-card bento-card">
-            <div class="feature-icon">🔗</div>
-            <h3>Tecnología Blockchain</h3>
-            <p>Todas las transacciones son transparentes y verificables en la blockchain.</p>
-          </div>
-          <div class="feature-card bento-card">
-            <div class="feature-icon">💫</div>
-            <h3>Sin Intermediarios</h3>
-            <p>Conecta directamente con los creadores sin comisiones de terceros.</p>
-          </div>
-          <div class="feature-card bento-card">
-            <div class="feature-icon">🚀</div>
-            <h3>Pagos Instantáneos</h3>
-            <p>Las donaciones llegan inmediatamente a los creadores.</p>
-          </div>
-          <div class="feature-card bento-card">
             <div class="feature-icon">🔒</div>
-            <h3>Completamente Seguro</h3>
-            <p>Utiliza contratos inteligentes para garantizar la seguridad.</p>
+            <h3>Verdaderamente Descentralizado</h3>
+            <p>Sin intermediarios - Las donaciones van directamente a las wallets de los creadores.</p>
+          </div>
+          <div class="feature-card bento-card">
+            <div class="feature-icon">💰</div>
+            <h3>Sin Comisiones de Plataforma</h3>
+            <p>100% de las donaciones van directamente para los creadores. Cero comisiones.</p>
+          </div>
+          <div class="feature-card bento-card">
+            <div class="feature-icon">🔐</div>
+            <h3>Privacidad Máxima</h3>
+            <p>No se requiere KYC. Mantén tu anonimato y privacidad en todas las donaciones.</p>
+          </div>
+          <div class="feature-card bento-card">
+            <div class="feature-icon">🌍</div>
+            <h3>Acceso Global</h3>
+            <p>Funciona en cualquier país sin restricciones geográficas o bancarias.</p>
           </div>
         </div>
       </div>

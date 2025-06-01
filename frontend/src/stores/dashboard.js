@@ -7,15 +7,11 @@ export const useDashboardStore = defineStore('dashboard', {
     cargandoDatos: false,
     cargandoWallets: false,
     cargandoSeguidores: false,
-    
-    // Datos del dashboard
+      // Datos del dashboard
     estadisticas: {
-      total_donations: 0,
-      total_received: 0,
       followers_count: 0,
       posts_count: 0
     },
-    donaciones: [],
     wallets: [],
     seguidores: [],
     
@@ -50,14 +46,12 @@ export const useDashboardStore = defineStore('dashboard', {
     }
   },
 
-  actions: {
-    // Obtener datos del dashboard
+  actions: {    // Obtener datos del dashboard
     async obtenerDatosDashboard() {
       this.cargandoDatos = true
       try {
         const respuesta = await api.get('/user/creator/dashboard')
         this.estadisticas = respuesta.data.stats
-        this.donaciones = respuesta.data.donations
         return { success: true }
       } catch (error) {
         console.error('Error al obtener datos del dashboard:', error)
