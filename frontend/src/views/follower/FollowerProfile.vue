@@ -120,7 +120,7 @@
 
       <!-- Change password section -->
       <div class="password-section">
-        <h3>🔒 Cambiar Contraseña</h3>
+        <h3>🔒 Contraseña</h3>
         <form @submit.prevent="cambiarContrasena" class="password-form">
           <div class="form-group">
             <label for="current-password" class="form-label">Contraseña actual</label>
@@ -144,8 +144,7 @@
               class="form-input"
             />
           </div>
-          
-          <div class="form-group">
+            <div class="form-group">
             <label for="confirm-password" class="form-label">Confirmar nueva contraseña</label>
             <input
               id="confirm-password"
@@ -155,14 +154,17 @@
               class="form-input"
             />
           </div>
+          
+          <div class="form-actions">
             <button 
-            type="submit" 
-            :disabled="cambiandoPassword"
-            class="btn btn-secondary"
-          >
-            <span v-if="cambiandoPassword">🔄 Cambiando...</span>
-            <span v-else>Cambiar Contraseña</span>
-          </button>
+              type="submit" 
+              :disabled="cambiandoPassword"
+              class="btn btn-secondary"
+            >
+              <span v-if="cambiandoPassword">🔄 Cambiando...</span>
+              <span v-else>🔒 Actualizar</span>
+            </button>
+          </div>
         </form>
       </div>
     </div>
@@ -520,21 +522,29 @@ onMounted(() => {
 }
 
 .btn-primary {
-  background: var(--color-primary);
+  background: #8b5cf6;
   color: white;
+  border: 2px solid #8b5cf6;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: var(--color-primary-dark);
+  background: #7c3aed;
+  border-color: #7c3aed;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
 }
 
 .btn-secondary {
-  background: var(--color-secondary);
+  background: #6366f1;
   color: white;
+  border: 2px solid #6366f1;
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background: var(--color-secondary-dark);
+  background: #4f46e5;
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
 }
 
 .btn-outline {

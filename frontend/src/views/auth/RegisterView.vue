@@ -131,7 +131,7 @@
         </div>
 
         <!-- Confirm Password -->
-        <div class="input-group">
+        <!-- <div class="input-group">
           <label for="confirmPassword" class="input-label">Confirmar contraseña</label>
           <div class="password-field">
             <input
@@ -153,7 +153,7 @@
             </button>
           </div>
           <span v-if="erroresValidacion.confirmPassword" class="input-error-text">{{ erroresValidacion.confirmPassword }}</span>
-        </div>
+        </div> -->
 
         <!-- Terms and conditions -->
         <div class="input-group">
