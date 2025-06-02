@@ -294,6 +294,193 @@ def follower_feed() -> Tuple[Any, int]:
         return jsonify({"error": "Error al obtener el feed"}), 500
 
 
+@user_bp.route("/search-creators", methods=["GET"])
+@role_required("follower")
+def search_creators() -> Tuple[Any, int]:
+    """
+    Busca creadores por username para que los followers puedan seguirlos
+    
+    Requiere: JWT válido en cabecera, rol follower
+    Query params: q (search query), page, limit
+    Retorna: lista de creadores que coinciden con la búsqueda
+    """
+    try:
+        follower_email: str = get_jwt_identity()
+        
+        # Parámetros de búsqueda
+        search_query: str = request.args.get("q", "").strip()
+        page: int = int(request.args.get("page", 1))
+        limit: int = int(request.args.get("limit", 10))
+        skip: int = (page - 1) * limit
+        
+        if not search_query:
+            return jsonify({
+                "creators": [],
+                "message": "Proporciona un término de búsqueda",
+                "page": page,
+                "limit": limit,
+                "total": 0,
+                "pages": 0
+            }), 200
+        
+        # Validar longitud mínima
+        if len(search_query) < 2:
+            return jsonify({
+                "creators": [],
+                "message": "El término de búsqueda debe tener al menos 2 caracteres",
+                "page": page,
+                "limit": limit,
+                "total": 0,
+                "pages": 0
+            }), 200
+        
+        # Crear query de búsqueda (case insensitive)
+        search_pattern = {"$regex": search_query, "$options": "i"}
+        query = {
+            "role": "creator",
+            "$or": [
+                {"username": search_pattern},
+                {"bio": search_pattern}
+            ]
+        }
+        
+        # Contar total de resultados
+        total_creators = mongo.db.users.count_documents(query)
+        
+        # Realizar búsqueda con paginación
+        creators_cursor = mongo.db.users.find(
+            query,
+            {"_id": 0, "password": 0, "email": 0}  # Excluir información sensible
+        ).sort("username", 1).skip(skip).limit(limit)
+        
+        creators: List[Dict[str, Any]] = []
+        
+        # Obtener lista de creadores que ya sigue este follower
+        following_data = mongo.db.followings.find(
+            {"follower_email": follower_email},
+            {"_id": 0, "creator_email": 1}
+        )
+        followed_emails = {item["creator_email"] for item in following_data}
+        
+        for creator in creators_cursor:
+            # Añadir información adicional
+            creator_email = creator.get("email", "")
+            
+            # Número de seguidores
+            followers_count = mongo.db.followings.count_documents({"creator_email": creator_email})
+            creator["followers_count"] = followers_count
+            
+            # Número de posts
+            posts_count = mongo.db.posts.count_documents({"creator_email": creator_email})
+            creator["posts_count"] = posts_count
+            
+            # Si ya lo sigue
+            creator["following"] = creator_email in followed_emails
+            
+            creators.append(creator)
+        
+        return jsonify({
+            "creators": creators,
+            "page": page,
+            "limit": limit,
+            "total": total_creators,
+            "pages": (total_creators + limit - 1) // limit,
+            "query": search_query,
+            "message": f"Se encontraron {total_creators} creadores para '{search_query}'"
+        }), 200
+        
+    except Exception as e:
+        current_app.logger.error(f"[search_creators] Error: {e}")
+        return jsonify({"error": "Error al buscar creadores"}), 500
+
+@user_bp.route("/explore-all-creators", methods=["GET"])
+@role_required("follower")
+def explore_all_creators() -> Tuple[Any, int]:
+    """
+    Explora todos los creadores disponibles (no solo los seguidos)
+    
+    Requiere: JWT válido en cabecera, rol follower
+    Query params: page, limit, sort (popular, recent, alphabetical)
+    Retorna: lista paginada de todos los creadores
+    """
+    try:
+        follower_email: str = get_jwt_identity()
+        
+        # Paginación
+        page: int = int(request.args.get("page", 1))
+        limit: int = int(request.args.get("limit", 12))
+        skip: int = (page - 1) * limit
+        
+        # Ordenación
+        sort_by: str = request.args.get("sort", "popular")
+        
+        # Query base para todos los creadores
+        query = {"role": "creator"}
+        
+        # Contar total de creadores
+        total_creators = mongo.db.users.count_documents(query)
+        
+        if sort_by == "alphabetical":
+            sort_criteria = [("username", 1)]
+        elif sort_by == "recent":
+            sort_criteria = [("created_at", -1)]
+        else:  # popular (por defecto)
+            sort_criteria = [("username", 1)]  # Temporal, ordenaremos después
+        
+        # Obtener creadores
+        creators_cursor = mongo.db.users.find(
+            query,
+            {"_id": 0, "password": 0}
+        ).sort(sort_criteria).skip(skip).limit(limit)
+        
+        creators: List[Dict[str, Any]] = []
+        
+        # Obtener lista de creadores que ya sigue
+        following_data = mongo.db.followings.find(
+            {"follower_email": follower_email},
+            {"_id": 0, "creator_email": 1}
+        )
+        followed_emails = {item["creator_email"] for item in following_data}
+        
+        for creator in creators_cursor:
+            # Información adicional
+            creator_email = creator["email"]
+            
+            # Número de seguidores
+            followers_count = mongo.db.followings.count_documents({"creator_email": creator_email})
+            creator["followers_count"] = followers_count
+            
+            # Número de posts
+            posts_count = mongo.db.posts.count_documents({"creator_email": creator_email})
+            creator["posts_count"] = posts_count
+            
+            # Si ya lo sigue
+            creator["following"] = creator_email in followed_emails
+            
+            # Eliminar email por seguridad
+            del creator["email"]
+            
+            creators.append(creator)
+        
+        # Ordenar por popularidad si se solicitó
+        if sort_by == "popular":
+            creators.sort(key=lambda x: x["followers_count"], reverse=True)
+        
+        return jsonify({
+            "creators": creators,
+            "page": page,
+            "limit": limit,
+            "total": total_creators,
+            "pages": (total_creators + limit - 1) // limit,
+            "sort": sort_by,
+            "message": f"Mostrando {len(creators)} de {total_creators} creadores disponibles"
+        }), 200
+        
+    except Exception as e:
+        current_app.logger.error(f"[explore_all_creators] Error: {e}")
+        return jsonify({"error": "Error al explorar creadores"}), 500
+
+
 @user_bp.route("/following", methods=["GET"])
 @role_required("follower")
 def get_following() -> Tuple[Any, int]:
@@ -518,7 +705,7 @@ def explore_creators() -> Tuple[Any, int]:
         return jsonify({"error": "Error al obtener creadores seguidos"}), 500
 
 
-# RUTAS PARA CREATORS
+# RUTAS PARA CREADORES
 
 @user_bp.route("/creator/<username>", methods=["GET"])
 def public_creator_profile(username: str) -> Tuple[Any, int]:

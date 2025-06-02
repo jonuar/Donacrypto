@@ -8,7 +8,20 @@
         </router-link>
         <div class="nav-links">
           <router-link v-if="usuario.role === 'creator' && route.path !== '/dashboard'" to="/dashboard" class="btn btn-primary btn-sm">Dashboard</router-link>
-          <router-link v-if="usuario.role === 'follower'" to="/feed" class="nav-link">Feed</router-link>
+          
+          <!-- Navigation for followers -->
+          <template v-if="usuario.role === 'follower'">
+            <router-link to="/feed" class="nav-link" :class="{ 'active': route.path === '/feed' }">
+              🏠 Feed
+            </router-link>
+            <router-link to="/explore" class="nav-link" :class="{ 'active': route.path === '/explore' }">
+              🔍 Explorar
+            </router-link>
+            <router-link to="/profile" class="nav-link" :class="{ 'active': route.path === '/profile' }">
+              👤 Perfil
+            </router-link>
+          </template>
+          
           <button @click="logout" class="btn btn-ghost btn-sm">Cerrar Sesión</button>
         </div>
       </div>
@@ -104,14 +117,30 @@ export default {
   padding: var(--spacing-sm) var(--spacing-md);
   border-radius: var(--border-radius-sm);
   transition: background-color 0.2s;
-  
-  &:hover {
-    background: var(--color-background);
+}
+
+.nav-link:hover {
+  background-color: var(--color-surface-alt);
+}
+
+.nav-link.active {
+  background-color: var(--color-primary);
+  color: white;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .nav-content {
+    padding: 0 var(--spacing-md);
   }
   
-  &.router-link-active {
-    background: var(--color-primary);
-    color: white;
+  .nav-links {
+    gap: var(--spacing-sm);
+  }
+  
+  .nav-link {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--font-size-sm);
   }
 }
 </style>

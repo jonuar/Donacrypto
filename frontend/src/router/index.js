@@ -47,6 +47,24 @@ const router = createRouter({
       name: 'feed',
       component: () => import('@/views/follower/FollowerFeed.vue'),
       meta: { requiresAuth: true, role: 'follower' }
+    },
+    {
+      path: '/profile',
+      name: 'follower-profile',
+      component: () => import('@/views/follower/FollowerProfile.vue'),
+      meta: { requiresAuth: true, role: 'follower' }
+    },
+    {
+      path: '/explore',
+      name: 'explore-creators',
+      component: () => import('@/views/follower/ExploreCreators.vue'),
+      meta: { requiresAuth: true, role: 'follower' }
+    },
+    {
+      path: '/creators',
+      name: 'following-creators',
+      component: () => import('@/views/follower/ExploreCreators.vue'),
+      meta: { requiresAuth: true, role: 'follower' }
     }
   ]
 })
