@@ -28,9 +28,7 @@
           <small v-if="terminoBusqueda" class="search-help">
             Presiona Enter o haz clic en buscar
           </small>
-        </div>
-
-        <!-- Filter tabs -->
+        </div>        <!-- Filter tabs -->
         <div class="filter-tabs">
           <button 
             @click="cambiarModo('explorar')" 
@@ -43,13 +41,6 @@
             :class="['tab-btn', { active: modo === 'siguiendo' }]"
           >
             👥 Siguiendo ({{ totalSiguiendo }})
-          </button>
-          <button 
-            @click="cambiarModo('busqueda')" 
-            :class="['tab-btn', { active: modo === 'busqueda' }]"
-            :disabled="!terminoBusqueda"
-          >
-            🔍 Resultados
           </button>
         </div>
 
@@ -302,11 +293,6 @@ const cargarEstadisticasSeguimiento = async () => {
 }
 
 const cambiarModo = async (nuevoModo) => {
-  if (nuevoModo === 'busqueda' && !terminoBusqueda.value) {
-    toast.info('Escribe algo en la búsqueda primero')
-    return
-  }
-  
   modo.value = nuevoModo
   paginaActual.value = 1
   await cargarCreadores(1)
