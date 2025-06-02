@@ -108,12 +108,12 @@
         <h3>📊 Estadísticas</h3>
         <div class="stats-grid">
           <div class="stat-card">
-            <div class="stat-number">{{ estadisticas.siguiendo }}</div>
-            <div class="stat-label">Siguiendo</div>
+              <div class="stat-label">Siguiendo</div>
+              <div class="stat-number">{{ estadisticas.siguiendo }}</div>
           </div>
           <div class="stat-card">
-            <div class="stat-number">{{ estadisticas.miembro_desde }}</div>
-            <div class="stat-label">Miembro desde</div>
+              <div class="stat-label">Miembro desde</div>
+              <div class="stat-number">{{ estadisticas.miembro_desde }}</div>
           </div>
         </div>
       </div>
@@ -155,14 +155,13 @@
               class="form-input"
             />
           </div>
-          
-          <button 
+            <button 
             type="submit" 
             :disabled="cambiandoPassword"
             class="btn btn-secondary"
           >
             <span v-if="cambiandoPassword">🔄 Cambiando...</span>
-            <span v-else">🔒 Cambiar Contraseña</span>
+            <span v-else>Cambiar Contraseña</span>
           </button>
         </form>
       </div>
@@ -200,7 +199,7 @@ const perfilOriginal = reactive({})
 // Estadísticas
 const estadisticas = reactive({
   siguiendo: 0,
-  miembro_desde: ''
+  miembro_desde: 'N/A'
 })
 
 // Datos de contraseña
@@ -218,10 +217,16 @@ const cargarPerfil = async () => {
     
     Object.assign(perfil, response.data)
     Object.assign(perfilOriginal, response.data)
-    
-    // Formatear fecha de miembro
+      // Formatear fecha de miembro
     if (perfil.created_at) {
-      estadisticas.miembro_desde = new Date(perfil.created_at).getFullYear()
+      const fecha = new Date(perfil.created_at)
+      if (!isNaN(fecha.getTime())) {
+        estadisticas.miembro_desde = fecha.getFullYear()
+      } else {
+        estadisticas.miembro_desde = 'N/A'
+      }
+    } else {
+      estadisticas.miembro_desde = 'N/A'
     }
     
     // Obtener estadísticas de seguimiento

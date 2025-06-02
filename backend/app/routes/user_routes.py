@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from werkzeug.security import generate_password_hash
 from datetime import datetime
@@ -81,12 +82,14 @@ def get_user_profile() -> Tuple[Any, int]:
         
         if not user_data:
             return jsonify({"error": "Usuario no encontrado"}), 404
-        
-        # Excluir información sensible
+          # Excluir información sensible
         if "password" in user_data:
             del user_data["password"]
         if "_id" in user_data:
             user_data["_id"] = str(user_data["_id"])
+            
+        # Convertir fechas BSON a formato JSON
+        user_data = convert_bson_dates_to_iso(user_data)
             
         return jsonify(user_data), 200
     except Exception as e:
