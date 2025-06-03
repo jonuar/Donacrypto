@@ -183,7 +183,7 @@ export default {
 
 .bento-card {
   background: var(--color-surface);
-  border-radius: var(--border-radius-lg);
+  border-radius: var(--radius-lg);
   padding: var(--spacing-xl);
   box-shadow: var(--shadow-sm);
   border: 1px solid var(--color-border-light);
@@ -202,7 +202,7 @@ export default {
   gap: var(--spacing-md);
   padding: var(--spacing-md);
   background: var(--color-background);
-  border-radius: var(--border-radius-md);
+  border-radius: var(--radius-md);
   border: 1px solid var(--color-border-light);
 }
 
@@ -213,7 +213,7 @@ export default {
 
 .benefit-text h4 {
   margin: 0 0 var(--spacing-xs) 0;
-  font-size: var(--font-size-md);
+  font-size: var(--font-size-base);
   font-weight: 600;
   color: var(--color-text);
 }
@@ -221,7 +221,7 @@ export default {
 .benefit-text p {
   margin: 0;
   font-size: var(--font-size-sm);
-  color: var(--color-text-light);
+  color: var(--color-text-secondary);
   line-height: 1.4;
 }
 
@@ -238,7 +238,7 @@ export default {
   gap: var(--spacing-md);
   padding: var(--spacing-lg);
   background: var(--color-background);
-  border-radius: var(--border-radius-md);
+  border-radius: var(--radius-md);
   border: 1px solid var(--color-border-light);
 }
 
@@ -258,7 +258,7 @@ export default {
 
 .step-content h4 {
   margin: 0 0 var(--spacing-xs) 0;
-  font-size: var(--font-size-md);
+  font-size: var(--font-size-base);
   font-weight: 600;
   color: var(--color-text);
 }
@@ -266,7 +266,7 @@ export default {
 .step-content p {
   margin: 0;
   font-size: var(--font-size-sm);
-  color: var(--color-text-light);
+  color: var(--color-text-secondary);
   line-height: 1.4;
 }
 

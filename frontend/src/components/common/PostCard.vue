@@ -109,7 +109,7 @@ export default {
 .post-card {
   background: var(--color-surface);
   border: 1px solid var(--color-border-light);
-  border-radius: var(--border-radius-lg);
+  border-radius: var(--radius-lg);
   padding: var(--spacing-lg);
   transition: all 0.2s ease;
   
@@ -163,7 +163,7 @@ export default {
 
 .post-date {
   font-size: var(--font-size-xs);
-  color: var(--color-text-light);
+  color: var(--color-text-secondary);
 }
 
 .post-actions {
@@ -172,11 +172,10 @@ export default {
 }
 
 .btn-icon {
-  background: none;
-  border: none;
+  background: none;  border: none;
   padding: var(--spacing-xs);
   cursor: pointer;
-  border-radius: var(--border-radius-sm);
+  border-radius: var(--radius-sm);
   transition: background-color 0.2s;
   
   &:hover {
@@ -184,7 +183,7 @@ export default {
   }
   
   &.btn-danger:hover {
-    background: rgba(var(--color-error-rgb), 0.1);
+    background: rgba(239, 68, 68, 0.1);
   }
 }
 
@@ -221,14 +220,13 @@ export default {
 .stat-item {
   display: flex;
   align-items: center;
-  gap: var(--spacing-xs);
-  font-size: var(--font-size-sm);
-  color: var(--color-text-light);
+  gap: var(--spacing-xs);  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
   
   &.interaction-btn {
     background: none;
     border: 1px solid transparent;
-    border-radius: var(--border-radius-sm);
+    border-radius: var(--radius-sm);
     padding: var(--spacing-xs);
     cursor: pointer;
     transition: all 0.2s ease;
@@ -241,18 +239,18 @@ export default {
     &.liked {
       color: var(--color-error);
       border-color: var(--color-error);
-      background: rgba(var(--color-error-rgb), 0.1);
+      background: rgba(239, 68, 68, 0.1);
     }
   }
 }
 
 .stat-icon {
-  font-size: var(--font-size-md);
+  font-size: var(--font-size-base);
 }
 
 .post-timestamp {
   font-size: var(--font-size-xs);
-  color: var(--color-text-light);
+  color: var(--color-text-secondary);
 }
 
 @media (max-width: 768px) {

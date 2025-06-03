@@ -8,7 +8,7 @@
         </div>
         <div class="nav-actions">
           <router-link to="/login" class="btn btn-ghost">
-            Iniciar Sesión
+            Iniciar sesión
           </router-link>
           <router-link to="/register" class="btn btn-primary">
             Registrarse
@@ -42,7 +42,7 @@
             <div class="card-header">
               <div class="creator-avatar">🎨</div>
               <div class="creator-info">
-                <h4>María García</h4>
+                <h4>María López</h4>
                 <p>@maria_art</p>
               </div>
             </div>

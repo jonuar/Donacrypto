@@ -366,7 +366,7 @@ onMounted(() => {
 }
 
 .page-title {
-  font-size: var(--font-size-xxl);
+  font-size: var(--font-size-3xl);
   font-weight: 700;
   color: var(--color-text);
   margin-bottom: var(--spacing-sm);
@@ -374,7 +374,7 @@ onMounted(() => {
 
 .page-subtitle {
   font-size: var(--font-size-lg);
-  color: var(--color-text-light);
+  color: var(--color-text-secondary);
 }
 
 .loading-container {
@@ -382,7 +382,7 @@ onMounted(() => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: var(--spacing-xxl);
+  padding: var(--spacing-2xl);
   gap: var(--spacing-lg);
 }
 
@@ -405,7 +405,7 @@ onMounted(() => {
 
 .profile-form {
   background: var(--color-surface);
-  border-radius: var(--border-radius-lg);
+  border-radius: var(--radius-lg);
   padding: var(--spacing-xl);
   box-shadow: var(--shadow-sm);
 }
@@ -462,11 +462,10 @@ onMounted(() => {
 
 .form-input,
 .form-textarea {
-  width: 100%;
-  padding: var(--spacing-md);
+  width: 100%;  padding: var(--spacing-md);
   border: 1px solid var(--color-border);
-  border-radius: var(--border-radius-md);
-  font-size: var(--font-size-md);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
   background: var(--color-background);
   color: var(--color-text);
   transition: border-color 0.2s ease;
@@ -476,7 +475,7 @@ onMounted(() => {
 .form-textarea:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.1);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
 }
 
 .form-input.readonly {
@@ -491,7 +490,7 @@ onMounted(() => {
 
 .form-help {
   font-size: var(--font-size-sm);
-  color: var(--color-text-light);
+  color: var(--color-text-secondary);
   margin-top: var(--spacing-xs);
   display: block;
 }
@@ -504,7 +503,7 @@ onMounted(() => {
 
 .btn {
   padding: var(--spacing-md) var(--spacing-lg);
-  border-radius: var(--border-radius-md);
+  border-radius: var(--radius-md);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -559,7 +558,7 @@ onMounted(() => {
 
 .profile-stats {
   background: var(--color-surface);
-  border-radius: var(--border-radius-lg);
+  border-radius: var(--radius-lg);
   padding: var(--spacing-xl);
   box-shadow: var(--shadow-sm);
 }
@@ -579,7 +578,7 @@ onMounted(() => {
   text-align: center;
   padding: var(--spacing-lg);
   background: var(--color-background);
-  border-radius: var(--border-radius-md);
+  border-radius: var(--radius-md);
   border: 1px solid var(--color-border-light);
 }
 
@@ -592,14 +591,14 @@ onMounted(() => {
 
 .stat-label {
   font-size: var(--font-size-sm);
-  color: var(--color-text-light);
+  color: var(--color-text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .password-section {
   background: var(--color-surface);
-  border-radius: var(--border-radius-lg);
+  border-radius: var(--radius-lg);
   padding: var(--spacing-xl);
   box-shadow: var(--shadow-sm);
 }

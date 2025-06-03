@@ -115,7 +115,7 @@ export default {
   color: var(--color-text);
   text-decoration: none;
   padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--border-radius-sm);
+  border-radius: var(--radius-sm);
   transition: background-color 0.2s;
 }
 

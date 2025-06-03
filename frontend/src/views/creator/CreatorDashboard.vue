@@ -708,7 +708,7 @@ export default {
 
 .dashboard-header {
   background: var(--color-surface);
-  border-radius: var(--border-radius-lg);
+  border-radius: var(--radius-lg);
   padding: var(--spacing-xl);
   margin-bottom: var(--spacing-xl);
   box-shadow: var(--shadow-sm);
@@ -722,14 +722,14 @@ export default {
 }
 
 .page-title {
-  font-size: var(--font-size-xxl);
+  font-size: var(--font-size-3xl);
   font-weight: 700;
   color: var(--color-text);
   margin: 0;
 }
 
 .page-subtitle {
-  color: var(--color-text-light);
+  color: var(--color-text-secondary);
   margin: var(--spacing-xs) 0 0 0;
 }
 
@@ -778,7 +778,7 @@ export default {
 
 .stat-card {
   background: var(--color-surface);
-  border-radius: var(--border-radius-lg);
+  border-radius: var(--radius-lg);
   padding: var(--spacing-lg);
   display: flex;
   align-items: center;
@@ -801,7 +801,7 @@ export default {
 .stat-label {
   display: block;
   font-size: var(--font-size-sm);
-  color: var(--color-text-light);
+  color: var(--color-text-secondary);
 }
 
 .dashboard-grid {
@@ -812,7 +812,7 @@ export default {
 
 .dashboard-section {
   background: var(--color-surface);
-  border-radius: var(--border-radius-lg);
+  border-radius: var(--radius-lg);
   padding: var(--spacing-xl);
   box-shadow: var(--shadow-sm);
   border: 1px solid var(--color-border-light);
@@ -843,7 +843,7 @@ export default {
 
 .wallet-card {
   border: 1px solid var(--color-border-light);
-  border-radius: var(--border-radius-md);
+  border-radius: var(--radius-md);
   padding: var(--spacing-lg);
   background: var(--color-background);
 }
@@ -874,7 +874,7 @@ export default {
   background: var(--color-success);
   color: white;
   padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: var(--border-radius-sm);
+  border-radius: var(--radius-sm);
   font-size: var(--font-size-xs);
   font-weight: 500;
 }
@@ -889,7 +889,7 @@ export default {
   border: none;
   padding: var(--spacing-xs);
   cursor: pointer;
-  border-radius: var(--border-radius-sm);
+  border-radius: var(--radius-sm);
   transition: background-color 0.2s;
   
   &:hover {
@@ -904,12 +904,12 @@ export default {
   margin-bottom: var(--spacing-md);
   padding: var(--spacing-sm);
   background: var(--color-surface);
-  border-radius: var(--border-radius-sm);
+  border-radius: var(--radius-sm);
 }
 
 .address-label {
   font-size: var(--font-size-sm);
-  color: var(--color-text-light);
+  color: var(--color-text-secondary);
   min-width: max-content;
 }
 
@@ -936,14 +936,14 @@ export default {
 }
 
 .qr-code {
-  border-radius: var(--border-radius-sm);
+  border-radius: var(--radius-sm);
   background: white;
   padding: var(--spacing-sm);
 }
 
 .qr-caption {
   font-size: var(--font-size-xs);
-  color: var(--color-text-light);
+  color: var(--color-text-secondary);
   margin-top: var(--spacing-xs);
 }
 
@@ -974,7 +974,7 @@ export default {
 
 .profile-email {
   font-size: var(--font-size-sm);
-  color: var(--color-text-light);
+  color: var(--color-text-secondary);
   margin-bottom: var(--spacing-sm);
 }
 
@@ -993,7 +993,7 @@ export default {
   display: flex;
   justify-content: space-between;
   padding: var(--spacing-sm);
-  border-radius: var(--border-radius-sm);
+  border-radius: var(--radius-sm);
   background: var(--color-background);
 }
 
@@ -1004,7 +1004,7 @@ export default {
 
 .donation-date {
   font-size: var(--font-size-sm);
-  color: var(--color-text-light);
+  color: var(--color-text-secondary);
 }
 
 .modal-overlay {
@@ -1023,7 +1023,7 @@ export default {
 
 .modal-content {
   background: var(--color-surface);
-  border-radius: var(--border-radius-lg);
+  border-radius: var(--radius-lg);
   max-width: 500px;
   width: 100%;
   max-height: 90vh;
@@ -1043,7 +1043,7 @@ export default {
   border: none;
   font-size: var(--font-size-xl);
   cursor: pointer;
-  color: var(--color-text-light);
+  color: var(--color-text-secondary);
   padding: var(--spacing-xs);
   
   &:hover {
@@ -1069,19 +1069,17 @@ export default {
 
 .form-input,
 .form-select,
-.form-textarea {
-  width: 100%;
+.form-textarea {  width: 100%;
   padding: var(--spacing-sm);
   border: 1px solid var(--color-border);
-  border-radius: var(--border-radius-sm);
-  font-size: var(--font-size-md);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-base);
   background: var(--color-background);
   color: var(--color-text);
-  
-  &:focus {
+    &:focus {
     outline: none;
     border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.1);
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
   }
   
   &.error {
@@ -1102,10 +1100,10 @@ export default {
 }
 
 .error-message {
-  background: rgba(var(--color-error-rgb), 0.1);
+  background: rgba(239, 68, 68, 0.1);
   color: var(--color-error);
   padding: var(--spacing-sm);
-  border-radius: var(--border-radius-sm);
+  border-radius: var(--radius-sm);
   margin-bottom: var(--spacing-md);
   font-size: var(--font-size-sm);
 }
@@ -1119,7 +1117,7 @@ export default {
 
 .info-banner {
   background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
-  border-radius: var(--border-radius-lg);
+  border-radius: var(--radius-lg);
   padding: var(--spacing-lg);
   margin-top: var(--spacing-lg);
   margin-bottom: var(--spacing-xl);
@@ -1149,7 +1147,7 @@ export default {
   gap: var(--spacing-md);
   padding: var(--spacing-lg);
   background: var(--color-surface);
-  border-radius: var(--border-radius-md);
+  border-radius: var(--radius-md);
   border: 1px solid var(--color-border-light);
   transition: all 0.2s ease;
   
@@ -1166,7 +1164,7 @@ export default {
 
 .benefit-content h4 {
   margin: 0 0 var(--spacing-xs) 0;
-  font-size: var(--font-size-md);
+  font-size: var(--font-size-base);
   font-weight: 600;
   color: var(--color-text);
 }
@@ -1174,7 +1172,7 @@ export default {
 .benefit-content p {
   margin: 0;
   font-size: var(--font-size-sm);
-  color: var(--color-text-light);
+  color: var(--color-text-secondary);
   line-height: 1.4;
 }
 
@@ -1191,7 +1189,7 @@ export default {
 
 .post-card {
   border: 1px solid var(--color-border-light);
-  border-radius: var(--border-radius-md);
+  border-radius: var(--radius-md);
   padding: var(--spacing-lg);
   background: var(--color-background);
   transition: all 0.2s ease;
@@ -1243,12 +1241,12 @@ export default {
 
 .post-date {
   font-size: var(--font-size-sm);
-  color: var(--color-text-light);
+  color: var(--color-text-secondary);
 }
 
 .post-likes {
   font-size: var(--font-size-sm);
-  color: var(--color-text-light);
+  color: var(--color-text-secondary);
   display: flex;
   align-items: center;
   gap: var(--spacing-xs);
@@ -1270,7 +1268,7 @@ export default {
   margin-top: var(--spacing-lg);
   padding: var(--spacing-md);
   background: var(--color-surface);
-  border-radius: var(--border-radius-md);
+  border-radius: var(--radius-md);
   border: 1px solid var(--color-border-light);
 }
 
@@ -1286,7 +1284,7 @@ export default {
 
 .posts-count {
   font-size: var(--font-size-xs);
-  color: var(--color-text-light);
+  color: var(--color-text-secondary);
   font-weight: normal;
 }
 

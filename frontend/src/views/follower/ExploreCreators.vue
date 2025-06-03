@@ -5,12 +5,10 @@
         <h1 class="page-title">🔍 Explorar Creadores</h1>
         <p class="page-subtitle">Descubre y sigue a nuevos creadores de contenido</p>
       </div>
-    </div>
-
-    <!-- Search and filters -->
+    </div>    <!-- Sección de búsqueda y filtros -->
     <div class="search-section">
       <div class="search-container">
-        <!-- Search bar -->
+        <!-- Barra de búsqueda de creadores -->
         <div class="search-bar">
           <div class="search-input-group">
             <input
@@ -24,11 +22,12 @@
             <button @click="buscarCreadores" class="search-btn">
               🔍
             </button>
-          </div>
-          <small v-if="terminoBusqueda" class="search-help">
+          </div>          <small v-if="terminoBusqueda" class="search-help">
             Presiona Enter o haz clic en buscar
           </small>
-        </div>        <!-- Filter tabs -->
+        </div>
+        
+        <!-- Pestañas de filtrado por modo de vista -->
         <div class="filter-tabs">
           <button 
             @click="cambiarModo('explorar')" 
@@ -41,10 +40,9 @@
             :class="['tab-btn', { active: modo === 'siguiendo' }]"
           >
             👥 Siguiendo ({{ totalSiguiendo }})
-          </button>
-        </div>
+          </button>        </div>
 
-        <!-- Sort options (only for explore mode) -->
+        <!-- Opciones de ordenamiento (solo para modo explorar) -->
         <div v-if="modo === 'explorar'" class="sort-options">
           <label class="sort-label">Ordenar por:</label>
           <select v-model="ordenActual" @change="cargarCreadores" class="sort-select">
@@ -53,16 +51,14 @@
             <option value="alphabetical">🔤 A-Z</option>
           </select>
         </div>
-      </div>
-    </div>
+      </div>    </div>
 
-    <!-- Loading state -->
+    <!-- Estado de carga -->
     <div v-if="cargandoCreadores" class="loading-container">
       <div class="loading-spinner"></div>
-      <p>{{ mensajeCarga }}</p>
-    </div>
+      <p>{{ mensajeCarga }}</p>    </div>
 
-    <!-- Empty states -->
+    <!-- Estados vacíos cuando no hay resultados -->
     <div v-else-if="creadores.length === 0" class="empty-state">
       <div class="empty-icon">
         {{ modo === 'busqueda' ? '🔍' : modo === 'siguiendo' ? '👥' : '🌟' }}
@@ -74,18 +70,16 @@
         <button @click="cambiarModo('explorar')" class="btn btn-primary">
           🌟 Explorar Creadores
         </button>
-      </div>
-    </div>
+      </div>    </div>
 
-    <!-- Creators grid -->
+    <!-- Cuadrícula de creadores -->
     <div v-else class="creators-content">
       <div class="creators-grid">
         <div 
           v-for="creador in creadores" 
           :key="creador.username || creador.email"
-          class="creator-card"
-        >
-          <!-- Creator avatar and info -->
+          class="creator-card"        >
+          <!-- Avatar e información del creador -->
           <div class="creator-header">
             <div class="creator-avatar">
               <img 
@@ -110,10 +104,9 @@
                   📝 {{ creador.posts_count || 0 }} posts
                 </span>
               </div>
-            </div>
-          </div>
+            </div>          </div>
 
-          <!-- Creator actions -->
+          <!-- Acciones del creador -->
           <div class="creator-actions">
             <router-link 
               :to="`/creator/${creador.username}`" 
@@ -129,7 +122,7 @@
               class="btn btn-primary btn-sm"
             >
               <span v-if="procesandoSeguimiento[creador.username]">⏳</span>
-              <span v-else>➕ Seguir</span>
+              <span v-else>➡️ Seguir</span>
             </button>
             
             <button 
@@ -141,11 +134,10 @@
               <span v-if="procesandoSeguimiento[creador.username]">⏳</span>
               <span v-else">✅ Siguiendo</span>
             </button>
-          </div>
-        </div>
+          </div>        </div>
       </div>
 
-      <!-- Pagination -->
+      <!-- Paginación -->
       <div v-if="totalPages > 1" class="pagination">
         <button 
           @click="cambiarPagina(paginaActual - 1)"
@@ -180,26 +172,26 @@ import api from '@/services/api'
 const router = useRouter()
 const toast = useToast()
 
-// Estados reactivos
+// Configuración de datos reactivos
 const cargandoCreadores = ref(false)
-const modo = ref('explorar') // 'explorar', 'siguiendo', 'busqueda'
+const modo = ref('explorar') // Modos disponibles: 'explorar', 'siguiendo', 'busqueda'
 const terminoBusqueda = ref('')
 const ordenActual = ref('popular')
 
-// Datos
+// Datos de creadores y paginación
 const creadores = ref([])
 const paginaActual = ref(1)
 const totalPages = ref(1)
 const totalCreadores = ref(0)
 const totalSiguiendo = ref(0)
 
-// Estados de procesamiento
+// Control de estados de procesamiento para evitar clics múltiples
 const procesandoSeguimiento = reactive({})
 
-// Configuración
+// Configuración de paginación
 const creadoresPorPagina = 12
 
-// Computed
+// Propiedades computadas para mensajes dinámicos
 const mensajeCarga = computed(() => {
   switch (modo.value) {
     case 'busqueda':
@@ -233,7 +225,7 @@ const descripcionVacio = computed(() => {
   }
 })
 
-// Métodos
+// Métodos principales
 const cargarCreadores = async (pagina = 1) => {
   cargandoCreadores.value = true
   
@@ -244,6 +236,7 @@ const cargarCreadores = async (pagina = 1) => {
       limit: creadoresPorPagina
     }
     
+    // Determinar endpoint y parámetros según el modo actual
     switch (modo.value) {
       case 'explorar':
         endpoint = '/user/explore-all-creators'
@@ -267,10 +260,10 @@ const cargarCreadores = async (pagina = 1) => {
     paginaActual.value = response.data.page || 1
     totalPages.value = response.data.pages || 1
     totalCreadores.value = response.data.total || 0
-    
-  } catch (error) {
+      } catch (error) {
     console.error('Error al cargar creadores:', error)
     
+    // Redireccionar a login si no está autenticado
     if (error.response?.status === 401) {
       router.push('/login')
       return
@@ -279,10 +272,10 @@ const cargarCreadores = async (pagina = 1) => {
     toast.error('No se pudieron cargar los creadores')
     creadores.value = []
   } finally {
-    cargandoCreadores.value = false
-  }
+    cargandoCreadores.value = false  }
 }
 
+// Cargar estadísticas de cuántos creadores sigue el usuario
 const cargarEstadisticasSeguimiento = async () => {
   try {
     const response = await api.get('/user/following')
@@ -419,7 +412,7 @@ onMounted(async () => {
 }
 
 .page-title {
-  font-size: var(--font-size-xxl);
+  font-size: var(--font-size-3xl);
   font-weight: 700;
   color: var(--color-text);
   margin-bottom: var(--spacing-sm);
@@ -427,7 +420,7 @@ onMounted(async () => {
 
 .page-subtitle {
   font-size: var(--font-size-lg);
-  color: var(--color-text-light);
+  color: var(--color-text-secondary);
 }
 
 .search-section {
@@ -437,7 +430,7 @@ onMounted(async () => {
 
 .search-container {
   background: var(--color-surface);
-  border-radius: var(--border-radius-lg);
+  border-radius: var(--radius-lg);
   padding: var(--spacing-xl);
   box-shadow: var(--shadow-sm);
 }
@@ -455,8 +448,8 @@ onMounted(async () => {
   flex: 1;
   padding: var(--spacing-md);
   border: 1px solid var(--color-border);
-  border-radius: var(--border-radius-md);
-  font-size: var(--font-size-md);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
   background: var(--color-background);
   color: var(--color-text);
 }
@@ -464,7 +457,7 @@ onMounted(async () => {
 .search-input:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.1);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
 }
 
 .search-btn {
@@ -472,7 +465,7 @@ onMounted(async () => {
   background: var(--color-primary);
   color: white;
   border: none;
-  border-radius: var(--border-radius-md);
+  border-radius: var(--radius-md);
   cursor: pointer;
   font-size: var(--font-size-lg);
   transition: background 0.2s ease;
@@ -485,7 +478,7 @@ onMounted(async () => {
 .search-help {
   display: block;
   font-size: var(--font-size-sm);
-  color: var(--color-text-light);
+  color: var(--color-text-secondary);
   margin-top: var(--spacing-xs);
 }
 
@@ -501,7 +494,7 @@ onMounted(async () => {
   border: 1px solid var(--color-border);
   background: var(--color-background);
   color: var(--color-text);
-  border-radius: var(--border-radius-md);
+  border-radius: var(--radius-md);
   cursor: pointer;
   transition: all 0.2s ease;
   font-weight: 500;
@@ -536,7 +529,7 @@ onMounted(async () => {
 .sort-select {
   padding: var(--spacing-sm) var(--spacing-md);
   border: 1px solid var(--color-border);
-  border-radius: var(--border-radius-md);
+  border-radius: var(--radius-md);
   background: var(--color-background);
   color: var(--color-text);
   cursor: pointer;
@@ -547,7 +540,7 @@ onMounted(async () => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: var(--spacing-xxl);
+  padding: var(--spacing-2xl);
   gap: var(--spacing-lg);
 }
 
@@ -562,7 +555,7 @@ onMounted(async () => {
 
 .empty-state {
   text-align: center;
-  padding: var(--spacing-xxl);
+  padding: var(--spacing-2xl);
   max-width: 500px;
   margin: 0 auto;
 }
@@ -578,7 +571,7 @@ onMounted(async () => {
 }
 
 .empty-state p {
-  color: var(--color-text-light);
+  color: var(--color-text-secondary);
   line-height: 1.6;
   margin-bottom: var(--spacing-xl);
 }
@@ -603,7 +596,7 @@ onMounted(async () => {
 
 .creator-card {
   background: var(--color-surface);
-  border-radius: var(--border-radius-lg);
+  border-radius: var(--radius-lg);
   padding: var(--spacing-lg);
   box-shadow: var(--shadow-sm);
   border: 1px solid var(--color-border-light);
@@ -662,7 +655,7 @@ onMounted(async () => {
 
 .creator-bio {
   font-size: var(--font-size-sm);
-  color: var(--color-text-light);
+  color: var(--color-text-secondary);
   line-height: 1.4;
   margin-bottom: var(--spacing-sm);
   display: -webkit-box;
@@ -680,10 +673,10 @@ onMounted(async () => {
 
 .stat {
   font-size: var(--font-size-xs);
-  color: var(--color-text-light);
+  color: var(--color-text-secondary);
   background: var(--color-background);
   padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: var(--border-radius-sm);
+  border-radius: var(--radius-sm);
   border: 1px solid var(--color-border-light);
 }
 
@@ -695,7 +688,7 @@ onMounted(async () => {
 
 .btn {
   padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--border-radius-md);
+  border-radius: var(--radius-md);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -729,12 +722,13 @@ onMounted(async () => {
 }
 
 .btn-secondary {
-  background: var(--color-secondary);
+  background: #10b981;
   color: white;
+  border: 1px solid #059669;
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background: var(--color-secondary-dark);
+  background: #059669;
 }
 
 .btn-outline {
@@ -760,7 +754,7 @@ onMounted(async () => {
   background: var(--color-primary);
   color: white;
   border: none;
-  border-radius: var(--border-radius-md);
+  border-radius: var(--radius-md);
   cursor: pointer;
   font-weight: 600;
   transition: background 0.2s ease;

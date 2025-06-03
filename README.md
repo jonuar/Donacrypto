@@ -11,6 +11,7 @@ Una alternativa descentralizada donde los creadores pueden recibir donaciones di
 - **Base de datos:** MongoDB + PyMongo
 - **Autenticación:** JWT (Flask-JWT-Extended)
 - **Seguridad:** bcrypt, Flask-CORS
+- **Validación:** python-dotenv
 
 ### Frontend
 - **Framework:** Vue.js 3 + Composition API

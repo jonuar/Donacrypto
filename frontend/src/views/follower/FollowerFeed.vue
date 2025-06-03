@@ -306,14 +306,14 @@ export default {
 }
 
 .page-title {
-  font-size: var(--font-size-xxl);
+  font-size: var(--font-size-3xl);
   font-weight: 700;
   color: var(--color-text);
   margin: 0 0 var(--spacing-xs) 0;
 }
 
 .page-subtitle {
-  color: var(--color-text-light);
+  color: var(--color-text-secondary);
   margin: 0;
 }
 
@@ -339,7 +339,7 @@ export default {
 
 .empty-feed {
   text-align: center;
-  padding: var(--spacing-xxl);
+  padding: var(--spacing-2xl);
   max-width: 500px;
   margin: 0 auto;
   
@@ -354,7 +354,7 @@ export default {
   }
   
   p {
-    color: var(--color-text-light);
+    color: var(--color-text-secondary);
     line-height: 1.6;
     margin-bottom: var(--spacing-xl);
   }
@@ -384,7 +384,7 @@ export default {
 
 .feed-post-wrapper {
   background: var(--color-surface);
-  border-radius: var(--border-radius-lg);
+  border-radius: var(--radius-lg);
   border: 1px solid var(--color-border-light);
   overflow: hidden;
   transition: all 0.2s ease;
@@ -413,9 +413,9 @@ export default {
   background: none;
   border: 1px solid var(--color-border);
   padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: var(--border-radius-sm);
+  border-radius: var(--radius-sm);
   font-size: var(--font-size-sm);
-  color: var(--color-text-light);
+  color: var(--color-text-secondary);
   cursor: pointer;
   transition: all 0.2s ease;
   text-decoration: none;
@@ -432,13 +432,13 @@ export default {
   &.liked {
     color: var(--color-error);
     border-color: var(--color-error);
-    background: rgba(var(--color-error-rgb), 0.1);
+    background: rgba(239, 68, 68, 0.1);
   }
   
   &.creator-btn:hover {
     color: var(--color-primary);
     border-color: var(--color-primary);
-    background: rgba(var(--color-primary-rgb), 0.1);
+    background: rgba(139, 92, 246, 0.1);
   }
 }
 
@@ -464,7 +464,7 @@ export default {
   background: none;
   border: 1px solid var(--color-border);
   padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: var(--border-radius-sm);
+  border-radius: var(--radius-sm);
   color: var(--color-text);
   cursor: pointer;
   min-width: 40px;

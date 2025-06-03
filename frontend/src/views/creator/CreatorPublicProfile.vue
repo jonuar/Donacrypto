@@ -355,7 +355,7 @@ export default {
   }
   
   p {
-    color: var(--color-text-light);
+    color: var(--color-text-secondary);
     margin-bottom: var(--spacing-lg);
   }
 }
@@ -367,7 +367,7 @@ export default {
 
 .profile-header {
   background: var(--color-surface);
-  border-radius: var(--border-radius-lg);
+  border-radius: var(--radius-lg);
   padding: var(--spacing-xl);
   margin-bottom: var(--spacing-xl);
   box-shadow: var(--shadow-sm);
@@ -403,14 +403,14 @@ export default {
 }
 
 .profile-username {
-  font-size: var(--font-size-xxl);
+  font-size: var(--font-size-3xl);
   font-weight: 700;
   color: var(--color-text);
   margin: 0 0 var(--spacing-sm) 0;
 }
 
 .profile-bio {
-  color: var(--color-text-light);
+  color: var(--color-text-secondary);
   line-height: 1.6;
   margin: 0 0 var(--spacing-md) 0;
 }
@@ -434,7 +434,7 @@ export default {
 .stat-label {
   display: block;
   font-size: var(--font-size-sm);
-  color: var(--color-text-light);
+  color: var(--color-text-secondary);
 }
 
 .donation-section {
@@ -444,7 +444,7 @@ export default {
   }
   
   p {
-    color: var(--color-text-light);
+    color: var(--color-text-secondary);
     margin: 0 0 var(--spacing-md) 0;
     font-size: var(--font-size-sm);
   }
@@ -458,7 +458,7 @@ export default {
 
 .wallet-item {
   border: 1px solid var(--color-border-light);
-  border-radius: var(--border-radius-md);
+  border-radius: var(--radius-md);
   padding: var(--spacing-md);
   background: var(--color-background);
 }
@@ -489,7 +489,7 @@ export default {
 .wallet-address {
   background: var(--color-surface);
   padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: var(--border-radius-sm);
+  border-radius: var(--radius-sm);
   font-family: monospace;
   font-size: var(--font-size-xs);
   color: var(--color-text);
@@ -504,7 +504,7 @@ export default {
   border: none;
   cursor: pointer;
   padding: var(--spacing-xs);
-  border-radius: var(--border-radius-sm);
+  border-radius: var(--radius-sm);
   
   &:hover {
     background: var(--color-border-light);
@@ -516,7 +516,7 @@ export default {
 }
 
 .qr-code {
-  border-radius: var(--border-radius-sm);
+  border-radius: var(--radius-sm);
   background: white;
   padding: var(--spacing-xs);
 }
@@ -524,7 +524,7 @@ export default {
 .no-wallets {
   text-align: center;
   padding: var(--spacing-lg);
-  color: var(--color-text-light);
+  color: var(--color-text-secondary);
 }
 
 .posts-section {
@@ -555,7 +555,7 @@ export default {
   }
   
   p {
-    color: var(--color-text-light);
+    color: var(--color-text-secondary);
   }
 }
 
@@ -566,7 +566,7 @@ export default {
 
 .post-card {
   background: var(--color-surface);
-  border-radius: var(--border-radius-lg);
+  border-radius: var(--radius-lg);
   padding: var(--spacing-lg);
   box-shadow: var(--shadow-sm);
   border: 1px solid var(--color-border-light);
@@ -595,7 +595,7 @@ export default {
 
 .post-date {
   font-size: var(--font-size-sm);
-  color: var(--color-text-light);
+  color: var(--color-text-secondary);
 }
 
 .post-content {
@@ -621,7 +621,7 @@ export default {
 
 .likes {
   font-size: var(--font-size-sm);
-  color: var(--color-text-light);
+  color: var(--color-text-secondary);
   display: flex;
   align-items: center;
   gap: var(--spacing-xs);
@@ -636,7 +636,7 @@ export default {
 }
 
 .page-info {
-  color: var(--color-text-light);
+  color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
 }
 
