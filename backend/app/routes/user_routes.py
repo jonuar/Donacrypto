@@ -535,10 +535,24 @@ def follow_creator() -> Tuple[Any, int]:
     """
     try:
         data: Dict[str, Any] = request.get_json()
-        creator_email: Optional[str] = data.get("creator_email")
         
+        # Aceptar tanto creator_email como creator_username
+        creator_email: Optional[str] = data.get("creator_email")
+        creator_username: Optional[str] = data.get("creator_username")
+        
+        # Si viene username, convertir a email
+        if creator_username and not creator_email:
+            creator_data = mongo.db.users.find_one(
+                {"username": creator_username, "role": "creator"},
+                {"email": 1}
+            )
+            if not creator_data:
+                return jsonify({"error": "Creador no encontrado"}), 404
+            creator_email = creator_data["email"]
+        
+        # Si no viene ninguno, error
         if not creator_email:
-            return jsonify({"error": "Email del creador requerido"}), 400
+            return jsonify({"error": "Email o username del creador requerido"}), 400
             
         follower_email: str = get_jwt_identity()
         
@@ -560,13 +574,12 @@ def follow_creator() -> Tuple[Any, int]:
         if existing:
             return jsonify({"message": "Ya sigues a este creador"}), 200
             
-        # Crear la relación de seguimiento usando el modelo Following
+        # Crear la relación de seguimiento
         following = Following(
             follower_email=follower_email,
-            creator_email=creator_email
+            creator_email=creator_email  # ← Sigue usando email internamente
         )
         
-        # Guardar en la base de datos
         mongo.db.followings.insert_one(following.to_dict())
         
         return jsonify({"message": f"Ahora sigues a {creator_data['username']}"}), 201
@@ -586,10 +599,23 @@ def unfollow_creator() -> Tuple[Any, int]:
     """
     try:
         data: Dict[str, Any] = request.get_json()
+        
+        # Aceptar tanto creator_email como creator_username
         creator_email: Optional[str] = data.get("creator_email")
+        creator_username: Optional[str] = data.get("creator_username")
+        
+        # Si viene username, convertir a email
+        if creator_username and not creator_email:
+            creator_data = mongo.db.users.find_one(
+                {"username": creator_username, "role": "creator"},
+                {"email": 1}
+            )
+            if not creator_data:
+                return jsonify({"error": "Creador no encontrado"}), 404
+            creator_email = creator_data["email"]
         
         if not creator_email:
-            return jsonify({"error": "Email del creador requerido"}), 400
+            return jsonify({"error": "Email o username del creador requerido"}), 400
             
         follower_email: str = get_jwt_identity()
         

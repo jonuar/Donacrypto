@@ -321,13 +321,8 @@ const seguirCreador = async (creador) => {
   procesandoSeguimiento[username] = true
   
   try {
-    // Necesitamos el email del creador para seguirlo
-    // Primero obtenemos el perfil público del creador
-    const perfilResponse = await api.get(`/user/creator/${username}`)
-    const creatorEmail = perfilResponse.data.email
-    
     await api.post('/user/follow', {
-      creator_email: creatorEmail
+      creator_username: username  // ✅ Usar username
     })
     
     // Actualizar estado local
@@ -357,12 +352,8 @@ const dejarDeSeguir = async (creador) => {
   procesandoSeguimiento[username] = true
   
   try {
-    // Obtener el email del creador
-    const perfilResponse = await api.get(`/user/creator/${username}`)
-    const creatorEmail = perfilResponse.data.email
-    
     await api.post('/user/unfollow', {
-      creator_email: creatorEmail
+      creator_username: username  // ✅ Usar username
     })
     
     // Actualizar estado local
