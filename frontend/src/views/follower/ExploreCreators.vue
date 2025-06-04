@@ -502,6 +502,7 @@ onMounted(async () => {
 
 .tab-btn:hover:not(:disabled) {
   background: var(--color-border-light);
+  color: var(--color-text-dark);
 }
 
 .tab-btn.active {
@@ -719,6 +720,8 @@ onMounted(async () => {
 
 .btn-primary:hover:not(:disabled) {
   background: var(--color-primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(81, 16, 185, 0.3);
 }
 
 .btn-secondary {
@@ -729,6 +732,9 @@ onMounted(async () => {
 
 .btn-secondary:hover:not(:disabled) {
   background: #059669;
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
 
 .btn-outline {
