@@ -1,20 +1,7 @@
 <template>
   <div class="about-page">
-    <nav class="navbar">
-      <div class="nav-container">
-        <router-link to="/" class="nav-brand">
-          <span class="brand-icon">💜</span>
-          <span class="brand-text">DonaCrypto</span>
-        </router-link>
-        <div class="nav-actions">
-          <router-link to="/dashboard" v-if="authStore?.estaAutenticado && authStore?.esCreador" class="btn btn-secondary">
-            Mi Dashboard
-          </router-link>
-          <router-link to="/" class="btn btn-ghost">Volver al Inicio</router-link>
-        </div>
-      </div>
-    </nav>
 
+    
     <main class="main-content">
       <div class="about-hero">
         <h1>Acerca de Nosotros</h1>
@@ -22,6 +9,7 @@
       </div>
 
       <div class="content-section">
+        <!-- Resto del contenido igual -->
         <div class="bento-card">
           <h2>Nuestra Misión</h2>
           <p>
@@ -102,17 +90,8 @@
 </template>
 
 <script>
-import { useAuthStore } from '@/stores/auth'
-
 export default {
-  name: 'AboutView',
-  setup() {
-    const authStore = useAuthStore()
-    
-    return {
-      authStore
-    }
-  }
+  name: 'AboutView'
 }
 </script>
 
@@ -120,36 +99,6 @@ export default {
 .about-page {
   min-height: 100vh;
   background: var(--color-background);
-}
-
-.navbar {
-  background: var(--color-surface);
-  border-bottom: 1px solid var(--color-border-light);
-  box-shadow: var(--shadow-sm);
-}
-
-.nav-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 var(--spacing-lg);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 70px;
-}
-
-.nav-brand {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  font-weight: 600;
-  font-size: var(--font-size-lg);
-  color: var(--color-text);
-  text-decoration: none;
-}
-
-.brand-icon {
-  font-size: var(--font-size-xl);
 }
 
 .main-content {
