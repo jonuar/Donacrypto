@@ -7,9 +7,8 @@
           <h1 class="page-title">PANEL DE CREADOR</h1>
           <p class="page-subtitle">Gestiona tu perfil, wallets y ve tus estadísticas</p>
         </div>
-        <div class="header-actions">
-          <button @click="actualizarDatos" :disabled="cargandoDatos" class="btn btn-secondary">
-            <span v-if="cargandoDatos">🔄</span>
+        <div class="header-actions">          <button @click="actualizarDatos" :disabled="cargandoDatos" class="btn btn-secondary">
+            <span v-if="cargandoDatos">...</span>
             <span v-else>↻</span>
             Actualizar
           </button>
@@ -102,22 +101,20 @@
                   <span class="currency-icon">{{ getCurrencyIcon(wallet.currency_type) }}</span>
                   <span class="currency-name">{{ wallet.currency_type }}</span>
                   <span v-if="wallet.is_default" class="default-badge">Predeterminada</span>
-                </div>
-                <div class="wallet-actions">
+                </div>                <div class="wallet-actions">
                   <button @click="editarWallet(wallet)" class="btn-icon" title="Editar">
-                    ✏️
+                    ✎
                   </button>
                   <button @click="eliminarWallet(wallet.currency_type)" class="btn-icon" title="Eliminar">
-                    🗑️
+                    ×
                   </button>
                 </div>
               </div>
               
               <div class="wallet-address">
                 <span class="address-label">Dirección:</span>
-                <code class="address-text">{{ wallet.wallet_address }}</code>
-                <button @click="copiarDireccion(wallet.wallet_address)" class="btn-copy" title="Copiar">
-                  📋
+                <code class="address-text">{{ wallet.wallet_address }}</code>                <button @click="copiarDireccion(wallet.wallet_address)" class="btn-copy" title="Copiar">
+                  ⧉
                 </button>
               </div>
                 <!-- QR Code -->

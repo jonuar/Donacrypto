@@ -19,7 +19,7 @@
             class="btn-icon btn-danger"
             title="Eliminar post"
           >
-            🗑️
+            ×
           </button>
         </div>
       </div>

@@ -2,8 +2,8 @@
   <div class="explore-creators">
     <div class="explore-header">
       <div class="header-content">
-        <h1 class="page-title">🔍 Explorar Creadores</h1>
-        <p class="page-subtitle">Descubre y sigue a nuevos creadores de contenido</p>
+        <h1 class="page-title">Descrubir Creadores</h1>
+        <p class="page-subtitle">Sigue a nuevos creadores de contenido</p>
       </div>
     </div>    <!-- Sección de búsqueda y filtros -->
     <div class="search-section">
@@ -19,37 +19,35 @@
               placeholder="Buscar creadores por nombre de usuario..."
               class="search-input"
             />
-            <button @click="buscarCreadores" class="search-btn">
-              🔍
-            </button>
-          </div>          <small v-if="terminoBusqueda" class="search-help">
+            <button @click="buscarCreadores" class="search-btn">Buscar</button>
+          </div>
+          <small v-if="terminoBusqueda" class="search-help">
             Presiona Enter o haz clic en buscar
           </small>
         </div>
         
         <!-- Pestañas de filtrado por modo de vista -->
-        <div class="filter-tabs">
-          <button 
+        <div class="filter-tabs">          <button 
             @click="cambiarModo('explorar')" 
             :class="['tab-btn', { active: modo === 'explorar' }]"
           >
-            🌟 Explorar Todos
+            Explorar Todos
           </button>
           <button 
             @click="cambiarModo('siguiendo')" 
             :class="['tab-btn', { active: modo === 'siguiendo' }]"
           >
-            👥 Siguiendo ({{ totalSiguiendo }})
-          </button>        </div>        <!-- Opciones de ordenamiento (solo para modo explorar) -->
+            Siguiendo ({{ totalSiguiendo }})
+          </button></div>        <!-- Opciones de ordenamiento (solo para modo explorar) -->
         <div v-if="modo === 'explorar'" class="sort-options">
-          <label class="sort-label">Ordenar por:</label>
-          <select v-model="ordenActual" @change="() => cargarCreadores(1)" class="sort-select">
-            <option value="popular">🔥 Más populares</option>
-            <option value="recent">⏰ Más recientes</option>
-            <option value="alphabetical">🔤 A-Z</option>
+          <label class="sort-label">Ordenar por:</label>          <select v-model="ordenActual" @change="() => cargarCreadores(1)" class="sort-select">
+            <option value="popular">Más populares</option>
+            <option value="recent">Más recientes</option>
+            <option value="alphabetical">A-Z</option>
           </select>
         </div>
-      </div>    </div>
+      </div>
+    </div>
 
     <!-- Estado de carga -->
     <div v-if="cargandoCreadores" class="loading-container">
@@ -57,18 +55,16 @@
       <p>{{ mensajeCarga }}</p>    </div>
 
     <!-- Estados vacíos cuando no hay resultados -->
-    <div v-else-if="creadores.length === 0" class="empty-state">
-      <div class="empty-icon">
-        {{ modo === 'busqueda' ? '🔍' : modo === 'siguiendo' ? '👥' : '🌟' }}
+    <div v-else-if="creadores.length === 0" class="empty-state">      <div class="empty-icon">
+        {{ modo === 'busqueda' ? '🔍' : modo === 'siguiendo' ? '👥' : '⭐' }}
       </div>
       <h2>{{ mensajeVacio }}</h2>
       <p>{{ descripcionVacio }}</p>
-      
-      <div v-if="modo === 'siguiendo'" class="empty-actions">
+        <div v-if="modo === 'siguiendo'" class="empty-actions">
         <button @click="cambiarModo('explorar')" class="btn btn-primary">
-          🌟 Explorar Creadores
+          Explorar Creadores
         </button>
-      </div>    </div>
+      </div></div>
 
     <!-- Cuadrícula de creadores -->
     <div v-else class="creators-content">
@@ -93,24 +89,22 @@
             
             <div class="creator-info">
               <h3 class="creator-name">{{ creador.username }}</h3>
-              <p v-if="creador.bio" class="creator-bio">{{ creador.bio }}</p>
-              <div class="creator-stats">
+              <p v-if="creador.bio" class="creator-bio">{{ creador.bio }}</p>              <div class="creator-stats">
                 <span class="stat">
-                  👥 {{ creador.followers_count || 0 }} seguidores
+                  {{ creador.followers_count || 0 }} seguidores
                 </span>
                 <span class="stat">
-                  📝 {{ creador.posts_count || 0 }} posts
+                  {{ creador.posts_count || 0 }} posts
                 </span>
               </div>
             </div>          </div>
 
           <!-- Acciones del creador -->
-          <div class="creator-actions">
-            <router-link 
+          <div class="creator-actions">            <router-link 
               :to="`/creator/${creador.username}`" 
               class="btn btn-outline btn-sm"
             >
-              👁️ Ver Perfil
+              Ver Perfil
             </router-link>
             
             <button 
@@ -119,8 +113,8 @@
               :disabled="procesandoSeguimiento[creador.username]"
               class="btn btn-primary btn-sm"
             >
-              <span v-if="procesandoSeguimiento[creador.username]">⏳</span>
-              <span v-else>➡️ Seguir</span>
+              <span v-if="procesandoSeguimiento[creador.username]">...</span>
+              <span v-else>Seguir</span>
             </button>
             
             <button 
@@ -129,8 +123,8 @@
               :disabled="procesandoSeguimiento[creador.username]"
               class="btn btn-secondary btn-sm"
             >
-              <span v-if="procesandoSeguimiento[creador.username]">⏳</span>
-              <span v-else">✅ Siguiendo</span>
+              <span v-if="procesandoSeguimiento[creador.username]">Dejando de seguir...</span>
+              <span v-else>Siguiendo</span>
             </button>
           </div>        </div>
       </div>
@@ -251,9 +245,8 @@ const cargarCreadores = async (pagina = 1) => {
         params.q = terminoBusqueda.value
         break
     }
-    
-    // DEBUG: Log para debugging
-    console.log('🔍 Cargando creadores:', {
+      // DEBUG: Log para debugging
+    console.log('Cargando creadores:', {
       modo: modo.value,
       endpoint,
       params,
@@ -261,9 +254,8 @@ const cargarCreadores = async (pagina = 1) => {
     })
     
     const response = await api.get(endpoint, { params })
-    
-    // DEBUG: Log de respuesta exitosa
-    console.log('✅ Respuesta exitosa:', {
+      // DEBUG: Log de respuesta exitosa
+    console.log('Respuesta exitosa:', {
       status: response.status,
       dataKeys: Object.keys(response.data),
       creatorsCount: response.data.creators?.length || 0,
@@ -273,9 +265,8 @@ const cargarCreadores = async (pagina = 1) => {
     creadores.value = response.data.creators || []
     paginaActual.value = response.data.page || 1
     totalPages.value = response.data.pages || 1
-    totalCreadores.value = response.data.total || 0
-  } catch (error) {
-    console.error('❌ Error al cargar creadores:', {
+    totalCreadores.value = response.data.total || 0  } catch (error) {
+    console.error('Error al cargar creadores:', {
       message: error.message,
       status: error.response?.status,
       statusText: error.response?.statusText,
@@ -355,7 +346,7 @@ const seguirCreador = async (creador) => {
     creador.followers_count = (creador.followers_count || 0) + 1
     totalSiguiendo.value += 1
     
-    toast.success(`✅ Ahora sigues a ${username}`)
+    toast.success(`Ahora sigues a ${username}`)
     
   } catch (error) {
     console.error('Error al seguir creador:', error)
@@ -364,9 +355,8 @@ const seguirCreador = async (creador) => {
       router.push('/login')
       return
     }
-    
-    const mensaje = error.response?.data?.error || 'Error al seguir al creador'
-    toast.error(`❌ ${mensaje}`)
+      const mensaje = error.response?.data?.error || 'Error al seguir al creador'
+    toast.error(`${mensaje}`)
   } finally {
     procesandoSeguimiento[username] = false
   }
@@ -386,7 +376,7 @@ const dejarDeSeguir = async (creador) => {
     creador.followers_count = Math.max((creador.followers_count || 1) - 1, 0)
     totalSiguiendo.value = Math.max(totalSiguiendo.value - 1, 0)
     
-    toast.success(`✅ Dejaste de seguir a ${username}`)
+    toast.success(`Dejaste de seguir a ${username}`)
     
     // Si estamos en la vista de "siguiendo", remover de la lista
     if (modo.value === 'siguiendo') {
@@ -400,9 +390,8 @@ const dejarDeSeguir = async (creador) => {
       router.push('/login')
       return
     }
-    
-    const mensaje = error.response?.data?.error || 'Error al dejar de seguir al creador'
-    toast.error(`❌ ${mensaje}`)
+      const mensaje = error.response?.data?.error || 'Error al dejar de seguir al creador'
+    toast.error(`${mensaje}`)
   } finally {
     procesandoSeguimiento[username] = false
   }
@@ -410,23 +399,23 @@ const dejarDeSeguir = async (creador) => {
 
 // Watchers
 watch(ordenActual, (nuevoOrden, ordenAnterior) => {
-  console.log('🔄 Cambio de ordenamiento detectado:', {
+  console.log('Cambio de ordenamiento detectado:', {
     anterior: ordenAnterior,
     nuevo: nuevoOrden,
     modo: modo.value
   })
   if (modo.value === 'explorar') {
-    console.log('▶️ Ejecutando cargarCreadores() por cambio de orden')
+    console.log('Ejecutando cargarCreadores() por cambio de orden')
     cargarCreadores(1)
   }
 })
 
 // Lifecycle
 onMounted(async () => {
-  console.log('🚀 ExploreCreators mounted - iniciando carga...')
+  console.log('ExploreCreators mounted - iniciando carga...')
   await cargarEstadisticasSeguimiento()
   await cargarCreadores(1)
-  console.log('✅ ExploreCreators carga inicial completada')
+  console.log('ExploreCreators carga inicial completada')
 })
 </script>
 

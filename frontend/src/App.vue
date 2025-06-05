@@ -12,13 +12,16 @@
           <!-- Navigation for followers -->
           <template v-if="usuario.role === 'follower'">
             <router-link to="/feed" class="nav-link" :class="{ 'active': route.path === '/feed' }">
-              🏠 Feed
+              <span class="nav-icon">🏠</span>
+              <span class="nav-text">Feed</span>
             </router-link>
             <router-link to="/explore" class="nav-link" :class="{ 'active': route.path === '/explore' }">
-              🔍 Explorar
+              <span class="nav-icon">🔍</span>
+              <span class="nav-text">Explorar</span>
             </router-link>
             <router-link to="/profile" class="nav-link" :class="{ 'active': route.path === '/profile' }">
-              👤 Perfil
+              <span class="nav-icon">👤</span>
+              <span class="nav-text">Perfil</span>
             </router-link>
           </template>
           
@@ -117,6 +120,25 @@ export default {
   padding: var(--spacing-sm) var(--spacing-md);
   border-radius: var(--radius-sm);
   transition: background-color 0.2s;
+  display: flex;
+  flex-direction: column;        /* Mantener columna */
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);        /* Espacio entre icono y texto */
+  white-space: nowrap;
+  min-height: 50px;
+  text-align: center;
+  font-size: var(--font-size-sm);
+}
+
+.nav-icon {
+  font-size: var(--font-size-lg);    /* Icono más grande */
+  line-height: 1;
+}
+
+.nav-text {
+  font-size: var(--font-size-sm);    /* Texto más pequeño */
+  line-height: 1;
 }
 
 .nav-link:hover {
@@ -140,7 +162,16 @@ export default {
   
   .nav-link {
     padding: var(--spacing-xs) var(--spacing-sm);
-    font-size: var(--font-size-sm);
+    min-height: 45px;
+    gap: 2px;
+  }
+  
+  .nav-icon {
+    font-size: var(--font-size-base);   /* Icono más pequeño en móvil */
+  }
+  
+  .nav-text {
+    font-size: var(--font-size-xs);     /* Texto más pequeño en móvil */
   }
 }
 </style>

@@ -19,13 +19,12 @@
       <div class="empty-icon">📱</div>
       <h2>Tu feed está vacío</h2>
       <p>{{ mensaje }}</p>
-      
-      <div class="feed-actions">
+        <div class="feed-actions">
         <router-link to="/explore" class="btn btn-primary">
-          🔍 Explorar Creadores
+          Explorar Creadores
         </router-link>
         <router-link to="/creators" class="btn btn-outline">
-          👥 Ver Todos los Creadores
+          Ver Todos los Creadores
         </router-link>
       </div>
     </div>    <!-- Posts feed -->
@@ -198,7 +197,7 @@ export default {
       post.liked = !post.liked
       if (post.liked) {
         post.likes_count = (post.likes_count || 0) + 1
-        toast.success('❤️ Te gusta este post')
+        toast.success('Te gusta este post')
       } else {
         post.likes_count = Math.max(0, (post.likes_count || 0) - 1)
       }

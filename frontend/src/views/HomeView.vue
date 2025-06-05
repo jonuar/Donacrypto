@@ -328,15 +328,60 @@ export default {
 @media (max-width: 768px) {
   .nav-container {
     padding: 0 var(--spacing-md);
+    height: auto;
+    min-height: 70px;
+    flex-wrap: wrap;
+    align-items: center;
   }
 
   .nav-brand {
     font-size: var(--font-size-base);
+    flex: 1;
   }
 
   .nav-actions {
-    flex-direction: column;
+    display: flex;
+    flex-direction: row;
     gap: var(--spacing-xs);
+    flex-shrink: 0;
+    align-items: center;
+  }
+
+  .nav-actions .btn {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--font-size-sm);
+    white-space: nowrap;
+    min-width: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .nav-container {
+    padding: 0 var(--spacing-md);
+    height: auto;
+    min-height: 70px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .nav-brand {
+    font-size: var(--font-size-base);
+    flex: 1;
+  }
+
+  .nav-actions {
+    display: flex;
+    flex-direction: row;
+    gap: var(--spacing-xs);
+    flex-shrink: 0;
+    align-items: center;
+  }
+
+  .nav-actions .btn {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--font-size-sm);
+    white-space: nowrap;
+    min-width: auto;
   }
 
   .hero-section {
@@ -365,6 +410,31 @@ export default {
   .features-grid {
     grid-template-columns: 1fr;
     gap: var(--spacing-lg);
+  }
+}
+
+/* Para pantallas muy pequeñas (móviles en modo portrait) */
+@media (max-width: 480px) {
+  .nav-container {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm);
+    align-items: stretch;
+  }
+
+  .nav-brand {
+    justify-content: center;
+    margin-bottom: var(--spacing-xs);
+  }
+
+  .nav-actions {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .nav-actions .btn {
+    flex: 1;
+    text-align: center;
   }
 }
 </style>

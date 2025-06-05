@@ -1,7 +1,7 @@
 <template>
   <div class="follower-profile">
     <div class="profile-header">
-      <h1 class="page-title">⚙️ Mi Perfil</h1>
+      <h1 class="page-title">Mi Perfil</h1>
       <p class="page-subtitle">Gestiona tu información personal</p>
     </div>
 
@@ -88,9 +88,8 @@
             type="submit" 
             :disabled="guardandoPerfil"
             class="btn btn-primary"
-          >
-            <span v-if="guardandoPerfil">💾 Guardando...</span>
-            <span v-else>💾 Guardar Cambios</span>
+          >            <span v-if="guardandoPerfil">Guardando...</span>
+            <span v-else>Guardar Cambios</span>
           </button>
           
           <button 
@@ -98,14 +97,14 @@
             @click="cancelarEdicion"
             class="btn btn-outline"
           >
-            🚫 Cancelar
+            Cancelar
           </button>
         </div>
       </form>
 
       <!-- Additional sections -->
       <div class="profile-stats">
-        <h3>📊 Estadísticas</h3>
+        <h3>Estadísticas</h3>
         <div class="stats-grid">
           <div class="stat-card">
               <div class="stat-label">Siguiendo</div>
@@ -120,7 +119,7 @@
 
       <!-- Change password section -->
       <div class="password-section">
-        <h3>🔒 Contraseña</h3>
+        <h3>Contraseña</h3>
         <form @submit.prevent="cambiarContrasena" class="password-form">
           <div class="form-group">
             <label for="current-password" class="form-label">Contraseña actual</label>
@@ -160,9 +159,8 @@
               type="submit" 
               :disabled="cambiandoPassword"
               class="btn btn-secondary"
-            >
-              <span v-if="cambiandoPassword">🔄 Cambiando...</span>
-              <span v-else>🔒 Actualizar</span>
+            >              <span v-if="cambiandoPassword">Cambiando...</span>
+              <span v-else>Actualizar</span>
             </button>
           </div>
         </form>
@@ -279,21 +277,20 @@ const actualizarPerfil = async () => {
     
     const response = await api.put('/user/update-profile', datosActualizacion)
     
-    toast.success('✅ Perfil actualizado con éxito')
+    toast.success('Perfil actualizado con éxito')
     
     // Actualizar datos originales
     Object.assign(perfilOriginal, perfil)
     
   } catch (error) {
     console.error('Error al actualizar perfil:', error)
-    
-    if (error.response?.status === 409) {
-      toast.error('❌ El nombre de usuario ya está en uso')
+      if (error.response?.status === 409) {
+      toast.error('El nombre de usuario ya está en uso')
     } else if (error.response?.status === 401) {
-      toast.error('❌ Sesión expirada')
+      toast.error('Sesión expirada')
       router.push('/login')
     } else {
-      toast.error('❌ Error al actualizar el perfil')
+      toast.error('Error al actualizar el perfil')
     }
   } finally {
     guardandoPerfil.value = false
@@ -302,17 +299,16 @@ const actualizarPerfil = async () => {
 
 const cancelarEdicion = () => {
   Object.assign(perfil, perfilOriginal)
-  toast.info('ℹ️ Cambios cancelados')
+  toast.info('Cambios cancelados')
 }
 
-const cambiarContrasena = async () => {
-  if (password.nueva !== password.confirmar) {
-    toast.error('❌ Las contraseñas no coinciden')
+const cambiarContrasena = async () => {  if (password.nueva !== password.confirmar) {
+    toast.error('Las contraseñas no coinciden')
     return
   }
   
   if (password.nueva.length < 6) {
-    toast.error('❌ La nueva contraseña debe tener al menos 6 caracteres')
+    toast.error('La nueva contraseña debe tener al menos 6 caracteres')
     return
   }
   
@@ -324,7 +320,7 @@ const cambiarContrasena = async () => {
       new_password: password.nueva
     })
     
-    toast.success('✅ Contraseña cambiada con éxito')
+    toast.success('Contraseña cambiada con éxito')
     
     // Limpiar formulario
     password.actual = ''
@@ -333,14 +329,13 @@ const cambiarContrasena = async () => {
     
   } catch (error) {
     console.error('Error al cambiar contraseña:', error)
-    
-    if (error.response?.status === 400) {
-      toast.error('❌ La contraseña actual es incorrecta')
+      if (error.response?.status === 400) {
+      toast.error('La contraseña actual es incorrecta')
     } else if (error.response?.status === 401) {
-      toast.error('❌ Sesión expirada')
+      toast.error('Sesión expirada')
       router.push('/login')
     } else {
-      toast.error('❌ Error al cambiar la contraseña')
+      toast.error('Error al cambiar la contraseña')
     }
   } finally {
     cambiandoPassword.value = false

@@ -20,7 +20,7 @@
         </div>
 
         <div class="bento-card">
-          <h2>🔒 ¿Por qué Descentralizado?</h2>
+          <h2>¿Por qué Descentralizado?</h2>
           <div class="benefits-list">
             <div class="benefit-item">
               <div class="benefit-icon">🔒</div>

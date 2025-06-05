@@ -1,4 +1,10 @@
-<!-- ===== VISTA DE INICIO DE SESIÓN ===== -->
+<!-- ===== VISTA DE INICIO DE SESIÓN ==            <button
+              @click="mostrarContrasena = !mostrarContrasena"
+              class="password-toggle"
+            >
+              <span v-if="mostrarContrasena">👁️</span>
+              <span v-else>👁️‍🗨️</span>
+            </button>
 <!-- Formulario de login con validación y manejo de errores -->
 <template>
   <AuthComponent>

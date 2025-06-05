@@ -52,19 +52,19 @@
                 <span class="currency-icon">{{ getCurrencyIcon(wallet.currency_type) }}</span>
                 <span class="currency-name">{{ wallet.currency_type }}</span>
               </div>
-              
-              <div class="wallet-address-container">
+                <div class="wallet-address-container">
                 <code class="wallet-address">{{ wallet.wallet_address }}</code>
                 <button @click="copiarDireccion(wallet.wallet_address)" class="btn-copy" title="Copiar">
-                  📋
+                  ⧉
                 </button>
-              </div>
-              
-              <div class="qr-container">
+              </div><div class="qr-container">
                 <canvas 
-                  :data-ref="`qr-${wallet.currency_type}`"
+                  :ref="`qr-${wallet.currency_type}`"
                   class="qr-code"
+                  @click="abrirModalQR(wallet)"
+                  title="Haz clic para ver en grande"
                 ></canvas>
+                <p class="qr-help">Haz clic para ampliar</p>
               </div>
             </div>
           </div>
@@ -131,7 +131,41 @@
             class="btn btn-outline"
           >
             Siguiente
-          </button>
+          </button>        </div>
+      </div>
+    </div>
+
+    <!-- Modal QR ampliado -->
+    <div v-if="mostrarModalQR" class="qr-modal-overlay" @click="cerrarModalQR">
+      <div class="qr-modal" @click.stop>
+        <div class="qr-modal-header">
+          <h3>{{ getCurrencyIcon(walletSeleccionada?.currency_type) }} {{ walletSeleccionada?.currency_type }}</h3>
+          <button @click="cerrarModalQR" class="close-btn">✕</button>
+        </div>
+          <div class="qr-modal-content">
+          <div class="qr-large-container">
+            <canvas 
+              ref="qrModalCanvas"
+              class="qr-large"
+            ></canvas>
+          </div>
+          
+          <div class="wallet-details">
+            <p class="wallet-label">Dirección de la wallet:</p>
+            <div class="wallet-address-large">
+              <code>{{ walletSeleccionada?.wallet_address }}</code>
+              <button 
+                @click="copiarDireccion(walletSeleccionada?.wallet_address)" 
+                class="btn-copy-large"
+                title="Copiar dirección"
+              >
+                ⧉ Copiar
+              </button>
+            </div>
+            <p class="qr-instructions">
+              Escanea este código QR con tu wallet o copia la dirección para enviar {{ walletSeleccionada?.currency_type }}
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -157,6 +191,13 @@ export default {
     const cargandoCreador = ref(false)
     const cargandoPosts = ref(false)
     const error = ref('')
+      // Estados del modal QR
+    const mostrarModalQR = ref(false)
+    const walletSeleccionada = ref(null)
+    
+    // Referencias para los canvas QR
+    const qrRefs = ref({})
+    const qrModalCanvas = ref(null)
     
     // Paginación
     const paginaActual = ref(1)
@@ -228,7 +269,7 @@ export default {
         toast.error('No se pudo copiar la dirección')
       }
     }
-    
+
     const formatearFecha = (fecha) => {
       if (!fecha) {
         return 'Fecha no disponible'
@@ -250,14 +291,32 @@ export default {
 
     const generarCodigosQR = async () => {
       await nextTick()
+        console.log('Generando códigos QR para wallets:', wallets.value)
       
       try {
         const QRCode = (await import('qrcode')).default
-        
-        for (const wallet of wallets.value) {
-          const canvas = document.querySelector(`[data-ref="qr-${wallet.currency_type}"]`)
-          if (canvas) {
-            QRCode.toCanvas(canvas, wallet.wallet_address, {
+        console.log('Librería QRCode cargada correctamente')
+          for (const wallet of wallets.value) {
+          console.log(`Procesando wallet ${wallet.currency_type}:`, wallet.wallet_address)
+          
+          // Esperar a que el DOM esté listo
+          await nextTick()
+          
+          // Buscar el canvas por múltiples selectores
+          const canvasSelectors = [
+            `canvas[ref="qr-${wallet.currency_type}"]`,
+            `[ref="qr-${wallet.currency_type}"]`,
+            `.qr-code:nth-of-type(${wallets.value.indexOf(wallet) + 1})`
+          ]
+          
+          let canvas = null
+          for (const selector of canvasSelectors) {
+            canvas = document.querySelector(selector)
+            if (canvas) break
+          }
+            console.log(`Canvas encontrado para ${wallet.currency_type}:`, !!canvas)
+            if (canvas) {
+            await QRCode.toCanvas(canvas, wallet.wallet_address, {
               width: 150,
               margin: 1,
               color: {
@@ -265,10 +324,57 @@ export default {
                 light: '#ffffff'
               }
             })
+            console.log(`QR generado exitosamente para ${wallet.currency_type}`)
+          } else {
+            console.error(`No se encontró canvas para ${wallet.currency_type}`)
+            console.log('Elementos canvas disponibles:', document.querySelectorAll('canvas'))
           }
+        }      } catch (error) {
+        console.error('Error al generar códigos QR:', error)
+      }
+    }
+
+    const abrirModalQR = async (wallet) => {
+      walletSeleccionada.value = wallet
+      mostrarModalQR.value = true
+      
+      // Esperar a que el modal se renderice y luego generar el QR grande
+      await nextTick()
+      setTimeout(async () => {
+        await generarQRModal(wallet)
+      }, 100)
+    }
+
+    const cerrarModalQR = () => {
+      mostrarModalQR.value = false
+      walletSeleccionada.value = null
+    }
+
+    const generarQRModal = async (wallet) => {
+      try {
+        console.log('Generando QR modal para:', wallet.currency_type)
+        const QRCode = (await import('qrcode')).default
+        
+        // Usar la ref del canvas del modal
+        const canvas = qrModalCanvas.value        
+        if (canvas) {
+          console.log('Canvas del modal encontrado usando ref, generando QR...')
+          await QRCode.toCanvas(canvas, wallet.wallet_address, {
+            width: 300,
+            margin: 2,
+            color: {
+              dark: '#1a1a1a',
+              light: '#ffffff'
+            }
+          })
+          console.log(`QR modal generado exitosamente para ${wallet.currency_type}`)
+        } else {
+          console.error(`No se encontró canvas para modal ${wallet.currency_type}`)
+          console.log('qrModalCanvas.value:', qrModalCanvas.value)
+          console.log('Modal visible:', !!document.querySelector('.qr-modal'))
         }
       } catch (error) {
-        console.warn('No se pudo cargar la librería QRCode:', error)
+        console.error('Error al generar QR modal:', error)
       }
     }
 
@@ -279,6 +385,17 @@ export default {
         await obtenerPosts(newUsername)
       }
     })
+
+    // Watcher para regenerar QR cuando cambien los wallets
+    watch(wallets, async (newWallets) => {
+      if (newWallets && newWallets.length > 0) {
+        console.log('Wallets detectados, generando códigos QR...')
+        // Pequeño delay para asegurar que el DOM esté actualizado
+        setTimeout(() => {
+          generarCodigosQR()
+        }, 100)
+      }
+    }, { deep: true })
 
     // Lifecycle
     onMounted(async () => {
@@ -296,14 +413,18 @@ export default {
       cargandoCreador,
       cargandoPosts,
       error,
-      paginaActual,
-      totalPages,
+      paginaActual,      totalPages,
+      mostrarModalQR,
+      walletSeleccionada,
+      qrModalCanvas,
       obtenerPerfilCreador,
       obtenerPosts,
       cambiarPagina,
       getCurrencyIcon,
-      copiarDireccion,
-      formatearFecha
+      copiarDireccion,      formatearFecha,
+      abrirModalQR,
+      cerrarModalQR,
+      generarQRModal
     }
   }
 }
@@ -519,6 +640,167 @@ export default {
   border-radius: var(--radius-sm);
   background: white;
   padding: var(--spacing-xs);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  
+  &:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.qr-help {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  margin-top: var(--spacing-xs);
+  margin-bottom: 0;
+}
+
+// Modal QR Styles
+.qr-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.qr-modal {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  max-width: 500px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--color-border-light);
+}
+
+.qr-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 1px solid var(--color-border-light);
+  
+  h3 {
+    margin: 0;
+    font-size: var(--font-size-xl);
+    color: var(--color-text);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: var(--font-size-xl);
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: var(--color-border-light);
+    color: var(--color-text);
+  }
+}
+
+.qr-modal-content {
+  text-align: center;
+}
+
+.qr-large-container {
+  margin-bottom: var(--spacing-lg);
+  display: flex;
+  justify-content: center;
+}
+
+.qr-large {
+  border-radius: var(--radius-md);
+  background: white;
+  padding: var(--spacing-md);
+  border: 2px solid var(--color-border-light);
+}
+
+.wallet-details {
+  text-align: left;
+}
+
+.wallet-label {
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: var(--spacing-sm);
+  font-size: var(--font-size-sm);
+}
+
+.wallet-address-large {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: var(--color-background);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-light);
+  
+  code {
+    flex: 1;
+    font-family: monospace;
+    font-size: var(--font-size-sm);
+    color: var(--color-text);
+    word-break: break-all;
+    line-height: 1.4;
+  }
+}
+
+.btn-copy-large {
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  white-space: nowrap;
+  
+  &:hover {
+    background: var(--color-primary-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+  }
+}
+
+.qr-instructions {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  margin: 0;
+  text-align: center;
+  padding: var(--spacing-md);
+  background: var(--color-background);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-light);
 }
 
 .no-wallets {
