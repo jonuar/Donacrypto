@@ -40,12 +40,10 @@
             :class="['tab-btn', { active: modo === 'siguiendo' }]"
           >
             👥 Siguiendo ({{ totalSiguiendo }})
-          </button>        </div>
-
-        <!-- Opciones de ordenamiento (solo para modo explorar) -->
+          </button>        </div>        <!-- Opciones de ordenamiento (solo para modo explorar) -->
         <div v-if="modo === 'explorar'" class="sort-options">
           <label class="sort-label">Ordenar por:</label>
-          <select v-model="ordenActual" @change="cargarCreadores" class="sort-select">
+          <select v-model="ordenActual" @change="() => cargarCreadores(1)" class="sort-select">
             <option value="popular">🔥 Más populares</option>
             <option value="recent">⏰ Más recientes</option>
             <option value="alphabetical">🔤 A-Z</option>
@@ -164,7 +162,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, computed } from 'vue'
+import { ref, reactive, onMounted, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import api from '@/services/api'
@@ -254,14 +252,40 @@ const cargarCreadores = async (pagina = 1) => {
         break
     }
     
+    // DEBUG: Log para debugging
+    console.log('🔍 Cargando creadores:', {
+      modo: modo.value,
+      endpoint,
+      params,
+      ordenActual: ordenActual.value
+    })
+    
     const response = await api.get(endpoint, { params })
+    
+    // DEBUG: Log de respuesta exitosa
+    console.log('✅ Respuesta exitosa:', {
+      status: response.status,
+      dataKeys: Object.keys(response.data),
+      creatorsCount: response.data.creators?.length || 0,
+      sort: response.data.sort
+    })
     
     creadores.value = response.data.creators || []
     paginaActual.value = response.data.page || 1
     totalPages.value = response.data.pages || 1
     totalCreadores.value = response.data.total || 0
-      } catch (error) {
-    console.error('Error al cargar creadores:', error)
+  } catch (error) {
+    console.error('❌ Error al cargar creadores:', {
+      message: error.message,
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      data: error.response?.data,
+      config: {
+        url: error.config?.url,
+        method: error.config?.method,
+        params: error.config?.params
+      }
+    })
     
     // Redireccionar a login si no está autenticado
     if (error.response?.status === 401) {
@@ -272,7 +296,8 @@ const cargarCreadores = async (pagina = 1) => {
     toast.error('No se pudieron cargar los creadores')
     creadores.value = []
   } finally {
-    cargandoCreadores.value = false  }
+    cargandoCreadores.value = false
+  }
 }
 
 // Cargar estadísticas de cuántos creadores sigue el usuario
@@ -321,7 +346,7 @@ const seguirCreador = async (creador) => {
   procesandoSeguimiento[username] = true
   
   try {
-    await api.post('/user/follow', {
+     await api.post('/user/follow', {
       creator_username: username  // ✅ Usar username
     })
     
@@ -383,10 +408,25 @@ const dejarDeSeguir = async (creador) => {
   }
 }
 
+// Watchers
+watch(ordenActual, (nuevoOrden, ordenAnterior) => {
+  console.log('🔄 Cambio de ordenamiento detectado:', {
+    anterior: ordenAnterior,
+    nuevo: nuevoOrden,
+    modo: modo.value
+  })
+  if (modo.value === 'explorar') {
+    console.log('▶️ Ejecutando cargarCreadores() por cambio de orden')
+    cargarCreadores(1)
+  }
+})
+
 // Lifecycle
 onMounted(async () => {
+  console.log('🚀 ExploreCreators mounted - iniciando carga...')
   await cargarEstadisticasSeguimiento()
   await cargarCreadores(1)
+  console.log('✅ ExploreCreators carga inicial completada')
 })
 </script>
 
