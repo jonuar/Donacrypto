@@ -72,23 +72,26 @@
         <div 
           v-for="creador in creadores" 
           :key="creador.username || creador.email"
-          class="creator-card"        >
-          <!-- Avatar e información del creador -->
+aje de          class="creator-card"        >          <!-- Avatar e información del creador -->
           <div class="creator-header">
-            <div class="creator-avatar">
-              <img 
-                v-if="creador.avatar_url" 
-                :src="creador.avatar_url" 
-                :alt="creador.username"
-                class="avatar-image"
-              />
-              <div v-else class="avatar-placeholder">
-                {{ creador.username ? creador.username.charAt(0).toUpperCase() : '👤' }}
+            <router-link :to="`/creator/${creador.username}`" class="creator-avatar-link">
+              <div class="creator-avatar">
+                <img 
+                  v-if="creador.avatar_url" 
+                  :src="creador.avatar_url" 
+                  :alt="creador.username"
+                  class="avatar-image"
+                />
+                <div v-else class="avatar-placeholder">
+                  {{ creador.username ? creador.username.charAt(0).toUpperCase() : '👤' }}
+                </div>
               </div>
-            </div>
+            </router-link>
             
             <div class="creator-info">
-              <h3 class="creator-name">{{ creador.username }}</h3>
+              <router-link :to="`/creator/${creador.username}`" class="creator-name-link">
+                <h3 class="creator-name">{{ creador.username }}</h3>
+              </router-link>
               <p v-if="creador.bio" class="creator-bio">{{ creador.bio }}</p>              <div class="creator-stats">
                 <span class="stat">
                   {{ creador.followers_count || 0 }} seguidores
@@ -97,16 +100,8 @@
                   {{ creador.posts_count || 0 }} posts
                 </span>
               </div>
-            </div>          </div>
-
-          <!-- Acciones del creador -->
-          <div class="creator-actions">            <router-link 
-              :to="`/creator/${creador.username}`" 
-              class="btn btn-outline btn-sm"
-            >
-              Ver Perfil
-            </router-link>
-            
+            </div>          </div>          <!-- Acciones del creador -->
+          <div class="creator-actions">
             <button 
               v-if="!creador.following"
               @click="seguirCreador(creador)"
@@ -126,7 +121,7 @@
               <span v-if="procesandoSeguimiento[creador.username]">Dejando de seguir...</span>
               <span v-else>Siguiendo</span>
             </button>
-          </div>        </div>
+          </div></div>
       </div>
 
       <!-- Paginación -->
@@ -642,12 +637,27 @@ onMounted(async () => {
   flex-shrink: 0;
 }
 
+.creator-avatar-link {
+  display: inline-block;
+  transition: transform 0.2s ease;
+  text-decoration: none;
+  
+  &:hover {
+    transform: scale(1.05);
+  }
+}
+
 .avatar-image {
   width: 60px;
   height: 60px;
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid var(--color-border);
+  transition: border-color 0.2s ease;
+}
+
+.creator-avatar-link:hover .avatar-image {
+  border-color: var(--color-primary);
 }
 
 .avatar-placeholder {
@@ -661,10 +671,23 @@ onMounted(async () => {
   justify-content: center;
   font-size: var(--font-size-lg);
   font-weight: 600;
+  transition: background-color 0.2s ease;
+}
+
+.creator-avatar-link:hover .avatar-placeholder {
+  background: var(--color-primary-dark);
 }
 
 .creator-info {
   flex: 1;
+}
+
+.creator-name-link {
+  text-decoration: none;
+  
+  &:hover .creator-name {
+    color: var(--color-primary);
+  }
 }
 
 .creator-name {
@@ -672,6 +695,7 @@ onMounted(async () => {
   font-weight: 600;
   color: var(--color-text);
   margin-bottom: var(--spacing-xs);
+  transition: color 0.2s ease;
 }
 
 .creator-bio {

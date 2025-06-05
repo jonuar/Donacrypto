@@ -1,15 +1,18 @@
 <template>
   <article class="post-card">
-    <header class="post-header">
-      <div class="post-meta">
+    <header class="post-header">      <div class="post-meta">
         <div class="creator-info" v-if="showCreator">
-          <img 
-            :src="post.creator_avatar || '/placeholder-avatar.png'" 
-            :alt="post.creator_username"
-            class="creator-avatar"
-          >
+          <router-link :to="`/creator/${post.creator_username}`" class="creator-link">
+            <img 
+              :src="post.creator_avatar || '/placeholder-avatar.png'" 
+              :alt="post.creator_username"
+              class="creator-avatar"
+            >
+          </router-link>
           <div class="creator-details">
-            <h4 class="creator-name">@{{ post.creator_username }}</h4>
+            <router-link :to="`/creator/${post.creator_username}`" class="creator-name-link">
+              <h4 class="creator-name">@{{ post.creator_username }}</h4>
+            </router-link>
             <time class="post-date">{{ formatearFecha(post.created_at) }}</time>
           </div>
         </div>
@@ -149,15 +152,33 @@ export default {
   flex-direction: column;
 }
 
+.creator-link {
+  display: inline-block;
+  transition: transform 0.2s ease;
+  
+  &:hover {
+    transform: scale(1.05);
+  }
+}
+
+.creator-name-link {
+  text-decoration: none;
+  
+  &:hover .creator-name {
+    text-decoration: underline;
+  }
+}
+
 .creator-name {
   font-size: var(--font-size-sm);
   font-weight: 600;
   color: var(--color-primary);
   margin: 0;
   text-decoration: none;
+  transition: color 0.2s ease;
   
   &:hover {
-    text-decoration: underline;
+    color: var(--color-primary-dark);
   }
 }
 

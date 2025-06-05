@@ -37,16 +37,11 @@
             :showInteractions="true"
             @like="toggleLike"
           />
-          
-          <!-- Additional feed actions -->
+            <!-- Additional feed actions -->
           <div class="feed-post-actions">
             <button class="action-btn share-btn" @click="compartirPost(post)">
-              🔗 Compartir
+              Compartir
             </button>
-            
-            <router-link :to="`/creator/${post.creator_username}`" class="action-btn creator-btn">
-              👤 Ver perfil
-            </router-link>
           </div>
         </div>
       </div>
