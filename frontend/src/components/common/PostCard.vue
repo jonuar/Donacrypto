@@ -106,11 +106,11 @@ export default {
         })
         
         // Mostrar mensaje de éxito
-        if (response.data.liked) {
-          toast.success('Te gusta este post')
-        } else {
-          toast.info('Ya no te gusta este post')
-        }
+        // if (response.data.liked) {
+        //   toast.success('Te gusta este post')
+        // } else {
+        //   toast.info('Ya no te gusta este post')
+        // }
         
       } catch (error) {
         console.error('Error al procesar like:', error)

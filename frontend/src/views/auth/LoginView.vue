@@ -158,7 +158,8 @@ export default {
       try {
         const result = await authStore.iniciarSesion({
           email: datosFormulario.email,
-          password: datosFormulario.password
+          password: datosFormulario.password,
+          rememberMe: datosFormulario.rememberMe
         })
 
         if (result.success) {
@@ -179,7 +180,7 @@ export default {
       } catch (error) {
         erroresValidacion.general = 'Error de conexión. Intenta de nuevo.'
         toast.error(erroresValidacion.general)
-            } finally {
+      } finally {
         cargandoDatos.value = false
       }
     }

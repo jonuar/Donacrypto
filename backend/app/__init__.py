@@ -59,24 +59,6 @@ def create_app():
 #------------------------------------------------------------------------------------------------------------
 #TODO
 
-# ARREGLAR DATOS DE DASHBOARD CREATOR
-
-# Configurar CORS para permitir peticiones desde el frontend
-
-# Revisitar datos de /register tras crear frontend
-
-# Usar librerías como pydantic, marshmallow o Cerberus para validar payloads
-
-# Tests básicos
-
-# Documentación de la API
-
-# Recuperación de contraseña con token temporal o vía correo
-
-# Usar Flask-Mail o un servicio como SendGrid, Mailgun, o SMTP.
-
-# Como registrar followers y creadores? (En Frontend)
-
 
 # {
 #   "email": "joshuanunezarcila@gmail.com",

@@ -100,7 +100,7 @@ def login() -> Tuple[Any, int]:
     """
     Autentica a un usuario y genera un token JWT
     
-    Requiere: email, password
+    Requiere: email, password, remember_me (opcional)
     Retorna: token de acceso o mensaje de error
     """
     try:
@@ -114,18 +114,29 @@ def login() -> Tuple[Any, int]:
         if len(data["email"]) > MAX_EMAIL_LENGTH or len(data["password"]) > MAX_PASSWORD_LENGTH:
             return jsonify({"error": "Datos demasiado largos"}), 400
 
+        # Obtener el valor de remember_me (por defecto False)
+        remember_me: bool = data.get("remember_me", False)
+
         # Autenticar usuario
         user_data: Optional[Dict[str, Any]] = find_by_email(data["email"])
         if user_data:
             user: User = User.from_dict(user_data)
             if user.check_password(data["password"]):
-                expires: timedelta = timedelta(hours=24)
+                # Configurar la duración del token basado en remember_me
+                if remember_me:
+                    expires: timedelta = timedelta(days=30)  # 30 días si "recordarme" está marcado
+                else:
+                    expires: timedelta = timedelta(hours=24)  # 24 horas por defecto
+                
                 token: str = create_access_token(
                     identity=user.email,
                     additional_claims={"role": user.role},
                     expires_delta=expires
                 )
-                return jsonify({"access_token": token}), 200
+                return jsonify({
+                    "access_token": token,
+                    "remember_me": remember_me
+                }), 200
         
         return jsonify({"error": "Credenciales incorrectas"}), 401
 

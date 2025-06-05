@@ -4,9 +4,10 @@ import api from '@/services/api'
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     usuarioActual: null,
-    tokenAcceso: localStorage.getItem('access_token'),
+    tokenAcceso: null,
     estaAutenticado: false,
-    cargandoDatos: false
+    cargandoDatos: false,
+    recordarSesion: false
   }),
 
   getters: {
@@ -14,15 +15,53 @@ export const useAuthStore = defineStore('auth', {
     esSeguidor: (state) => state.usuarioActual?.role === 'follower',
     rolUsuario: (state) => state.usuarioActual?.role
   },
+
   actions: {
+    // Función para obtener el token desde cualquier almacenamiento
+    obtenerTokenAlmacenado() {
+      return localStorage.getItem('access_token') || sessionStorage.getItem('access_token')
+    },
+
+    // Función para guardar token según la estrategia
+    guardarToken(token, recordarMe) {
+      if (recordarMe) {
+        localStorage.setItem('access_token', token)
+        localStorage.setItem('remember_me', 'true')
+        // Limpiar sessionStorage si existe
+        sessionStorage.removeItem('access_token')
+      } else {
+        sessionStorage.setItem('access_token', token)
+        // Limpiar localStorage si existe
+        localStorage.removeItem('access_token')
+        localStorage.removeItem('remember_me')
+      }
+    },
+
+    // Función para limpiar todos los tokens
+    limpiarTokens() {
+      localStorage.removeItem('access_token')
+      localStorage.removeItem('remember_me')
+      sessionStorage.removeItem('access_token')
+    },
+
     async iniciarSesion(credenciales) {
       this.cargandoDatos = true
       try {
-        const respuesta = await api.post('/auth/login', credenciales)
-        const { access_token } = respuesta.data
+        // Incluir remember_me en las credenciales
+        const datosLogin = {
+          email: credenciales.email,
+          password: credenciales.password,
+          remember_me: credenciales.rememberMe || false
+        }
+
+        const respuesta = await api.post('/auth/login', datosLogin)
+        const { access_token, remember_me } = respuesta.data
         
         this.tokenAcceso = access_token
-        localStorage.setItem('access_token', access_token)
+        this.recordarSesion = remember_me || false
+        
+        // Guardar token según la estrategia
+        this.guardarToken(access_token, this.recordarSesion)
         
         // Obtener información del usuario
         await this.obtenerPerfilUsuario()
@@ -68,12 +107,18 @@ export const useAuthStore = defineStore('auth', {
       this.usuarioActual = null
       this.tokenAcceso = null
       this.estaAutenticado = false
-      localStorage.removeItem('access_token')
+      this.recordarSesion = false
+      this.limpiarTokens()
     },
 
     // Inicializar store al cargar la app
     async inicializar() {
-      if (this.tokenAcceso) {
+      const token = this.obtenerTokenAlmacenado()
+      const recordarMe = localStorage.getItem('remember_me') === 'true'
+      
+      if (token) {
+        this.tokenAcceso = token
+        this.recordarSesion = recordarMe
         await this.obtenerPerfilUsuario()
       }
     }

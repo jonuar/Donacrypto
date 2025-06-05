@@ -9,7 +9,7 @@
         <div class="nav-links">
           <router-link v-if="usuario.role === 'creator' && route.path !== '/dashboard'" to="/dashboard" class="btn btn-primary btn-sm">Dashboard</router-link>
           
-          <!-- Navigation for followers -->
+          <!-- Nav para seguidores -->
           <template v-if="usuario.role === 'follower'">
             <router-link to="/feed" class="nav-link" :class="{ 'active': route.path === '/feed' }">
               <span class="nav-icon">🏠</span>
