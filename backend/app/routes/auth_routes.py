@@ -13,6 +13,7 @@ from ..extensions import blacklist
 auth_bp = Blueprint("auth_bp", __name__)
 
 # Límites de longitud
+MIN_USERNAME_LENGTH: int = 5
 MAX_USERNAME_LENGTH: int = 30
 MAX_EMAIL_LENGTH: int = 100
 MAX_PASSWORD_LENGTH: int = 128
@@ -62,13 +63,13 @@ def register() -> Tuple[Any, int]:
     Retorna: mensaje de confirmación o error
     """
     try:
-        data: Dict[str, Any] = request.get_json()
-
-        # Validar datos
+        data: Dict[str, Any] = request.get_json()        # Validar datos
         if not data or not all(k in data for k in ("username", "email", "password", "role")):
             return jsonify({"error": "Faltan datos"}), 400
 
         # Validar longitudes
+        if len(data["username"]) < MIN_USERNAME_LENGTH:
+            return jsonify({"error": "El nombre de usuario debe tener al menos 5 caracteres"}), 400
         if len(data["username"]) > MAX_USERNAME_LENGTH:
             return jsonify({"error": "Username demasiado largo"}), 400
         if len(data["email"]) > MAX_EMAIL_LENGTH:

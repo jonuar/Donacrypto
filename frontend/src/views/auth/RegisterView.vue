@@ -267,8 +267,8 @@ export default {
       if (!datosFormulario.username.trim()) {
         erroresValidacion.username = 'El nombre de usuario es requerido'
         esValido = false
-      } else if (datosFormulario.username.length < 3) {
-        erroresValidacion.username = 'El nombre de usuario debe tener al menos 3 caracteres'
+      } else if (datosFormulario.username.length < 5) {
+        erroresValidacion.username = 'El nombre de usuario debe tener al menos 5 caracteres'
         esValido = false
       }
 
