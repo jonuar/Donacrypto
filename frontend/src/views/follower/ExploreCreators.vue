@@ -7,22 +7,18 @@
       </div>
     </div>    <!-- Sección de búsqueda y filtros -->
     <div class="search-section">
-      <div class="search-container">
-        <!-- Barra de búsqueda de creadores -->
+      <div class="search-container">        <!-- Barra de búsqueda de creadores -->
         <div class="search-bar">
-          <div class="search-input-group">
-            <input
+          <div class="search-input-group">            <input
               v-model="terminoBusqueda"
-              @input="buscarCreadores"
               @keyup.enter="buscarCreadores"
               type="text"
-              placeholder="Buscar creadores por nombre de usuario..."
+              placeholder="Escribe el usuario aquí..."
               class="search-input"
             />
             <button @click="buscarCreadores" class="search-btn">Buscar</button>
-          </div>
-          <small v-if="terminoBusqueda" class="search-help">
-            Presiona Enter o haz clic en buscar
+          </div>          <small v-if="terminoBusqueda" class="search-help">
+            Presiona Enter o haz clic en "Buscar" para iniciar la búsqueda
           </small>
         </div>
         
@@ -38,7 +34,7 @@
             :class="['tab-btn', { active: modo === 'siguiendo' }]"
           >
             Siguiendo ({{ totalSiguiendo }})
-          </button></div>        <!-- Opciones de ordenamiento (solo para modo explorar) -->
+          </button></div>        <!-- Opciones de ordenamiento (Modo explorar) -->
         <div v-if="modo === 'explorar'" class="sort-options">
           <label class="sort-label">Ordenar por:</label>          <select v-model="ordenActual" @change="() => cargarCreadores(1)" class="sort-select">
             <option value="popular">Más populares</option>
@@ -279,7 +275,11 @@ const cargarCreadores = async (pagina = 1) => {
       return
     }
     
-    toast.error('No se pudieron cargar los creadores')
+    // Solo mostrar error toast si es un error real del servidor (no simplemente sin resultados)
+    if (error.response?.status !== 404) {
+      toast.error('No se pudieron cargar los creadores')
+    }
+    
     creadores.value = []
   } finally {
     cargandoCreadores.value = false
@@ -304,12 +304,11 @@ const cambiarModo = async (nuevoModo) => {
 
 const buscarCreadores = async () => {
   if (!terminoBusqueda.value.trim()) {
-    toast.info('Escribe algo para buscar')
     return
   }
   
-  if (terminoBusqueda.value.trim().length < 2) {
-    toast.info('La búsqueda debe tener al menos 2 caracteres')
+  if (terminoBusqueda.value.trim().length < 5) {
+    toast.info('La búsqueda debe tener al menos 5 caracteres')
     return
   }
   
