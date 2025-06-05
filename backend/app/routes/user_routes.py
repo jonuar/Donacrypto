@@ -11,6 +11,8 @@ from ..models.post import Post
 from ..models.user import User
 from ..models.following import Following
 from ..models.creator_wallet import CreatorWallet
+from ..models.like import Like
+from ..utils.like_utils import add_like_info_to_posts
 from ..extensions import mongo
 
 user_bp = Blueprint("user_bp", __name__)
@@ -255,18 +257,16 @@ def follower_feed() -> Tuple[Any, int]:
             return jsonify({
                 "posts": [],
                 "message": "No sigues a ningún creador. ¡Explora y sigue a algunos creadores!",
-                "page": page,
-                "pages": 0,
+                "page": page,            "pages": 0,
                 "total": 0
             }), 200
-              # Obtener posts de los creadores seguidos
-        total_posts = mongo.db.posts.count_documents({"creator_email": {"$in": creator_emails}})
         
+        # Obtener posts de los creadores seguidos
+        total_posts = mongo.db.posts.count_documents({"creator_email": {"$in": creator_emails}})
         posts_cursor = mongo.db.posts.find({"creator_email": {"$in": creator_emails}}) \
                       .sort("created_at", -1) \
                       .skip(skip) \
                       .limit(limit)
-        
         posts: List[Dict[str, Any]] = []
         for post in posts_cursor:
             # Convertir fechas y ObjectId para JSON
@@ -284,6 +284,10 @@ def follower_feed() -> Tuple[Any, int]:
                 post_dict["creator_avatar"] = creator.get("avatar_url", "")
                 
             posts.append(post_dict)
+        
+        # Agregar información de likes usando la función utilitaria
+        follower_email = get_jwt_identity()
+        posts = add_like_info_to_posts(posts, follower_email)
             
         return jsonify({
             "posts": posts,
@@ -952,13 +956,15 @@ def get_creator_posts(username: str) -> Tuple[Any, int]:
         total_posts = mongo.db.posts.count_documents({"creator_email": email})
 
         # Obtener posts del creador - CORREGIDO: creator_email en lugar de author_email
-        posts_cursor = mongo.db.posts.find({"creator_email": email}).sort("created_at", -1).skip(skip).limit(limit)
-          # Convertir el cursor a lista y formatear ObjectId - CORREGIDO: manipulación correcta
+        posts_cursor = mongo.db.posts.find({"creator_email": email}).sort("created_at", -1).skip(skip).limit(limit)        # Convertir el cursor a lista y formatear ObjectId - CORREGIDO: manipulación correcta
         posts: List[Dict[str, Any]] = []
         for post in posts_cursor:
             post_dict = dict(post)
             post_dict = process_post_for_json(post_dict)
             posts.append(post_dict)
+        
+        # Agregar información de likes usando la función utilitaria
+        posts = add_like_info_to_posts(posts)
         
         return jsonify({
             "posts": posts,
@@ -1354,4 +1360,121 @@ def get_creator_donation_info(username: str) -> Tuple[Any, int]:
     except Exception as e:
         current_app.logger.error(f"[get_creator_donation_info] Error: {e}")
         return jsonify({"error": "Error al obtener información de donación"}), 500
+
+
+# RUTAS PARA SISTEMA DE LIKES
+
+@user_bp.route("/like-post", methods=["POST"])
+@jwt_required()
+def toggle_like_post() -> Tuple[Any, int]:
+    """
+    Alterna el like de un post (dar/quitar like)
+    
+    Requiere: JWT válido en cabecera, post_id en el cuerpo
+    Retorna: estado del like y nuevo conteo
+    """
+    try:
+        data: Dict[str, Any] = request.get_json()
+        post_id: Optional[str] = data.get("post_id")
+        
+        if not post_id:
+            return jsonify({"error": "post_id es requerido"}), 400
+        
+        user_email: str = get_jwt_identity()
+        
+        # Verificar si el post existe
+        from bson import ObjectId
+        try:
+            post_object_id = ObjectId(post_id)
+        except:
+            return jsonify({"error": "post_id inválido"}), 400
+            
+        post_exists = mongo.db.posts.find_one({"_id": post_object_id})
+        if not post_exists:
+            return jsonify({"error": "Post no encontrado"}), 404
+        
+        # Verificar si ya existe el like
+        existing_like = mongo.db.likes.find_one({
+            "user_email": user_email,
+            "post_id": post_id
+        })
+        
+        if existing_like:
+            # Quitar like
+            mongo.db.likes.delete_one({
+                "user_email": user_email,
+                "post_id": post_id
+            })
+            liked = False
+            action = "removed"
+        else:
+            # Agregar like
+            like = Like(user_email, post_id)
+            mongo.db.likes.insert_one(like.to_dict())
+            liked = True
+            action = "added"
+        
+        # Contar total de likes para este post
+        total_likes = mongo.db.likes.count_documents({"post_id": post_id})
+        
+        return jsonify({
+            "liked": liked,
+            "likes_count": total_likes,
+            "action": action,
+            "message": f"Like {action} successfully"
+        }), 200
+        
+    except Exception as e:
+        current_app.logger.error(f"[toggle_like_post] Error: {e}")
+        return jsonify({"error": "Error interno del servidor"}), 500
+
+
+@user_bp.route("/post/<post_id>/likes", methods=["GET"])
+def get_post_likes(post_id: str) -> Tuple[Any, int]:
+    """
+    Obtiene información de likes de un post específico
+    
+    Requiere: post_id en la URL
+    Retorna: conteo total y si el usuario actual le dio like (si está autenticado)
+    """
+    try:
+        # Verificar si el post existe
+        from bson import ObjectId
+        try:
+            post_object_id = ObjectId(post_id)
+        except:
+            return jsonify({"error": "post_id inválido"}), 400
+            
+        post_exists = mongo.db.posts.find_one({"_id": post_object_id})
+        if not post_exists:
+            return jsonify({"error": "Post no encontrado"}), 404
+        
+        # Contar total de likes
+        total_likes = mongo.db.likes.count_documents({"post_id": post_id})
+        
+        # Verificar si el usuario actual le dio like (si está autenticado)
+        user_liked = False
+        try:
+            from flask_jwt_extended import get_jwt_identity, verify_jwt_in_request
+            verify_jwt_in_request(optional=True)
+            user_email = get_jwt_identity()
+            if user_email:
+                user_like = mongo.db.likes.find_one({
+                    "user_email": user_email,
+                    "post_id": post_id
+                })
+                user_liked = user_like is not None
+        except:
+            # Usuario no autenticado o token inválido
+            pass
+        
+        return jsonify({
+            "post_id": post_id,
+            "likes_count": total_likes,
+            "user_liked": user_liked
+        }), 200
+        
+    except Exception as e:
+        current_app.logger.error(f"[get_post_likes] Error: {e}")
+        return jsonify({"error": "Error interno del servidor"}), 500
 

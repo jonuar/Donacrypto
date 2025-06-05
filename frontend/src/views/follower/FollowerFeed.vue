@@ -29,13 +29,12 @@
       </div>
     </div>    <!-- Posts feed -->
     <div v-else class="feed-content">
-      <div class="posts-container">        <div v-for="post in posts" :key="post._id" class="feed-post-wrapper">
-          <PostCard 
+      <div class="posts-container">        <div v-for="post in posts" :key="post._id" class="feed-post-wrapper">          <PostCard 
             :post="post" 
             :showCreator="true" 
             :showActions="false"
             :showInteractions="true"
-            @like="toggleLike"
+            @like="handleLike"
           />
             <!-- Additional feed actions -->
           <div class="feed-post-actions">
@@ -142,9 +141,7 @@ export default {
       }
       
       return paginas
-    })
-
-    // Métodos
+    })    // Métodos
     const cargarFeed = async (page = 1) => {
       cargandoFeed.value = true
       mensaje.value = ''
@@ -172,8 +169,7 @@ export default {
         }
         
         toast.error('No se pudo cargar el feed')
-        mensaje.value = 'Hubo un problema al cargar tu feed. Por favor, inténtalo más tarde.'
-      } finally {
+        mensaje.value = 'Hubo un problema al cargar tu feed. Por favor, inténtalo más tarde.'      } finally {
         cargandoFeed.value = false
       }
     }
@@ -186,16 +182,8 @@ export default {
       }
     }
 
-    const toggleLike = async (post) => {
-      // Por ahora solo actualizar localmente
-      // En el futuro se puede implementar la funcionalidad real de likes
-      post.liked = !post.liked
-      if (post.liked) {
-        post.likes_count = (post.likes_count || 0) + 1
-        toast.success('Te gusta este post')
-      } else {
-        post.likes_count = Math.max(0, (post.likes_count || 0) - 1)
-      }
+    const handleLike = (likeData) => {
+      // El PostCard ya maneja todo, solo registramos el evento si es necesario
     }
 
     const compartirPost = async (post) => {
@@ -249,14 +237,13 @@ export default {
         return `${horas}h`
       } else if (dias < 7) {
         return `${dias}d`
-      } else {
-        return fechaPost.toLocaleDateString('es-ES', {
+      } else {        return fechaPost.toLocaleDateString('es-ES', {
           month: 'short',
           day: 'numeric'
         })
       }
     }
-
+    
     // Lifecycle
     onMounted(() => {
       cargarFeed()
@@ -271,7 +258,7 @@ export default {
       paginasVisibles,
       cargarFeed,
       cargarPagina,
-      toggleLike,
+      handleLike,
       compartirPost,
       formatearTiempo
     }

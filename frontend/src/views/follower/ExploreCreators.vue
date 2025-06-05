@@ -235,23 +235,7 @@ const cargarCreadores = async (pagina = 1) => {
         endpoint = '/user/search-creators'
         params.q = terminoBusqueda.value
         break
-    }
-      // DEBUG: Log para debugging
-    console.log('Cargando creadores:', {
-      modo: modo.value,
-      endpoint,
-      params,
-      ordenActual: ordenActual.value
-    })
-    
-    const response = await api.get(endpoint, { params })
-      // DEBUG: Log de respuesta exitosa
-    console.log('Respuesta exitosa:', {
-      status: response.status,
-      dataKeys: Object.keys(response.data),
-      creatorsCount: response.data.creators?.length || 0,
-      sort: response.data.sort
-    })
+    }    const response = await api.get(endpoint, { params })
     
     creadores.value = response.data.creators || []
     paginaActual.value = response.data.page || 1
@@ -393,23 +377,15 @@ const dejarDeSeguir = async (creador) => {
 
 // Watchers
 watch(ordenActual, (nuevoOrden, ordenAnterior) => {
-  console.log('Cambio de ordenamiento detectado:', {
-    anterior: ordenAnterior,
-    nuevo: nuevoOrden,
-    modo: modo.value
-  })
   if (modo.value === 'explorar') {
-    console.log('Ejecutando cargarCreadores() por cambio de orden')
     cargarCreadores(1)
   }
 })
 
 // Lifecycle
 onMounted(async () => {
-  console.log('ExploreCreators mounted - iniciando carga...')
   await cargarEstadisticasSeguimiento()
   await cargarCreadores(1)
-  console.log('ExploreCreators carga inicial completada')
 })
 </script>
 

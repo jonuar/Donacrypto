@@ -31,14 +31,14 @@
     
     <div class="post-content">
       <p>{{ post.content }}</p>
-    </div>
-      <footer class="post-footer">
+    </div>      <footer class="post-footer">
       <div class="post-stats">
         <button 
           v-if="showInteractions" 
-          @click="$emit('like', post)"
+          @click="toggleLike"
           class="stat-item interaction-btn like-btn" 
-          :class="{ liked: post.liked }"
+          :class="{ liked: post.user_liked }"
+          :disabled="likingPost"
         >
           <span class="stat-icon">❤️</span>
           <span class="stat-count">{{ post.likes_count || 0 }}</span>
@@ -56,6 +56,10 @@
 </template>
 
 <script>
+import { ref } from 'vue'
+import { useToast } from 'vue-toastification'
+import api from '@/services/api'
+
 export default {
   name: 'PostCard',  props: {
     post: {
@@ -75,7 +79,59 @@ export default {
       default: false
     }
   },
-  emits: ['delete', 'like'],  methods: {
+  emits: ['delete', 'like'],
+  setup(props, { emit }) {
+    const toast = useToast()
+    const likingPost = ref(false)
+    
+    const toggleLike = async () => {
+      if (likingPost.value) return
+      
+      likingPost.value = true
+      
+      try {
+        const response = await api.post('/user/like-post', {
+          post_id: props.post._id
+        })
+        
+        // Actualizar el post con la respuesta del servidor
+        props.post.user_liked = response.data.liked
+        props.post.likes_count = response.data.likes_count
+        
+        // Emitir evento para que el componente padre pueda reaccionar si es necesario
+        emit('like', {
+          post: props.post,
+          liked: response.data.liked,
+          likes_count: response.data.likes_count
+        })
+        
+        // Mostrar mensaje de éxito
+        if (response.data.liked) {
+          toast.success('Te gusta este post')
+        } else {
+          toast.info('Ya no te gusta este post')
+        }
+        
+      } catch (error) {
+        console.error('Error al procesar like:', error)
+        
+        if (error.response?.status === 401) {
+          toast.error('Debes iniciar sesión para dar likes')
+        } else if (error.response?.status === 404) {
+          toast.error('Post no encontrado')
+        } else {
+          toast.error('Error al procesar like. Intenta de nuevo.')
+        }
+      } finally {
+        likingPost.value = false
+      }
+    }
+    
+    return {
+      likingPost,
+      toggleLike
+    }
+  },methods: {
     formatearFecha(fecha) {
       if (!fecha) {
         return 'Fecha no disponible'
