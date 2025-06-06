@@ -7,8 +7,7 @@
     </div>
 
     <!-- Error state -->
-    <div v-else-if="error" class="error-container">
-      <div class="error-icon">❌</div>
+    <div v-else-if="error" class="error-container">      <div class="error-icon">❌</div>
       <h2>Creador no encontrado</h2>
       <p>{{ error }}</p>
       <router-link to="/" class="btn btn-primary">Volver al inicio</router-link>
@@ -16,122 +15,152 @@
 
     <!-- Creator profile -->
     <div v-else-if="creador" class="creator-profile">
-      <!-- Header -->
-      <div class="profile-header">
-        <div class="profile-info">
-          <div class="profile-avatar">
-            <img 
-              :src="creador.avatar_url || '/placeholder-avatar.png'" 
-              :alt="creador.username"
-              class="avatar-image"
-            >
-          </div>
-          
-          <div class="profile-details">
-            <h1 class="profile-username">@{{ creador.username }}</h1>
-            <p v-if="creador.bio" class="profile-bio">{{ creador.bio }}</p>
+      <!-- Bento Grid Layout -->
+      <div class="bento-grid">
+          <!-- Perfil Principal (Bento Card Grande) -->
+        <div class="bento-card profile-main">
+          <div class="profile-content">
+            <div class="profile-avatar">
+              <img 
+                :src="creador.avatar_url || '/placeholder-avatar.png'" 
+                :alt="creador.username"
+                class="avatar-image"
+              >
+              <div class="avatar-badge">✨</div>
+            </div>
             
-            <div class="profile-stats">
-              <div class="stat">
-                <span class="stat-value">{{ posts.length }}</span>
-                <span class="stat-label">Posts</span>
+            <div class="profile-info">
+              <h1 class="profile-username">@{{ creador.username }}</h1>
+              <p v-if="creador.bio" class="profile-bio">{{ creador.bio }}</p>
+              <div class="profile-meta">
+                <span class="creator-badge">Creador Verificado</span>
               </div>
-              <!-- Aquí podrían ir más estadísticas como seguidores si las haces públicas -->
             </div>
           </div>
         </div>
 
-        <!-- Donation section -->
-        <div class="donation-section">
-          <h3>💰 Apoyar al Creador</h3>
-          <p>Donaciones directas sin intermediarios</p>
+        <!-- Estadísticas -->
+        <div class="bento-card stats-card">
+          <div class="card-header">
+            <h3>📊 Estadísticas</h3>
+          </div>
+          <div class="stats-grid">
+            <div class="stat-item">
+              <span class="stat-value">{{ posts.length }}</span>
+              <span class="stat-label">Posts</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value">{{ wallets.length }}</span>
+              <span class="stat-label">Wallets</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Donaciones (Bento Card Mediana) -->
+        <div class="bento-card donation-card">
+          <div class="card-header">
+            <h3>💰 Apoyar Creador</h3>
+            <p class="card-subtitle">Donaciones directas sin intermediarios</p>
+          </div>
           
           <div v-if="wallets.length > 0" class="donation-methods">
-            <div v-for="wallet in wallets" :key="wallet.currency_type" class="wallet-item">
-              <div class="wallet-info">
+            <div v-for="wallet in wallets" :key="wallet.currency_type" class="wallet-bento">
+              <div class="wallet-header">
                 <span class="currency-icon">{{ getCurrencyIcon(wallet.currency_type) }}</span>
                 <span class="currency-name">{{ wallet.currency_type }}</span>
               </div>
+              
+              <div class="wallet-body">
                 <div class="wallet-address-container">
-                <code class="wallet-address">{{ wallet.wallet_address }}</code>
-                <button @click="copiarDireccion(wallet.wallet_address)" class="btn-copy" title="Copiar">
-                  ⧉
-                </button>
-              </div><div class="qr-container">
-                <canvas 
-                  :ref="`qr-${wallet.currency_type}`"
-                  class="qr-code"
-                  @click="abrirModalQR(wallet)"
-                  title="Haz clic para ver en grande"
-                ></canvas>
-                <p class="qr-help">Haz clic para ampliar</p>
+                  <code class="wallet-address">{{ wallet.wallet_address.slice(0, 12) }}...{{ wallet.wallet_address.slice(-8) }}</code>
+                  <button @click="copiarDireccion(wallet.wallet_address)" class="btn-copy" title="Copiar dirección completa">
+                    📋
+                  </button>
+                </div>
+                  <div class="qr-container">
+                  <canvas 
+                    :id="`qr-${wallet.currency_type}`"
+                    class="qr-code"
+                    @click="abrirModalQR(wallet)"
+                    title="Haz clic para ver en grande"
+                  ></canvas>
+                </div>
               </div>
             </div>
           </div>
           
           <div v-else class="no-wallets">
-            <p>Este creador aún no ha configurado métodos de donación.</p>
+            <div class="empty-state">
+              <span class="empty-icon">💳</span>
+              <p>Sin wallets configurados</p>
+            </div>
           </div>
-        </div>
-      </div>
+        </div>        <!-- Posts (Bento Card Ancha) -->
+        <div class="bento-card posts-card">
+          <div class="card-header">
+            <h3>📝 Posts del Creador</h3>
+            <span v-if="totalPosts > 0" class="posts-count">{{ totalPosts }} publicaciones</span>
+          </div>
 
-      <!-- Posts section -->
-      <div class="posts-section">
-        <div class="section-header">
-          <h2>📝 Posts Recientes</h2>
-        </div>
+          <div v-if="cargandoPosts" class="loading-state">
+            <div class="loading-spinner small"></div>
+            <p>Cargando posts...</p>
+          </div>
 
-        <div v-if="cargandoPosts" class="loading-container">
-          <div class="loading-spinner small"></div>
-          <p>Cargando posts...</p>
-        </div>
+          <div v-else-if="posts.length === 0" class="empty-state">
+            <span class="empty-icon">📄</span>
+            <h4>No hay contenido aún</h4>
+            <p>Este creador está preparando contenido increíble</p>
+          </div>
 
-        <div v-else-if="posts.length === 0" class="empty-posts">
-          <div class="empty-icon">📄</div>
-          <h3>No hay posts aún</h3>
-          <p>Este creador aún no ha publicado contenido.</p>
-        </div>
+          <div v-else class="posts-grid">
+            <article v-for="post in posts" :key="post._id" class="post-card">
+              <header class="post-header">
+                <h3 class="post-title">{{ post.title }}</h3>
+                <time class="post-date">{{ formatearFecha(post.created_at) }}</time>
+              </header>
+              
+              <div class="post-content">
+                <p>{{ post.content }}</p>
+              </div>
+              
+              <footer class="post-footer">
+                <div class="post-stats">
+                  <span class="likes">❤️ {{ post.likes_count || 0 }}</span>
+                </div>
+              </footer>
+            </article>
+          </div>
 
-        <div v-else class="posts-grid">
-          <article v-for="post in posts" :key="post._id" class="post-card">
-            <header class="post-header">
-              <h3 class="post-title">{{ post.title }}</h3>
-              <time class="post-date">{{ formatearFecha(post.created_at) }}</time>
-            </header>
+          <!-- Pagination -->
+          <div v-if="totalPages > 1" class="pagination">
+            <button 
+              @click="cambiarPagina(paginaActual - 1)"
+              :disabled="paginaActual === 1 || cargandoPosts"
+              class="btn btn-outline"
+            >
+              ← Anterior
+            </button>
             
-            <div class="post-content">
-              <p>{{ post.content }}</p>
+            <div class="pagination-info">
+              <span class="page-info">
+                Página {{ paginaActual }} de {{ totalPages }}
+              </span>
+              <span class="posts-info">
+                {{ ((paginaActual - 1) * postsPorPagina) + 1 }}-{{ Math.min(paginaActual * postsPorPagina, totalPosts) }} de {{ totalPosts }} posts
+              </span>
             </div>
             
-            <footer class="post-footer">
-              <div class="post-stats">
-                <span class="likes">❤️ {{ post.likes_count || 0 }}</span>
-              </div>
-            </footer>
-          </article>
+            <button 
+              @click="cambiarPagina(paginaActual + 1)"
+              :disabled="paginaActual === totalPages || cargandoPosts"
+              class="btn btn-outline"
+            >
+              Siguiente →
+            </button>
+          </div>
         </div>
 
-        <!-- Pagination -->
-        <div v-if="totalPages > 1" class="pagination">
-          <button 
-            @click="cambiarPagina(paginaActual - 1)"
-            :disabled="paginaActual === 1"
-            class="btn btn-outline"
-          >
-            Anterior
-          </button>
-          
-          <span class="page-info">
-            Página {{ paginaActual }} de {{ totalPages }}
-          </span>
-          
-          <button 
-            @click="cambiarPagina(paginaActual + 1)"
-            :disabled="paginaActual === totalPages"
-            class="btn btn-outline"
-          >
-            Siguiente
-          </button>        </div>
       </div>
     </div>
 
@@ -182,9 +211,7 @@ export default {
   name: 'CreatorPublicProfile',
   setup() {
     const route = useRoute()
-    const toast = useToast()
-
-    // Estados reactivos
+    const toast = useToast()    // Estados reactivos
     const creador = ref(null)
     const posts = ref([])
     const wallets = ref([])
@@ -237,17 +264,14 @@ export default {
         
         posts.value = response.data.posts
         totalPosts.value = response.data.total
-        paginaActual.value = page
-      } catch (err) {
-        console.error('Error al obtener posts:', err)
-        toast.error('No se pudieron cargar los posts')
-      } finally {
+        paginaActual.value = page      } catch (err) {
+        console.error('Error al obtener posts:', err);
+        toast.error('No se pudieron cargar los posts')      } finally {
         cargandoPosts.value = false
       }
     }
 
-    const cambiarPagina = async (nuevaPagina) => {
-      if (nuevaPagina >= 1 && nuevaPagina <= totalPages.value) {
+    const cambiarPagina = async (nuevaPagina) => {      if (nuevaPagina >= 1 && nuevaPagina <= totalPages.value && !cargandoPosts.value) {
         await obtenerPosts(route.params.username, nuevaPagina)
       }
     }
@@ -291,31 +315,38 @@ export default {
 
     const generarCodigosQR = async () => {
       await nextTick()
-        console.log('Generando códigos QR para wallets:', wallets.value)
+      console.log('Generando códigos QR para wallets:', wallets.value)
       
       try {
         const QRCode = (await import('qrcode')).default
         console.log('Librería QRCode cargada correctamente')
-          for (const wallet of wallets.value) {
+        
+        for (const wallet of wallets.value) {
           console.log(`Procesando wallet ${wallet.currency_type}:`, wallet.wallet_address)
           
           // Esperar a que el DOM esté listo
           await nextTick()
-          
-          // Buscar el canvas por múltiples selectores
+            // Buscar el canvas por múltiples selectores
           const canvasSelectors = [
-            `canvas[ref="qr-${wallet.currency_type}"]`,
-            `[ref="qr-${wallet.currency_type}"]`,
-            `.qr-code:nth-of-type(${wallets.value.indexOf(wallet) + 1})`
+            `#qr-${wallet.currency_type}`,
+            `canvas#qr-${wallet.currency_type}`,
+            `canvas[id="qr-${wallet.currency_type}"]`,
+            `.qr-code`
           ]
           
           let canvas = null
           for (const selector of canvasSelectors) {
-            canvas = document.querySelector(selector)
-            if (canvas) break
+            const elements = document.querySelectorAll(selector)
+            if (elements.length > 0) {
+              // Si hay múltiples canvas, usar el índice correspondiente
+              const index = wallets.value.indexOf(wallet)
+              canvas = elements[index] || elements[0]
+              break
+            }
           }
-            console.log(`Canvas encontrado para ${wallet.currency_type}:`, !!canvas)
-            if (canvas) {
+          
+          console.log(`Canvas encontrado para ${wallet.currency_type}:`, !!canvas)
+          if (canvas) {
             await QRCode.toCanvas(canvas, wallet.wallet_address, {
               width: 150,
               margin: 1,
@@ -329,7 +360,8 @@ export default {
             console.error(`No se encontró canvas para ${wallet.currency_type}`)
             console.log('Elementos canvas disponibles:', document.querySelectorAll('canvas'))
           }
-        }      } catch (error) {
+        }
+      } catch (error) {
         console.error('Error al generar códigos QR:', error)
       }
     }
@@ -367,8 +399,7 @@ export default {
               light: '#ffffff'
             }
           })
-          console.log(`QR modal generado exitosamente para ${wallet.currency_type}`)
-        } else {
+          console.log(`QR modal generado exitosamente para ${wallet.currency_type}`)        } else {
           console.error(`No se encontró canvas para modal ${wallet.currency_type}`)
           console.log('qrModalCanvas.value:', qrModalCanvas.value)
           console.log('Modal visible:', !!document.querySelector('.qr-modal'))
@@ -413,7 +444,10 @@ export default {
       cargandoCreador,
       cargandoPosts,
       error,
-      paginaActual,      totalPages,
+      paginaActual,
+      totalPages,
+      totalPosts,
+      postsPorPagina,
       mostrarModalQR,
       walletSeleccionada,
       qrModalCanvas,
@@ -422,6 +456,7 @@ export default {
       cambiarPagina,
       getCurrencyIcon,
       copiarDireccion,      formatearFecha,
+      generarCodigosQR,
       abrirModalQR,
       cerrarModalQR,
       generarQRModal
@@ -486,28 +521,51 @@ export default {
   margin: 0 auto;
 }
 
-.profile-header {
-  background: var(--color-surface);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-xl);
-  margin-bottom: var(--spacing-xl);
-  box-shadow: var(--shadow-sm);
+.bento-grid {
   display: grid;
   grid-template-columns: 2fr 1fr;
-  gap: var(--spacing-xl);
-  
-  @media (max-width: 768px) {
+  grid-template-rows: auto auto;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+
+  @media (max-width: 1024px) {
     grid-template-columns: 1fr;
   }
 }
 
-.profile-info {
+.bento-card {
+  background: var(--color-surface);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border-light);
+  position: relative;
+  overflow: hidden;
+}
+
+.profile-main {
+  grid-column: 1 / 2;
+  grid-row: 1 / 2;
+  
+  @media (max-width: 1024px) {
+    grid-column: 1;
+    grid-row: 1;
+  }
+}
+
+.profile-content {
   display: flex;
-  gap: var(--spacing-lg);
-  align-items: flex-start;
+  align-items: center;
+  gap: var(--spacing-xl);
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    text-align: center;
+  }
 }
 
 .profile-avatar {
+  position: relative;
   flex-shrink: 0;
 }
 
@@ -516,10 +574,26 @@ export default {
   height: 120px;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid var(--color-border-light);
+  border: 4px solid var(--color-border-light);
 }
 
-.profile-details {
+.avatar-badge {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background: var(--color-primary);
+  color: white;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  border: 3px solid var(--color-surface);
+}
+
+.profile-info {
   flex: 1;
 }
 
@@ -528,96 +602,179 @@ export default {
   font-weight: 700;
   color: var(--color-text);
   margin: 0 0 var(--spacing-sm) 0;
+  background: linear-gradient(135deg, var(--color-text), var(--color-primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .profile-bio {
   color: var(--color-text-secondary);
   line-height: 1.6;
   margin: 0 0 var(--spacing-md) 0;
+  font-size: var(--font-size-lg);
 }
 
-.profile-stats {
+.profile-meta {
   display: flex;
-  gap: var(--spacing-lg);
+  gap: var(--spacing-sm);
 }
 
-.stat {
+.creator-badge {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  color: white;
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.stats-card {
+  grid-column: 2 / 3;
+  grid-row: 1 / 2;
+  
+  @media (max-width: 1024px) {
+    grid-column: 1;
+    grid-row: 2;
+  }
+}
+
+.card-header {
+  margin-bottom: var(--spacing-lg);
+  
+  h3 {
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 0 0 var(--spacing-xs) 0;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+  
+  .card-subtitle {
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+    margin: 0;
+  }
+  
+  .posts-count {
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+  }
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+}
+
+.stat-item {
   text-align: center;
+  padding: var(--spacing-md);
+  background: var(--color-background);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border-light);
 }
 
 .stat-value {
   display: block;
-  font-size: var(--font-size-xl);
+  font-size: var(--font-size-2xl);
   font-weight: 700;
   color: var(--color-text);
+  margin-bottom: var(--spacing-xs);
 }
 
 .stat-label {
   display: block;
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
+  font-weight: 500;
 }
 
-.donation-section {
-  h3 {
-    color: var(--color-text);
-    margin: 0 0 var(--spacing-xs) 0;
-  }
+.donation-card {
+  grid-column: 1 / 3;
+  grid-row: 2 / 3;
   
-  p {
-    color: var(--color-text-secondary);
-    margin: 0 0 var(--spacing-md) 0;
-    font-size: var(--font-size-sm);
+  @media (max-width: 1024px) {
+    grid-column: 1;
+    grid-row: 3;
   }
 }
 
 .donation-methods {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-lg);
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
 }
 
-.wallet-item {
-  border: 1px solid var(--color-border-light);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-md);
+.wallet-bento {
   background: var(--color-background);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  border: 2px solid var(--color-border-light);
+  position: relative;
+  overflow: hidden;
 }
 
-.wallet-info {
+.wallet-header {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  margin-bottom: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 1px solid var(--color-border-light);
 }
 
 .currency-icon {
-  font-size: var(--font-size-lg);
+  font-size: var(--font-size-xl);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-primary);
+  color: white;
+  border-radius: 50%;
 }
 
 .currency-name {
   font-weight: 600;
   color: var(--color-text);
+  font-size: var(--font-size-lg);
+}
+
+.wallet-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
 }
 
 .wallet-address-container {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  margin-bottom: var(--spacing-sm);
+  background: var(--color-surface);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-light);
 }
 
 .wallet-address {
-  background: var(--color-surface);
-  padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: var(--radius-sm);
-  font-family: monospace;
-  font-size: var(--font-size-xs);
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+  font-size: var(--font-size-sm);
   color: var(--color-text);
   flex: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  font-weight: 500;
 }
 
 .btn-copy {
@@ -626,37 +783,62 @@ export default {
   cursor: pointer;
   padding: var(--spacing-xs);
   border-radius: var(--radius-sm);
-  
-  &:hover {
-    background: var(--color-border-light);
-  }
+  font-size: var(--font-size-lg);
+  color: var(--color-text-secondary);
 }
 
 .qr-container {
-  text-align: center;
+  display: flex;
+  justify-content: center;
 }
 
 .qr-code {
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   background: white;
-  padding: var(--spacing-xs);
+  padding: var(--spacing-sm);
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
   
   &:hover {
     transform: scale(1.05);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    border-color: var(--color-primary);
   }
 }
 
-.qr-help {
-  font-size: var(--font-size-xs);
-  color: var(--color-text-secondary);
-  margin-top: var(--spacing-xs);
-  margin-bottom: 0;
+.posts-card {
+  grid-column: 1 / 3;
+  grid-row: 3 / 4;
+  
+  @media (max-width: 1024px) {
+    grid-column: 1;
+    grid-row: 4;
+  }
 }
 
-// Modal QR Styles
+.loading-state, .empty-state {
+  text-align: center;
+  padding: var(--spacing-xl);
+  color: var(--color-text-secondary);
+  
+  .loading-spinner {
+    margin: 0 auto var(--spacing-md);
+  }
+  
+  .empty-icon {
+    font-size: 3rem;
+    margin-bottom: var(--spacing-md);
+    opacity: 0.7;
+  }
+  
+  h4 {
+    color: var(--color-text);
+    margin-bottom: var(--spacing-sm);
+    font-weight: 600;
+  }
+}
+
 .qr-modal-overlay {
   position: fixed;
   top: 0;
@@ -713,12 +895,6 @@ export default {
   align-items: center;
   justify-content: center;
   border-radius: var(--radius-sm);
-  transition: all 0.2s ease;
-  
-  &:hover {
-    background: var(--color-border-light);
-    color: var(--color-text);
-  }
 }
 
 .qr-modal-content {
@@ -778,17 +954,10 @@ export default {
   font-size: var(--font-size-sm);
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   gap: var(--spacing-xs);
   white-space: nowrap;
-  
-  &:hover {
-    background: var(--color-primary-dark);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
-  }
 }
 
 .qr-instructions {
@@ -809,38 +978,6 @@ export default {
   color: var(--color-text-secondary);
 }
 
-.posts-section {
-  .section-header {
-    margin-bottom: var(--spacing-lg);
-    
-    h2 {
-      font-size: var(--font-size-xl);
-      font-weight: 600;
-      color: var(--color-text);
-      margin: 0;
-    }
-  }
-}
-
-.empty-posts {
-  text-align: center;
-  padding: var(--spacing-xl);
-  
-  .empty-icon {
-    font-size: 3rem;
-    margin-bottom: var(--spacing-md);
-  }
-  
-  h3 {
-    color: var(--color-text);
-    margin-bottom: var(--spacing-sm);
-  }
-  
-  p {
-    color: var(--color-text-secondary);
-  }
-}
-
 .posts-grid {
   display: grid;
   gap: var(--spacing-lg);
@@ -848,51 +985,55 @@ export default {
 
 .post-card {
   background: var(--color-surface);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-lg);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-xl);
   box-shadow: var(--shadow-sm);
   border: 1px solid var(--color-border-light);
-  transition: all 0.2s ease;
-  
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-  }
+  position: relative;
+  overflow: hidden;
 }
 
 .post-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+  gap: var(--spacing-md);
 }
 
 .post-title {
-  font-size: var(--font-size-lg);
+  font-size: var(--font-size-xl);
   font-weight: 600;
   color: var(--color-text);
   margin: 0;
   flex: 1;
+  line-height: 1.3;
 }
 
 .post-date {
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
+  background: var(--color-background);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-full);
+  font-weight: 500;
+  flex-shrink: 0;
 }
 
 .post-content {
-  margin-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
   
   p {
     color: var(--color-text);
     line-height: 1.6;
     margin: 0;
     white-space: pre-wrap;
+    font-size: var(--font-size-md);
   }
 }
 
 .post-footer {
-  padding-top: var(--spacing-sm);
+  padding-top: var(--spacing-md);
   border-top: 1px solid var(--color-border-light);
 }
 
@@ -913,13 +1054,56 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: var(--spacing-md);
+  gap: var(--spacing-lg);
   margin-top: var(--spacing-xl);
+  padding: var(--spacing-lg);
+}
+
+.pagination-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
 }
 
 .page-info {
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
+  font-weight: 500;
+  background: var(--color-surface);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-border-light);
+}
+
+.posts-info {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+}
+
+.btn {
+  border-radius: var(--radius-md);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  cursor: pointer;
+  border: 2px solid transparent;
+  
+  &.btn-outline {
+    background: var(--color-surface);
+    color: var(--color-text);
+    border-color: var(--color-border-light);
+    
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+  
+  &.btn-primary {
+    background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+    color: white;
+  }
 }
 
 @media (max-width: 768px) {
@@ -927,18 +1111,62 @@ export default {
     padding: var(--spacing-md);
   }
   
-  .profile-info {
+  .bento-grid {
+    gap: var(--spacing-md);
+  }
+  
+  .bento-card {
+    padding: var(--spacing-lg);
+  }
+  
+  .profile-content {
+    gap: var(--spacing-lg);
+  }
+  
+  .avatar-image {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .profile-username {
+    font-size: var(--font-size-2xl);
+  }
+  
+  .donation-methods {
+    grid-template-columns: 1fr;
+  }
+  
+  .wallet-bento {
+    padding: var(--spacing-md);
+  }
+  
+  .post-card {
+    padding: var(--spacing-lg);
+  }
+  
+  .post-header {
     flex-direction: column;
-    text-align: center;
+    gap: var(--spacing-sm);
+    align-items: flex-start;
   }
-  
-  .profile-stats {
-    justify-content: center;
-  }
-  
+    
   .pagination {
     flex-direction: column;
     gap: var(--spacing-sm);
+  }
+  
+  .pagination-info {
+    order: -1;
+  }
+}
+
+@media (max-width: 480px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .wallet-address {
+    font-size: var(--font-size-xs);
   }
 }
 </style>
