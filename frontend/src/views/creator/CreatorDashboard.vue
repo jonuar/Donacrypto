@@ -327,10 +327,40 @@
                 Siguiente →
               </button>
             </div>
+          </div>        </section>
+
+        <!-- Danger Zone -->
+        <section class="dashboard-section danger-zone">
+          <div class="section-header">
+            <h2 class="section-title danger-title">Zona de Peligro</h2>
           </div>
-        </section> 
+          
+          <div class="danger-content">
+            <div class="danger-warning">
+              <div class="warning-icon">⚠️</div>
+              <div class="warning-text">
+                <h3>Eliminar Cuenta</h3>
+                <p>Una vez que elimines tu cuenta, no podrás recuperarla. Esta acción es permanente.</p>
+              </div>
+            </div>
+            
+            <button 
+              @click="mostrarModalEliminarCuenta = true" 
+              class="btn btn-danger"
+            >
+              Eliminar Cuenta Permanentemente
+            </button>
+          </div>
+        </section>
       </div>
     </div>
+
+    <!-- Modal para Eliminar Cuenta -->
+    <DeleteAccountModal 
+      v-if="mostrarModalEliminarCuenta"
+      :user-role="'creator'"
+      @close="mostrarModalEliminarCuenta = false"
+    />
 
     <!-- Modal para Agregar/Editar Wallet -->
     <div v-if="mostrarFormularioWallet" class="modal-overlay" @click="cerrarFormularioWallet">
@@ -441,16 +471,19 @@ import { useDashboardStore } from '@/stores/dashboard'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from 'vue-toastification'
 import PostCard from '@/components/common/PostCard.vue'
+import DeleteAccountModal from '@/components/common/DeleteAccountModal.vue'
 
 export default {
-  name: 'CreatorDashboard',
-  components: {
-    PostCard
+  name: 'CreatorDashboard',  components: {
+    PostCard,
+    DeleteAccountModal
   },
   setup() {
     const dashboardStore = useDashboardStore()
     const authStore = useAuthStore()
-    const toast = useToast()    // Estados reactivos
+    const toast = useToast()
+
+    // Estados reactivos
     const mostrarFormularioWallet = ref(false)
     const walletEditando = ref(null)
     const walletFormulario = reactive({
@@ -469,7 +502,11 @@ export default {
     const postFormulario = reactive({
       title: '',
       content: ''
-    })    // Computed properties
+    })
+
+    const mostrarModalEliminarCuenta = ref(false)
+
+    // Computed properties
     const estadisticas = computed(() => dashboardStore.estadisticas)
     const wallets = computed(() => dashboardStore.wallets)
     const posts = computed(() => dashboardStore.posts)
@@ -756,9 +793,9 @@ export default {
       walletEditando,
       walletFormulario,
       editandoPerfil,
-      perfilFormulario,
-      mostrarFormularioPost,
+      perfilFormulario,      mostrarFormularioPost,
       postFormulario,
+      mostrarModalEliminarCuenta,
         // Computed
       estadisticas,
       wallets,
@@ -1518,10 +1555,105 @@ export default {
     margin-bottom: var(--spacing-xs);
     color: var(--color-text);
   }
-  
-  .empty-description {
+    .empty-description {
     font-size: var(--font-size-sm);
     line-height: 1.5;
+  }
+}
+
+// Danger Zone Styles
+.danger-zone {
+  border: 2px solid #dc3545;
+  border-radius: var(--border-radius);
+  background: rgba(220, 53, 69, 0.05);
+  
+  .danger-title {
+    color: #dc3545;
+    font-weight: 700;
+  }
+  
+  .danger-content {
+    padding: var(--spacing-lg);
+  }
+  
+  .danger-warning {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+    padding: var(--spacing-md);
+    background: rgba(220, 53, 69, 0.1);
+    border-radius: var(--border-radius-sm);
+    border-left: 4px solid #dc3545;
+    
+    .warning-icon {
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+    
+    .warning-text {
+      flex: 1;
+      
+      h3 {
+        color: #721c24;
+        font-size: var(--font-size-md);
+        font-weight: 600;
+        margin: 0 0 var(--spacing-xs) 0;
+      }
+      
+      p {
+        color: #856404;
+        font-size: var(--font-size-sm);
+        line-height: 1.5;
+        margin: 0;
+      }
+    }
+  }
+  
+  .btn-danger {
+    background: #dc3545;
+    color: white;
+    border: 2px solid #dc3545;
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border-radius: var(--border-radius-sm);
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      background: #c82333;
+      border-color: #c82333;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+    }
+    
+    &:active {
+      transform: translateY(0);
+    }
+    
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.25);
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .danger-zone {
+    .danger-warning {
+      flex-direction: column;
+      text-align: center;
+      
+      .warning-icon {
+        align-self: center;
+      }
+    }
+    
+    .btn-danger {
+      width: 100%;
+      padding: var(--spacing-md);
+    }
   }
 }
 </style>

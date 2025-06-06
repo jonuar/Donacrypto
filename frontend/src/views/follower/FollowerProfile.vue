@@ -159,13 +159,34 @@
               type="submit" 
               :disabled="cambiandoPassword"
               class="btn btn-secondary"
-            >              <span v-if="cambiandoPassword">Cambiando...</span>
+            >
+              <span v-if="cambiandoPassword">Cambiando...</span>
               <span v-else>Actualizar</span>
             </button>
           </div>
         </form>
       </div>
+
+      <!-- Danger Zone -->
+      <div class="danger-zone">
+        <h3 class="section-title">Zona Peligrosa</h3>
+        <div class="danger-content">
+          <div class="danger-description">
+            <h4>Eliminar Cuenta</h4>
+            <p>Una vez eliminada tu cuenta, no hay vuelta atrás. Toda tu información será eliminada permanentemente.</p>
+          </div>
+          <button @click="mostrarModalEliminar = true" class="btn btn-danger">
+            Eliminar Cuenta
+          </button>
+        </div>
+      </div>
     </div>
+
+    <!-- Modal de eliminación -->
+    <DeleteAccountModal 
+      :mostrar="mostrarModalEliminar" 
+      @cerrar="mostrarModalEliminar = false" 
+    />
   </div>
 </template>
 
@@ -174,6 +195,7 @@ import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import api from '@/services/api'
+import DeleteAccountModal from '@/components/common/DeleteAccountModal.vue'
 
 const router = useRouter()
 const toast = useToast()
@@ -182,6 +204,7 @@ const toast = useToast()
 const cargandoPerfil = ref(true)
 const guardandoPerfil = ref(false)
 const cambiandoPassword = ref(false)
+const mostrarModalEliminar = ref(false)
 
 // Datos del perfil
 const perfil = reactive({
@@ -339,6 +362,23 @@ const cambiarContrasena = async () => {  if (password.nueva !== password.confirm
     }
   } finally {
     cambiandoPassword.value = false
+  }
+}
+
+const eliminarCuenta = async () => {
+  try {
+    await api.delete('/user/delete-account')
+    
+    toast.success('Cuenta eliminada con éxito')
+    
+    // Cerrar sesión y redirigir a inicio
+    router.push('/')
+    
+  } catch (error) {
+    console.error('Error al eliminar cuenta:', error)
+    toast.error('Error al eliminar la cuenta')
+  } finally {
+    mostrarModalEliminar.value = false
   }
 }
 
@@ -609,6 +649,70 @@ onMounted(() => {
   gap: var(--spacing-md);
 }
 
+/* Estilos para zona peligrosa */
+.danger-zone {
+  border: 1px solid #ef4444;
+  border-radius: var(--radius-lg);
+  background: #fef2f2;
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-sm);
+}
+
+.danger-zone .section-title {
+  color: #ef4444;
+  margin-bottom: var(--spacing-lg);
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+}
+
+.danger-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-lg);
+}
+
+.danger-description {
+  flex: 1;
+}
+
+.danger-description h4 {
+  color: #ef4444;
+  margin-bottom: var(--spacing-sm);
+  font-size: var(--font-size-base);
+  font-weight: 600;
+}
+
+.danger-description p {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+}
+
+.btn-danger {
+  background: #ef4444;
+  color: white;
+  border: 1px solid #ef4444;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #dc2626;
+  border-color: #dc2626;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.btn-danger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
@@ -631,6 +735,12 @@ onMounted(() => {
   
   .stats-grid {
     grid-template-columns: 1fr;
+  }
+  
+  .danger-content {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
   }
 }
 </style>

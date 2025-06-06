@@ -185,7 +185,7 @@ def change_password() -> Tuple[Any, int]:
 @jwt_required()
 def delete_account() -> Tuple[Any, int]:
     """
-    Elimina la cuenta del usuario autenticado
+    Elimina la cuenta del usuario autenticado y todos sus datos relacionados
     
     Requiere: JWT válido en cabecera, password para confirmar
     Retorna: confirmación o error
@@ -198,7 +198,6 @@ def delete_account() -> Tuple[Any, int]:
             return jsonify({"error": "Se requiere contraseña para confirmar"}), 400
             
         # Verificar contraseña
-        from ..models.user import User
         user_data = find_by_email(email)
         if not user_data:
             return jsonify({"error": "Usuario no encontrado"}), 404
@@ -207,17 +206,41 @@ def delete_account() -> Tuple[Any, int]:
         if not user.check_password(data["password"]):
             return jsonify({"error": "Contraseña incorrecta"}), 401
             
-        # Eliminar cuenta y datos relacionados
-        # En un sistema real, esto podría implicar eliminar datos asociados, tokens, etc.
+        user_role = user_data.get("role")
+        
+        # Eliminar datos específicos según el rol
+        if user_role == "creator":
+            # Eliminar wallets del creador
+            mongo.db.creator_wallets.delete_many({"creator_email": email})
+            
+            # Eliminar posts del creador
+            mongo.db.posts.delete_many({"creator_email": email})
+            
+            # Eliminar relaciones de seguimiento donde es el creador
+            mongo.db.followings.delete_many({"creator_email": email})
+            
+            # Eliminar likes en posts del creador
+            mongo.db.likes.delete_many({"creator_email": email})
+            
+        elif user_role == "follower":
+            # Eliminar relaciones de seguimiento donde es el follower
+            mongo.db.followings.delete_many({"follower_email": email})
+            
+            # Eliminar likes hechos por el follower
+            mongo.db.likes.delete_many({"user_email": email})
+        
+        # Eliminar la cuenta del usuario
         result = mongo.db.users.delete_one({"email": email})
         
         if result.deleted_count > 0:
-            # También sería bueno invalidar el token JWT actual
+            # Invalidar el token JWT actual
             jti: str = get_jwt()["jti"]
             from ..extensions import blacklist
             blacklist.add(jti)
             
-            return jsonify({"message": "Cuenta eliminada con éxito"}), 200
+            return jsonify({
+                "message": "Cuenta eliminada con éxito. Todos tus datos han sido eliminados."
+            }), 200
         else:
             return jsonify({"error": "No se pudo eliminar la cuenta"}), 500
             

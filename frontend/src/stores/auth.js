@@ -111,6 +111,25 @@ export const useAuthStore = defineStore('auth', {
       this.limpiarTokens()
     },
 
+    // Eliminar cuenta del usuario
+    async eliminarCuenta(password) {
+      try {
+        await api.delete('/user/delete-account', {
+          data: { password }
+        })
+        
+        // Limpiar estado de autenticación
+        this.cerrarSesion()
+        
+        return { success: true }
+      } catch (error) {
+        return { 
+          success: false, 
+          error: error.response?.data?.error || 'Error al eliminar la cuenta' 
+        }
+      }
+    },
+
     // Inicializar store al cargar la app
     async inicializar() {
       const token = this.obtenerTokenAlmacenado()

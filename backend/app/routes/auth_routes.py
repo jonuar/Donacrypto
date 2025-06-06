@@ -55,7 +55,7 @@ def save_user_to_db(user_dict: Dict[str, Any]) -> bool:
 # RUTAS DE AUTENTICACIÓN
 
 @auth_bp.route("/register", methods=["POST"])
-def register() -> Tuple[Any, int]:
+def register():
     """
     Registra un nuevo usuario en el sistema
     
@@ -63,8 +63,11 @@ def register() -> Tuple[Any, int]:
     Retorna: mensaje de confirmación o error
     """
     try:
-        data: Dict[str, Any] = request.get_json()        # Validar datos
-        if not data or not all(k in data for k in ("username", "email", "password", "role")):
+        data = request.get_json()
+        
+        # Validar datos
+        required_fields = ("username", "email", "password", "role")
+        if not data or not all(k in data for k in required_fields):
             return jsonify({"error": "Faltan datos"}), 400
 
         # Validar longitudes
@@ -82,8 +85,15 @@ def register() -> Tuple[Any, int]:
             return jsonify({"error": "El usuario ya existe"}), 409
 
         # Crear usuario
-        user: User = User(data["username"], data["email"], data["password"], data["role"])
-        user_dict: Dict[str, Any] = user.to_dict()
+        user = User(
+            username=data["username"], 
+            email=data["email"], 
+            password=data["password"], 
+            role=data["role"],
+            first_name=data.get("first_name", ""),
+            last_name=data.get("last_name", "")
+        )
+        user_dict = user.to_dict()
         
         if save_user_to_db(user_dict):
             return jsonify({"message": "Usuario registrado con éxito"}), 201
@@ -96,7 +106,7 @@ def register() -> Tuple[Any, int]:
 
 
 @auth_bp.route("/login", methods=["POST"])
-def login() -> Tuple[Any, int]:
+def login():
     """
     Autentica a un usuario y genera un token JWT
     
@@ -104,7 +114,7 @@ def login() -> Tuple[Any, int]:
     Retorna: token de acceso o mensaje de error
     """
     try:
-        data: Dict[str, Any] = request.get_json()
+        data = request.get_json()
 
         # Validar datos
         if not data or not all(k in data for k in ("email", "password")):
@@ -115,20 +125,20 @@ def login() -> Tuple[Any, int]:
             return jsonify({"error": "Datos demasiado largos"}), 400
 
         # Obtener el valor de remember_me (por defecto False)
-        remember_me: bool = data.get("remember_me", False)
+        remember_me = data.get("remember_me", False)
 
         # Autenticar usuario
-        user_data: Optional[Dict[str, Any]] = find_by_email(data["email"])
+        user_data = find_by_email(data["email"])
         if user_data:
-            user: User = User.from_dict(user_data)
+            user = User.from_dict(user_data)
             if user.check_password(data["password"]):
                 # Configurar la duración del token basado en remember_me
                 if remember_me:
-                    expires: timedelta = timedelta(days=30)  # 30 días si "recordarme" está marcado
+                    expires = timedelta(days=30)  # 30 días si "recordarme" está marcado
                 else:
-                    expires: timedelta = timedelta(hours=24)  # 24 horas por defecto
+                    expires = timedelta(hours=24)  # 24 horas por defecto
                 
-                token: str = create_access_token(
+                token = create_access_token(
                     identity=user.email,
                     additional_claims={"role": user.role},
                     expires_delta=expires
@@ -146,22 +156,22 @@ def login() -> Tuple[Any, int]:
     
 
 @auth_bp.route("/request-reset", methods=["POST"])
-def request_password_reset() -> Tuple[Any, int]:
+def request_password_reset():
     """
     Solicita el envío de un token para restablecer contraseña
     
     Requiere: email
     Retorna: token de restablecimiento o error
     """
-    data: Dict[str, Any] = request.get_json()
-    email: Optional[str] = data.get("email")
+    data = request.get_json()
+    email = data.get("email")
 
     # Verifica el email enviado y el usuario en la base de datos
     if not email or not find_by_email(email):
         return jsonify({"error": "Email no registrado"}), 404
 
     # Genera un token único y seguro para el restablecimiento de contraseña
-    token: str = secrets.token_urlsafe(32)
+    token = secrets.token_urlsafe(32)
     
     # Guarda el token en la base de datos con una fecha de expiración
     if PasswordResetToken.save_token(email, token):
@@ -172,30 +182,30 @@ def request_password_reset() -> Tuple[Any, int]:
 
 @auth_bp.route("/reset-password", methods=["POST"])
 @jwt_required()
-def reset_password() -> Tuple[Any, int]:
+def reset_password():
     """
     Cambia la contraseña si el token es válido
     
     Requiere: token, new_password
     Retorna: confirmación o error
     """
-    data: Dict[str, Any] = request.get_json()
-    token: Optional[str] = data.get("token")
-    new_password: Optional[str] = data.get("new_password")
+    data = request.get_json()
+    token = data.get("token")
+    new_password = data.get("new_password")
 
     # Verifica que ambos campos (token y nueva contraseña) estén presentes
     if not token or not new_password:
         return jsonify({"error": "Datos incompletos"}), 400
 
     # Verifica si el token es válido y no ha expirado
-    email: Optional[str] = PasswordResetToken.verify_token(token)
+    email = PasswordResetToken.verify_token(token)
     if not email:
         return jsonify({"error": "Token inválido o expirado"}), 400
 
     # Si el token es válido, cambia la contraseña
     try:
         # Cifra la nueva contraseña
-        hashed_password: str = generate_password_hash(new_password)
+        hashed_password = generate_password_hash(new_password)
         # Actualiza la contraseña del usuario en la base de datos
         mongo.db.users.update_one({"email": email}, {"$set": {"password": hashed_password}})
         # Elimina el token después de usarlo para evitar su reutilización
@@ -207,7 +217,7 @@ def reset_password() -> Tuple[Any, int]:
 
 @auth_bp.route("/logout", methods=["POST"])
 @jwt_required()
-def logout() -> Tuple[Any, int]:
+def logout():
     """
     Invalida el token actual (agrega a la lista negra)
     
@@ -215,7 +225,7 @@ def logout() -> Tuple[Any, int]:
     Retorna: confirmación de cierre de sesión
     """
     try:
-        jti: str = get_jwt()["jti"]  # JWT ID
+        jti = get_jwt()["jti"]  # JWT ID
         blacklist.add(jti)
         return jsonify({"message": "Sesión cerrada correctamente"}), 200
     except Exception as e:

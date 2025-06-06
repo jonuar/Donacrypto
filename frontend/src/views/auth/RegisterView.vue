@@ -214,7 +214,6 @@ export default {
     // Estados reactivos para controlar la UI
     const cargandoDatos = ref(false)
     const mostrarContrasena = ref(false)
-    const mostrarConfirmacionContrasena = ref(false)
 
     const datosFormulario = reactive({
       role: 'follower',
@@ -223,7 +222,6 @@ export default {
       username: '',
       email: '',
       password: '',
-      confirmPassword: '',
       acceptTerms: false
     })
 
@@ -234,7 +232,6 @@ export default {
       username: '',
       email: '',
       password: '',
-      confirmPassword: '',
       acceptTerms: '',
       general: ''
     })
@@ -288,14 +285,6 @@ export default {
         esValido = false
       }
 
-      if (!datosFormulario.confirmPassword) {
-        erroresValidacion.confirmPassword = 'Confirma tu contraseña'
-        esValido = false
-      } else if (datosFormulario.password !== datosFormulario.confirmPassword) {
-        erroresValidacion.confirmPassword = 'Las contraseñas no coinciden'
-        esValido = false
-      }
-
       if (!datosFormulario.acceptTerms) {
         erroresValidacion.acceptTerms = 'Debes aceptar los términos y condiciones'
         esValido = false
@@ -305,12 +294,20 @@ export default {
     }
 
     const manejarRegistro = async () => {
-      if (!validarFormulario()) return
+      console.log('=== INICIO REGISTRO ===')
+      console.log('Datos del formulario:', datosFormulario)
+      
+      if (!validarFormulario()) {
+        console.log('Validación falló')
+        return
+      }
 
+      console.log('Validación exitosa, iniciando registro...')
       cargandoDatos.value = true
       limpiarErrores()
 
       try {
+        console.log('Enviando datos al store...')
         const resultado = await authStore.registrarUsuario({
           first_name: datosFormulario.firstName,
           last_name: datosFormulario.lastName,
@@ -320,18 +317,23 @@ export default {
           role: datosFormulario.role
         })
 
+        console.log('Resultado del registro:', resultado)
+
         if (resultado.success) {
           toast.success('¡Cuenta creada exitosamente! Por favor inicia sesión.')
-          router.push('/login')
+          await router.push('/login')
         } else {
+          console.log('Error del servidor:', resultado.error)
           erroresValidacion.general = resultado.error || 'Error al crear la cuenta'
           toast.error(erroresValidacion.general)
         }
       } catch (error) {
+        console.error('Error de conexión:', error)
         erroresValidacion.general = 'Error de conexión. Intenta de nuevo.'
         toast.error(erroresValidacion.general)
       } finally {
         cargandoDatos.value = false
+        console.log('=== FIN REGISTRO ===')
       }
     }
 
@@ -340,7 +342,6 @@ export default {
       erroresValidacion,
       cargandoDatos,
       mostrarContrasena,
-      mostrarConfirmacionContrasena,
       manejarRegistro
     }
   }
