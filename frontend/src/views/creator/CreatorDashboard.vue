@@ -48,13 +48,13 @@
               <span class="stat-label">Wallets Configuradas</span>
             </div>
           </div>
-          <div class="stat-card">
+          <!-- <div class="stat-card">
             <div class="stat-icon">🔒</div>
             <div class="stat-info">
               <span class="stat-value">100%</span>
               <span class="stat-label">Donaciones Directas</span>
             </div>
-          </div>
+          </div> -->
         </div>
         
         <!-- Información sobre donaciones directas -->
@@ -212,6 +212,15 @@
         <section class="dashboard-section">
           <div class="section-header">
             <h2 class="section-title">Seguidores ({{ estadisticas.followers_count || 0 }})</h2>
+            <button 
+              v-if="estadisticas.followers_count > 0" 
+              @click="cargarSeguidores" 
+              :disabled="cargandoSeguidores"
+              class="btn btn-outline btn-sm"
+            >
+              <span v-if="cargandoSeguidores">Cargando...</span>
+              <span v-else>↻ Actualizar</span>
+            </button>
           </div>
           
           <div v-if="estadisticas.followers_count === 0" class="empty-state">
@@ -220,9 +229,48 @@
             <p>Comparte tu perfil para empezar a recibir seguidores</p>
           </div>
           
-          <div v-else class="followers-info">
-            <p>Tienes {{ estadisticas.followers_count }} seguidores de tu contenido.</p>
-            <!-- Lista de seguidores -->
+          <div v-else-if="cargandoSeguidores && seguidores.length === 0" class="loading-container">
+            <div class="loading-spinner small"></div>
+            <p>Cargando seguidores...</p>
+          </div>
+          
+          <div v-else class="followers-content">
+            <div class="followers-list">
+              <div 
+                v-for="seguidor in seguidores" 
+                :key="seguidor.username" 
+                class="follower-item"
+              >
+                <div class="follower-avatar">
+                  <img 
+                    v-if="seguidor.avatar_url" 
+                    :src="seguidor.avatar_url" 
+                    :alt="seguidor.username"
+                    class="avatar-image"
+                  />
+                  <div v-else class="avatar-placeholder">
+                    {{ seguidor.username ? seguidor.username.charAt(0).toUpperCase() : '👤' }}
+                  </div>
+                </div>
+                  <div class="follower-info">
+                  <h4 class="follower-username">@{{ seguidor.username }}</h4>
+                  <p class="follower-date">
+                    Siguiendo desde {{ formatearFechaSeguimiento(seguidor.followed_at) }}
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Mostrar mensaje si hay más seguidores -->
+            <div v-if="estadisticas.followers_count > seguidores.length" class="followers-summary">
+              <p class="summary-text">
+                Mostrando {{ seguidores.length }} de {{ estadisticas.followers_count }} seguidores
+              </p>
+              <button @click="cargarMasSeguidores" :disabled="cargandoSeguidores" class="btn btn-outline btn-sm">
+                <span v-if="cargandoSeguidores">Cargando...</span>
+                <span v-else>Ver más seguidores</span>
+              </button>
+            </div>
           </div>
         </section>
 
@@ -433,6 +481,10 @@ export default {
     const usuarioActual = computed(() => authStore.usuarioActual)
     const monedasSoportadas = computed(() => dashboardStore.monedasSoportadas)
     
+    // Seguidores computed properties
+    const seguidores = computed(() => dashboardStore.seguidores)
+    const cargandoSeguidores = computed(() => dashboardStore.cargandoSeguidores)
+    
     // Pagination computed properties
     const paginaActualPosts = computed(() => dashboardStore.paginaActualPosts)
     const totalPostsPaginas = computed(() => dashboardStore.totalPostsPaginas)
@@ -461,7 +513,7 @@ export default {
       return icons[currency] || '💰'
     }
 
-    const copiarDireccion = async (address) => {
+        const copiarDireccion = async (address) => {
       try {
         await navigator.clipboard.writeText(address)
         toast.success('Dirección copiada al portapapeles')
@@ -472,6 +524,55 @@ export default {
 
     const formatearFecha = (fecha) => {
       return new Date(fecha).toLocaleDateString('es-ES')
+    }
+
+    // Gestión de seguidores
+    const cargarSeguidores = async () => {      const resultado = await dashboardStore.obtenerSeguidores()
+      if (!resultado.success) {
+        toast.error(resultado.error || 'Error al cargar seguidores')
+      }
+    }
+
+    const cargarMasSeguidores = async () => {
+      const resultado = await dashboardStore.obtenerSeguidores(false) // false = no limpiar lista existente
+      if (!resultado.success) {
+        toast.error(resultado.error || 'Error al cargar más seguidores')
+      }
+    }
+
+    const formatearFechaSeguimiento = (fecha) => {
+      if (!fecha) return 'Fecha no disponible'
+      
+      try {
+        let fechaSeguimiento
+        
+        // Manejar diferentes formatos de fecha de MongoDB
+        if (typeof fecha === 'string') {
+          fechaSeguimiento = new Date(fecha)
+        } else if (fecha.$date) {
+          // Formato BSON ObjectId con $date
+          fechaSeguimiento = new Date(fecha.$date)
+        } else if (fecha.getTime) {
+          // Ya es un objeto Date
+          fechaSeguimiento = fecha
+        } else {
+          // Intentar convertir directamente
+          fechaSeguimiento = new Date(fecha)
+        }
+        
+        if (isNaN(fechaSeguimiento.getTime())) {
+          console.warn('Fecha inválida recibida:', fecha)
+          return 'Fecha inválida'
+        }
+        
+        return fechaSeguimiento.toLocaleDateString('es-ES', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        })      } catch (error) {
+        console.error('Error al formatear fecha:', error, fecha)
+        return 'Fecha inválida'
+      }
     }
 
     // Gestión de wallets
@@ -646,6 +747,7 @@ export default {
     onMounted(async () => {
       await dashboardStore.inicializarDashboard()
       await generarCodigosQR()
+      await cargarSeguidores()
     })
 
     return {
@@ -657,26 +759,30 @@ export default {
       perfilFormulario,
       mostrarFormularioPost,
       postFormulario,
-      
-      // Computed
+        // Computed
       estadisticas,
       wallets,
       posts,
       cargandoDatos,
       cargandoWallets,
       cargandoPosts,
-      cargandoPerfil,      erroresFormulario,
+      cargandoPerfil,
+      erroresFormulario,
       usuarioActual,
       monedasDisponibles,
       paginaActualPosts,
       totalPostsPaginas,
       totalPostsCount,
-      
-      // Métodos
+      seguidores,
+      cargandoSeguidores,
+        // Métodos
       actualizarDatos,
       getCurrencyIcon,
       copiarDireccion,
       formatearFecha,
+      cargarSeguidores,
+      cargarMasSeguidores,
+      formatearFechaSeguimiento,
       editarWallet,
       cerrarFormularioWallet,
       guardarWallet,
@@ -955,8 +1061,8 @@ export default {
 }
 
 .avatar-image {
-  width: 80px;
-  height: 80px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid var(--color-border-light);
@@ -1321,10 +1427,101 @@ export default {
     gap: var(--spacing-sm);
     text-align: center;
   }
-  
-  .posts-pagination .btn {
+    .posts-pagination .btn {
     min-width: auto;
     flex: 1;
+  }
+}
+
+// Styles for followers section
+.followers-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.followers-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.follower-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: var(--color-background);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-light);
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: var(--color-primary);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+  }
+}
+
+.follower-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--color-border-light);
+  background: var(--color-background);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.follower-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.follower-username {
+  font-weight: 600;
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+}
+
+.follower-date {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.load-more-btn {
+  align-self: center;
+  margin-top: var(--spacing-md);
+}
+
+.empty-state {
+  text-align: center;
+  padding: var(--spacing-xl);
+  color: var(--color-text-secondary);
+  
+  .empty-icon {
+    font-size: 48px;
+    margin-bottom: var(--spacing-md);
+    opacity: 0.5;
+  }
+  
+  .empty-title {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    margin-bottom: var(--spacing-xs);
+    color: var(--color-text);
+  }
+  
+  .empty-description {
+    font-size: var(--font-size-sm);
+    line-height: 1.5;
   }
 }
 </style>
