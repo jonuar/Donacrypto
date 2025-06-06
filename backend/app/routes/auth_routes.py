@@ -1,12 +1,11 @@
 from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import jwt_required, get_jwt, create_access_token
 from werkzeug.security import generate_password_hash
-import secrets
 from datetime import timedelta
 from typing import Dict, Any, Optional, Tuple
 
 from ..models.user import User
-from ..models.password_reset import PasswordResetToken
+
 from ..extensions import mongo
 from ..extensions import blacklist
 
@@ -155,65 +154,7 @@ def login():
         return jsonify({"error": "Error interno del servidor"}), 500
     
 
-@auth_bp.route("/request-reset", methods=["POST"])
-def request_password_reset():
-    """
-    Solicita el envío de un token para restablecer contraseña
-    
-    Requiere: email
-    Retorna: token de restablecimiento o error
-    """
-    data = request.get_json()
-    email = data.get("email")
 
-    # Verifica el email enviado y el usuario en la base de datos
-    if not email or not find_by_email(email):
-        return jsonify({"error": "Email no registrado"}), 404
-
-    # Genera un token único y seguro para el restablecimiento de contraseña
-    token = secrets.token_urlsafe(32)
-    
-    # Guarda el token en la base de datos con una fecha de expiración
-    if PasswordResetToken.save_token(email, token):
-        # El token puede ser enviado por correo, o simplemente devolverlo si es para frontend
-        return jsonify({"message": "Token generado", "reset_token": token}), 200
-    else:
-        return jsonify({"error": "Error generando token"}), 500
-
-@auth_bp.route("/reset-password", methods=["POST"])
-@jwt_required()
-def reset_password():
-    """
-    Cambia la contraseña si el token es válido
-    
-    Requiere: token, new_password
-    Retorna: confirmación o error
-    """
-    data = request.get_json()
-    token = data.get("token")
-    new_password = data.get("new_password")
-
-    # Verifica que ambos campos (token y nueva contraseña) estén presentes
-    if not token or not new_password:
-        return jsonify({"error": "Datos incompletos"}), 400
-
-    # Verifica si el token es válido y no ha expirado
-    email = PasswordResetToken.verify_token(token)
-    if not email:
-        return jsonify({"error": "Token inválido o expirado"}), 400
-
-    # Si el token es válido, cambia la contraseña
-    try:
-        # Cifra la nueva contraseña
-        hashed_password = generate_password_hash(new_password)
-        # Actualiza la contraseña del usuario en la base de datos
-        mongo.db.users.update_one({"email": email}, {"$set": {"password": hashed_password}})
-        # Elimina el token después de usarlo para evitar su reutilización
-        PasswordResetToken.delete_token(token)
-        
-        return jsonify({"message": "Contraseña actualizada correctamente"}), 200
-    except Exception as e:
-        return jsonify({"error": "Error actualizando contraseña"}), 500 
 
 @auth_bp.route("/logout", methods=["POST"])
 @jwt_required()

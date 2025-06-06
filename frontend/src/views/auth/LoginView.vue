@@ -50,9 +50,6 @@
             <input v-model="datosFormulario.rememberMe" type="checkbox" class="checkbox" />
             <span class="checkbox-label">Recordarme</span>
           </label>
-          <router-link to="/forgot-password" class="forgot-link">
-            ¿Olvidaste tu contraseña?
-          </router-link>
         </div>
 
         <button
@@ -263,18 +260,6 @@ export default {
 .checkbox-label {
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
-}
-
-.forgot-link {
-  font-size: var(--font-size-sm);
-  color: var(--color-primary);
-  text-decoration: none;
-  transition: var(--transition);
-
-  &:hover {
-    color: var(--color-primary-dark);
-    text-decoration: underline;
-  }
 }
 
 .form-footer {

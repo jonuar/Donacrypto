@@ -29,16 +29,21 @@ Una alternativa descentralizada donde los creadores pueden recibir donaciones di
 ### 🔐 Autenticación y Seguridad
 - Registro de usuario (`POST /auth/register`)
 - Inicio de sesión con JWT (`POST /auth/login`)
+- Cierre de sesión con invalidación de token (`POST /auth/logout`)
 - Protección de rutas privadas con `@jwt_required`
 - Middleware de roles (`role_required`)
 - Store de autenticación con Pinia (frontend)
+- Cambio de contraseña para usuarios autenticados (`PUT /user/change-password`)
+- **Eliminación completa de cuenta** con confirmación de contraseña (`DELETE /user/delete-account`)
 
 ### 👤 Gestión de Usuarios y Perfiles
-- Obtener perfil actual (`GET /auth/me`)
+- Obtener perfil actual (`GET /user/profile`)
 - Actualizar perfil de follower (`PUT /user/update-profile`)
+- Actualizar perfil de creador (`PUT /user/creator/update-profile`)
 - Subida de avatar con preview
 - Edición de username, bio y contraseña
 - Validación de formularios
+- **Zona de peligro** con eliminación de cuenta y confirmación de contraseña
 
 ### 🎨 Sistema de Posts Completo
 - Crear publicaciones (`POST /user/posts`)
@@ -101,8 +106,10 @@ backend/
 │   │   ├── user.py
 │   │   ├── creator_wallet.py
 │   │   ├── post.py
-│   │   ├── following.py
-│   │   └── password_reset.py
+│   │   ├── like.py
+│   │   └── following.py
+│   ├── utils/
+│   │   └── like_utils.py
 │   └── routes/
 │       ├── auth_routes.py
 │       └── user_routes.py
@@ -137,7 +144,8 @@ frontend/
 │   │   ├── auth/
 │   │   │   └── AuthComponent.vue
 │   │   └── common/
-│   │       └── PostCard.vue
+│   │       ├── PostCard.vue
+│   │       └── DeleteAccountModal.vue
 │   ├── services/
 │   │   └── api.js
 │   └── assets/
@@ -173,12 +181,16 @@ npm run dev
 ```http
 POST /auth/register    # Registro de usuario
 POST /auth/login       # Inicio de sesión
-GET /auth/me          # Obtener perfil actual
+POST /auth/logout      # Cierre de sesión
 ```
 
 ### Usuarios
 ```http
+GET /user/profile                  # Obtener perfil actual
 PUT /user/update-profile           # Actualizar perfil de follower
+PUT /user/creator/update-profile   # Actualizar perfil de creador
+PUT /user/change-password          # Cambiar contraseña
+DELETE /user/delete-account        # Eliminar cuenta
 POST /user/posts                   # Crear publicación
 GET /user/posts/<username>         # Obtener posts de usuario
 DELETE /user/posts/<post_id>       # Eliminar post
@@ -197,6 +209,22 @@ GET /user/feed                    # Feed personalizado
 
 ---
 
+## 🔒 Características de Seguridad
+
+### 
+- **Autenticación JWT** con tokens de larga duración opcionales (30 días con "Recordarme")
+- **Validación de contraseñas** con longitud mínima y cifrado bcrypt
+- **Protección de rutas** basada en roles (creator/follower)
+- **Blacklist de tokens** para logout seguro
+- **Confirmación de contraseña** para operaciones críticas (eliminación de cuenta)
+- **Validación de entrada** en todos los endpoints
+- **Gestión segura de sesiones** con almacenamiento local/sesión
+
+
+> **Nota**: Los usuarios solo pueden cambiar su contraseña si están autenticados y conocen la actual.
+
+---
+
 ## 🏗️ Próximos Pasos
 - Sistema de donaciones real con blockchain
 - Integración con wallets (Metamask)
@@ -207,6 +235,43 @@ GET /user/feed                    # Feed personalizado
 - Sistema de búsqueda avanzada
 - Modo oscuro
 - PWA (Progressive Web App)
+
+---
+
+## 📈 Estado Actual del Proyecto
+
+### ✅ Completado
+- ✅ Sistema de autenticación completo (registro, login, logout)
+- ✅ Gestión de perfiles para creadores y followers
+- ✅ Sistema de posts con CRUD completo
+- ✅ Gestión de wallets de criptomonedas
+- ✅ Sistema de seguimiento entre usuarios
+- ✅ Feed personalizado y exploración de creadores
+- ✅ **Eliminación completa de cuenta** con confirmación
+- ✅ **Cambio de contraseña** para usuarios autenticados
+- ✅ Interfaz responsive y moderna
+- ✅ **Remoción de funcionalidad de recuperación de contraseña**
+
+### 🔧 Configuración de Desarrollo
+```bash
+# Backend (Puerto 5000)
+cd backend
+python app.py
+
+# Frontend (Puerto 5173) 
+cd frontend
+npm run dev
+```
+
+### 🎯 Funcionalidades Principales Verificadas
+- [x] Registro y login de usuarios
+- [x] Dashboard completo para creadores
+- [x] Feed personalizado para followers
+- [x] Exploración y seguimiento de creadores
+- [x] Gestión de posts y wallets
+- [x] Perfiles públicos y privados
+- [x] Eliminación segura de cuentas
+- [x] Cambio de contraseñas
 
 ---
 
