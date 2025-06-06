@@ -276,9 +276,6 @@ export default {
   background: var(--color-surface);
   border-bottom: 1px solid var(--color-border-light);
   padding: var(--spacing-lg);
-  position: sticky;
-  top: 0;
-  z-index: 10;
 }
 
 .header-content {
@@ -369,11 +366,9 @@ export default {
   border: 1px solid var(--color-border-light);
   overflow: hidden;
   transition: all 0.2s ease;
-  
-  &:hover {
-    box-shadow: var(--shadow-md);
-    border-color: var(--color-border);
-  }
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-border);
+
 }
 
 .feed-post-actions {

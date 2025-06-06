@@ -161,14 +161,9 @@ export default {
 .post-card {
   background: var(--color-surface);
   border: 1px solid var(--color-border-light);
-  border-radius: var(--radius-lg);
   padding: var(--spacing-lg);
   transition: all 0.2s ease;
-  
-  &:hover {
-    box-shadow: var(--shadow-md);
-    border-color: var(--color-border);
-  }
+
 }
 
 .post-header {
