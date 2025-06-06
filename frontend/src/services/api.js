@@ -41,9 +41,7 @@ api.interceptors.response.use(
   (respuesta) => respuesta,
   (errorRespuesta) => {
     if (errorRespuesta.response?.status === 401) {
-      // Token expirado o inválido
       limpiarTokens()
-      window.location.href = '/login'
     }
     return Promise.reject(errorRespuesta)
   }

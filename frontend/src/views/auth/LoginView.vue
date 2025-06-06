@@ -1,10 +1,3 @@
-<!-- ===== VISTA DE INICIO DE SESIÓN ==            <button
-              @click="mostrarContrasena = !mostrarContrasena"
-              class="password-toggle"
-            >
-              <span v-if="mostrarContrasena">👁️</span>
-              <span v-else>👁️‍🗨️</span>
-            </button>
 <!-- Formulario de login con validación y manejo de errores -->
 <template>
   <AuthComponent>
@@ -18,7 +11,7 @@
         <p class="form-subtitle">Inicia sesión para continuar con tu cuenta</p>
       </div>
 
-      <form @submit.prevent="handleLogin" class="form">        <div class="input-group">
+      <div class="form">        <div class="input-group">
           <label for="email" class="input-label">Correo electrónico</label>
           <input
             id="email"
@@ -27,12 +20,12 @@
             class="input-field"
             :class="{ 'input-error': erroresValidacion.email }"
             placeholder="tu@email.com"
-            required
+            @keyup.enter="handleLogin"
           />
           <span v-if="erroresValidacion.email" class="input-error-text">{{ erroresValidacion.email }}</span>
         </div>        <div class="input-group">
           <label for="password" class="input-label">Contraseña</label>
-          <div class="password-field">
+         <div class="password-field">
             <input
               id="password"
               v-model="datosFormulario.password"
@@ -40,11 +33,11 @@
               class="input-field"
               :class="{ 'input-error': erroresValidacion.password }"
               placeholder="••••••••"
-              required
+              @keyup.enter="handleLogin"
             />
             <button
               type="button"
-              @click="mostrarContrasena = !mostrarContrasena"
+              @click.prevent.stop="mostrarContrasena = !mostrarContrasena"
               class="password-toggle"
             >
               <span v-if="mostrarContrasena">👁️</span>
@@ -63,18 +56,15 @@
         </div>
 
         <button
-          type="submit"
+          type="button"
+          @click.prevent.stop="handleLogin"
           :disabled="cargandoDatos"
           class="btn btn-primary btn-lg w-full"
         >
           <span v-if="cargandoDatos" class="spinner"></span>
           <span v-else>Iniciar Sesión</span>
         </button>
-
-        <div v-if="erroresValidacion.general" class="error-message">
-          {{ erroresValidacion.general }}
-        </div>
-      </form>
+      </div>
 
       <div class="form-footer">
         <p class="footer-text">
@@ -98,7 +88,7 @@ import AuthComponent from '@/components/auth/AuthComponent.vue'
 export default {
   name: 'LoginView',
   components: {
-    AuthComponent // Cambiado de AuthLayout a AuthComponent
+    AuthComponent
   },
   setup() {    const router = useRouter()
     const toast = useToast()
@@ -117,13 +107,11 @@ export default {
     // Objeto reactivo para manejar errores de validación
     const erroresValidacion = reactive({
       email: '',
-      password: '',
-      general: ''
+      password: ''
     })    // Función para limpiar todos los errores
     const clearErrors = () => {
       erroresValidacion.email = ''
       erroresValidacion.password = ''
-      erroresValidacion.general = ''
     }    // Función de validación del formulario
     const validateForm = () => {
       clearErrors()
@@ -150,12 +138,18 @@ export default {
 
     // Función principal para manejar el login
     const handleLogin = async () => {
-      if (!validateForm()) return
-
-      cargandoDatos.value = true
-      clearErrors()
-
       try {
+        if (!validateForm()) {
+          return false
+        }
+
+        if (cargandoDatos.value) {
+          return false
+        }
+
+        cargandoDatos.value = true
+        clearErrors()
+        
         const result = await authStore.iniciarSesion({
           email: datosFormulario.email,
           password: datosFormulario.password,
@@ -167,22 +161,22 @@ export default {
           
           // Redirigir según el rol del usuario
           if (authStore.esCreador) {
-            router.push('/dashboard')
+            await router.push('/dashboard')
           } else if (authStore.esSeguidor) {
-            router.push('/feed')
+            await router.push('/feed')
           } else {
-            router.push('/')
+            await router.push('/')
           }
         } else {
-          erroresValidacion.general = result.error || 'Error al iniciar sesión'
-          toast.error(erroresValidacion.general)
+          toast.error('❌ Credenciales incorrectas. Verifica tu email y contraseña.')
         }
       } catch (error) {
-        erroresValidacion.general = 'Error de conexión. Intenta de nuevo.'
-        toast.error(erroresValidacion.general)
+        toast.error('Error de conexión. Intenta de nuevo.')
       } finally {
         cargandoDatos.value = false
       }
+      
+      return false
     }
 
     return {
@@ -281,16 +275,6 @@ export default {
     color: var(--color-primary-dark);
     text-decoration: underline;
   }
-}
-
-.error-message {
-  padding: var(--spacing-md);
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid var(--color-error);
-  border-radius: var(--radius-md);
-  color: var(--color-error);
-  font-size: var(--font-size-sm);
-  text-align: center;
 }
 
 .form-footer {
