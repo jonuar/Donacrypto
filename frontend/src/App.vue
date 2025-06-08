@@ -158,7 +158,7 @@ export default {
   
   .nav-links {
     gap: var(--spacing-sm);
-    margin-left: 10px;;
+    margin-left: 10px;
   }
   
   .nav-link {
@@ -167,21 +167,24 @@ export default {
     gap: 2px;
   }
 
-  .brand-text {
-    display: none; /* Ocultar texto en móvil */
-  }
-
   .brand-icon {
     font-size: var(--font-size-4xl);
-    padding-left: 10px;;
+    padding-left: 10px;
   }
   
   .nav-icon {
-    font-size: var(--font-size-base);   /* Icono más pequeño en móvil */
+    font-size: var(--font-size-base);
   }
   
   .nav-text {
-    font-size: var(--font-size-xs);     /* Texto más pequeño en móvil */
+    font-size: var(--font-size-xs);
+  }
+}
+
+/* Solo ocultar en pantallas muy pequeñas */
+@media (max-width: 480px) {
+  .brand-text {
+    display: none;
   }
 }
 </style>

@@ -1,5 +1,3 @@
-<!-- ===== VISTA DE REGISTRO ===== -->
-<!-- Formulario de registro con selección de rol y validación completa -->
 <template>
   <AuthComponent>
     <div class="register-form">
@@ -120,42 +118,26 @@
             />
             <button
               type="button"
-              @click="mostrarContrasena = !mostrarContrasena"
+              @click.prevent.stop="mostrarContrasena = !mostrarContrasena"
               class="password-toggle"
+              :aria-label="mostrarContrasena ? 'Ocultar contraseña' : 'Mostrar contraseña'"
             >
-              <span v-if="mostrarContrasena">👁️</span>
-              <span v-else>🙈</span>
+              <!-- Iconos SVG -->
+              <svg v-if="mostrarContrasena" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94L17.94 17.94z"/>
+                <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19l-6.84-6.84z"/>
+                <line x1="1" y1="1" x2="23" y2="23"/>
+              </svg>
+              <svg v-else width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
             </button>
           </div>
           <span v-if="erroresValidacion.password" class="input-error-text">{{ erroresValidacion.password }}</span>
         </div>
 
-        <!-- Confirm Password -->
-        <!-- <div class="input-group">
-          <label for="confirmPassword" class="input-label">Confirmar contraseña</label>
-          <div class="password-field">
-            <input
-              id="confirmPassword"
-              v-model="datosFormulario.confirmPassword"
-              :type="mostrarConfirmacionContrasena ? 'text' : 'password'"
-              class="input-field"
-              :class="{ 'input-error': erroresValidacion.confirmPassword }"
-              placeholder="••••••••"
-              required
-            />
-            <button
-              type="button"
-              @click="mostrarConfirmacionContrasena = !mostrarConfirmacionContrasena"
-              class="password-toggle"
-            >
-              <span v-if="mostrarConfirmacionContrasena">👁️</span>
-              <span v-else>🙈</span>
-            </button>
-          </div>
-          <span v-if="erroresValidacion.confirmPassword" class="input-error-text">{{ erroresValidacion.confirmPassword }}</span>
-        </div> -->
-
-        <!-- Terms and conditions -->
+        <!-- Terminos y condiciones -->
         <div class="input-group">
           <label class="checkbox-group">
             <input v-model="datosFormulario.acceptTerms" type="checkbox" class="checkbox" />
@@ -193,7 +175,6 @@
   </AuthComponent>
 </template>
 
-<!-- ===== LÓGICA DEL COMPONENTE DE REGISTRO ===== -->
 <script>
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
@@ -453,22 +434,43 @@ export default {
 
 .password-field {
   position: relative;
+  width: 100%;
+
+  & .input-field {
+    width: 100%;
+    padding-right: 50px; /* Espacio para el botón */
+    box-sizing: border-box;
+  }
 }
 
 .password-toggle {
   position: absolute;
-  right: var(--spacing-md);
+  right: 12px; /* Según el padding del input */
   top: 50%;
   transform: translateY(-50%);
   background: none;
   border: none;
   cursor: pointer;
   font-size: var(--font-size-lg);
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
   transition: var(--transition);
+  z-index: 2; /* Encima del input */
+  padding: 4px; /* Área de click más grande */
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
 
   &:hover {
     color: var(--color-primary);
+    background-color: rgba(var(--color-primary-rgb), 0.1);
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(var(--color-primary-rgb), 0.2);
   }
 }
 
@@ -547,6 +549,17 @@ export default {
     text-align: center;
     flex-direction: column;
     gap: var(--spacing-xs);
+  }
+
+  .password-field .input-field {
+    padding-right: 45px; /* Menos espacio en móvil */
+  }
+  
+  .password-toggle {
+    right: 10px;
+    width: 28px;
+    height: 28px;
+    font-size: var(--font-size-base);
   }
 }
 </style>

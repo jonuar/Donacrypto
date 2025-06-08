@@ -1,7 +1,7 @@
-<!-- Formulario de login con validación y manejo de errores -->
 <template>
   <AuthComponent>
-    <div class="login-form">      <div class="form-header">
+    <div class="login-form">
+      <div class="form-header">
         <!-- Botón para volver al inicio -->
         <router-link to="/" class="back-to-home">
           <span class="back-icon">←</span>
@@ -11,7 +11,8 @@
         <p class="form-subtitle">Inicia sesión para continuar con tu cuenta</p>
       </div>
 
-      <div class="form">        <div class="input-group">
+      <div class="form">
+        <div class="input-group">
           <label for="email" class="input-label">Correo electrónico</label>
           <input
             id="email"
@@ -35,14 +36,6 @@
               placeholder="••••••••"
               @keyup.enter="handleLogin"
             />
-            <!-- <button
-              type="button"
-              @click.prevent.stop="mostrarContrasena = !mostrarContrasena"
-              class="password-toggle"
-            >
-              <span v-if="mostrarContrasena">👁️</span>
-              <span v-else>🙈</span>
-            </button> -->
 
             <button
               type="button"
@@ -92,7 +85,6 @@
   </AuthComponent>
 </template>
 
-<!-- ===== LÓGICA DEL COMPONENTE ===== -->
 <script>
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'

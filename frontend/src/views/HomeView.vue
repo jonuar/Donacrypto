@@ -278,7 +278,7 @@ export default {
 }
 
 .features-section {
-  padding: var(--spacing-2xl) 0;
+  padding-bottom: var(--spacing-2xl);
 }
 
 .section-title {
@@ -325,33 +325,53 @@ export default {
   color: var(--color-text-secondary);
 }
 
-@media (max-width: 768px) {
-  .nav-container {
-    padding: 0 var(--spacing-md);
-    height: auto;
-    min-height: 70px;
-    flex-wrap: wrap;
-    align-items: center;
+/* Pantallas de escritorio grandes (1200px+) */
+@media (min-width: 1200px) {
+  .hero-card {
+    max-width: 450px;
+    padding: var(--spacing-2xl);
   }
 
-  .nav-brand {
-    font-size: var(--font-size-base);
-    flex: 1;
+  .creator-avatar {
+    width: 60px;
+    height: 60px;
+    font-size: var(--font-size-2xl);
   }
 
-  .nav-actions {
-    display: flex;
-    flex-direction: row;
-    gap: var(--spacing-xs);
-    flex-shrink: 0;
-    align-items: center;
+  .creator-info h4 {
+    font-size: var(--font-size-lg);
   }
 
-  .nav-actions .btn {
-    padding: var(--spacing-xs) var(--spacing-sm);
-    font-size: var(--font-size-sm);
-    white-space: nowrap;
-    min-width: auto;
+  .donation-amount {
+    padding: var(--spacing-lg);
+    
+    .amount {
+      font-size: var(--font-size-2xl);
+    }
+  }
+}
+
+/* Pantallas de escritorio medianas (992px - 1199px) */
+@media (min-width: 992px) and (max-width: 1199px) {
+  .hero-card {
+    max-width: 400px;
+    padding: var(--spacing-xl);
+  }
+
+  .creator-avatar {
+    width: 55px;
+    height: 55px;
+  }
+
+  .donation-amount .amount {
+    font-size: var(--font-size-xl);
+  }
+}
+
+/* Tablets y pantallas medianas (769px - 991px) */
+@media (min-width: 769px) and (max-width: 991px) {
+  .hero-card {
+    max-width: 350px;
   }
 }
 
@@ -367,6 +387,10 @@ export default {
   .nav-brand {
     font-size: var(--font-size-base);
     flex: 1;
+  }
+
+  .brand-icon  {
+    font-size: var(--font-size-3xl);
   }
 
   .nav-actions {
@@ -425,6 +449,10 @@ export default {
   .nav-brand {
     justify-content: center;
     margin-bottom: var(--spacing-xs);
+  }
+
+  .brand-icon  {
+    font-size: var(--font-size-3xl);
   }
 
   .nav-actions {
