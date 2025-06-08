@@ -1,6 +1,6 @@
-<!-- ===== COMPONENTE DE AUTENTICACIÓN ===== -->
-<!-- Componente contenedor para las vistas de login y registro -->
-<!-- Diseño split-screen con branding a la izquierda y formulario a la derecha -->
+
+<!-- Componente para vistas de login y registro -->
+
 <template>
   <div class="auth-layout">
     <div class="auth-container">
@@ -10,11 +10,11 @@
           <!-- Logo y título principal -->
           <div class="brand-logo">
             <div class="logo-icon">💜</div>
-            <h1 class="brand-title">Decentralized<br/>Donations</h1>
+            <h1 class="brand-title">Donaciones<br/>Decentralizadas</h1>
           </div>
           <!-- Descripción de la plataforma -->
           <p class="brand-subtitle">
-            Empodera a los creadores con donaciones descentralizadas y transparentes
+            Ayuda a crecer a los creadores con donaciones descentralizadas y transparentes
           </p>
           <!-- Grid de características principales -->
           <div class="feature-grid">
@@ -41,7 +41,7 @@
       <!-- Lado Derecho - Sección del formulario de autenticación -->
       <div class="auth-form-section">
         <div class="auth-form-container">
-          <!-- Slot para el contenido dinámico (LoginView o RegisterView) -->
+          <!-- Espacio para el contenido dinámico (LoginView o RegisterView) -->
           <slot />
         </div>
       </div>
@@ -84,6 +84,7 @@
   align-items: center;
   position: relative;
   overflow: hidden;
+  text-align: center;
 
   /* Efecto de fondo animado */
   &::before {
@@ -134,7 +135,7 @@
 /* Grid de características en 2x2 */
 .feature-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* Adaptable a diferentes tamaños */
   gap: var(--spacing-lg);
 }
 
@@ -187,7 +188,6 @@
 }
 
 /* ===== RESPONSIVE DESIGN ===== */
-/* Estilos para dispositivos móviles y tablets */
 @media (max-width: 768px) {
   /* Cambiar a una sola columna en móviles */
   .auth-container {
@@ -201,6 +201,14 @@
     padding: var(--spacing-xl);
     min-height: 200px;
     text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center
+  }
+
+  .brand-content {
+    width: 100%;
+    max-width: 100%; /* Asegurar que no se corte */
   }
 
   /* Reducir tamaño del título */
@@ -208,10 +216,15 @@
     font-size: var(--font-size-2xl);
   }
 
+  .brand-subtitle {
+    display: None;
+  }
+
   /* Mantener grid 2x2 pero con menos espacio */
   .feature-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: var(--spacing-md);
+    // grid-template-columns: 1fr;
+    // gap: var(--spacing-md);
+    display: None;
   }
 
   /* Reducir padding del formulario */

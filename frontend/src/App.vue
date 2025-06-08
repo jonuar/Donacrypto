@@ -158,12 +158,22 @@ export default {
   
   .nav-links {
     gap: var(--spacing-sm);
+    margin-left: 10px;;
   }
   
   .nav-link {
     padding: var(--spacing-xs) var(--spacing-sm);
     min-height: 45px;
     gap: 2px;
+  }
+
+  .brand-text {
+    display: none; /* Ocultar texto en móvil */
+  }
+
+  .brand-icon {
+    font-size: var(--font-size-4xl);
+    padding-left: 10px;;
   }
   
   .nav-icon {

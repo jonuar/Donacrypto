@@ -113,7 +113,8 @@
               
               <div class="wallet-address">
                 <span class="address-label">Dirección:</span>
-                <code class="address-text">{{ wallet.wallet_address }}</code>                <button @click="copiarDireccion(wallet.wallet_address)" class="btn-copy" title="Copiar">
+                <code class="address-text">{{ wallet.wallet_address }}</code>
+                <button @click="copiarDireccion(wallet.wallet_address)" class="btn-copy" title="Copiar">
                   ⧉
                 </button>
               </div>
@@ -343,23 +344,20 @@
                 <p>Una vez que elimines tu cuenta, no podrás recuperarla. Esta acción es permanente.</p>
               </div>
             </div>
-            
-            <button 
+              <button 
               @click="mostrarModalEliminarCuenta = true" 
-              class="btn btn-danger"
+              class="btn-danger"
             >
               Eliminar Cuenta Permanentemente
             </button>
           </div>
         </section>
       </div>
-    </div>
-
-    <!-- Modal para Eliminar Cuenta -->
+    </div>    <!-- Modal para Eliminar Cuenta -->
     <DeleteAccountModal 
-      v-if="mostrarModalEliminarCuenta"
+      :mostrar="mostrarModalEliminarCuenta"
       :user-role="'creator'"
-      @close="mostrarModalEliminarCuenta = false"
+      @cerrar="mostrarModalEliminarCuenta = false"
     />
 
     <!-- Modal para Agregar/Editar Wallet -->
@@ -793,7 +791,8 @@ export default {
       walletEditando,
       walletFormulario,
       editandoPerfil,
-      perfilFormulario,      mostrarFormularioPost,
+      perfilFormulario,
+      mostrarFormularioPost,
       postFormulario,
       mostrarModalEliminarCuenta,
         // Computed
@@ -946,7 +945,7 @@ export default {
 
 .dashboard-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  grid-template-columns: 1fr 1fr 1fr;
   gap: var(--spacing-xl);
 }
 
@@ -956,10 +955,14 @@ export default {
   padding: var(--spacing-xl);
   box-shadow: var(--shadow-sm);
   border: 1px solid var(--color-border-light);
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .section-header {
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
   align-items: center;
   margin-bottom: var(--spacing-lg);
@@ -979,6 +982,7 @@ export default {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
+  width: 100%;
 }
 
 .wallet-card {
@@ -986,6 +990,8 @@ export default {
   border-radius: var(--radius-md);
   padding: var(--spacing-lg);
   background: var(--color-background);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .wallet-header {
@@ -1123,30 +1129,6 @@ export default {
   line-height: 1.5;
 }
 
-.donations-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-}
-
-.donation-item {
-  display: flex;
-  justify-content: space-between;
-  padding: var(--spacing-sm);
-  border-radius: var(--radius-sm);
-  background: var(--color-background);
-}
-
-.donation-amount {
-  font-weight: 600;
-  color: var(--color-success);
-}
-
-.donation-date {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
-}
-
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -1275,47 +1257,6 @@ export default {
   line-height: 1.5;
 }
 
-.decentralized-benefits {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: var(--spacing-md);
-}
-
-.benefit-card {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--spacing-md);
-  padding: var(--spacing-lg);
-  background: var(--color-surface);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-border-light);
-  transition: all 0.2s ease;
-  
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-  }
-}
-
-.benefit-icon {
-  font-size: 2rem;
-  flex-shrink: 0;
-}
-
-.benefit-content h4 {
-  margin: 0 0 var(--spacing-xs) 0;
-  font-size: var(--font-size-base);
-  font-weight: 600;
-  color: var(--color-text);
-}
-
-.benefit-content p {
-  margin: 0;
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
-  line-height: 1.4;
-}
-
 /* Estilos para Posts */
 .posts-section {
   grid-column: 1 / -1; /* Ocupa todo el ancho del grid */
@@ -1325,71 +1266,6 @@ export default {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
-}
-
-.post-card {
-  border: 1px solid var(--color-border-light);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-lg);
-  background: var(--color-background);
-  transition: all 0.2s ease;
-  
-  &:hover {
-    box-shadow: var(--shadow-sm);
-    border-color: var(--color-border);
-  }
-}
-
-.post-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: var(--spacing-md);
-}
-
-.post-title {
-  font-size: var(--font-size-lg);
-  font-weight: 600;
-  color: var(--color-text);
-  margin: 0;
-  flex: 1;
-}
-
-.post-actions {
-  display: flex;
-  gap: var(--spacing-sm);
-}
-
-.post-content {
-  margin-bottom: var(--spacing-md);
-}
-
-.post-content p {
-  color: var(--color-text);
-  line-height: 1.6;
-  margin: 0;
-  white-space: pre-wrap; /* Preserve line breaks */
-}
-
-.post-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-top: var(--spacing-sm);
-  border-top: 1px solid var(--color-border-light);
-}
-
-.post-date {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
-}
-
-.post-likes {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xs);
 }
 
 .post-form {
@@ -1437,6 +1313,47 @@ export default {
   }
 }
 
+@media (max-width: 480px) {
+  .dashboard-page {
+    padding: var(--spacing-sm);
+  }
+  
+  .dashboard-header {
+    padding: var(--spacing-lg);
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .stat-card {
+    padding: var(--spacing-sm);
+  }
+  
+  .wallet-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .wallet-actions {
+    align-self: stretch;
+    justify-content: flex-end;
+  }
+  
+  .modal-overlay {
+    padding: var(--spacing-sm);
+  }
+  
+  .modal-content {
+    margin: 0;
+    max-width: 100%;
+  }
+  
+  .address-text {
+    max-width: 120px;
+  }
+}
+
 @media (max-width: 768px) {
   .dashboard-page {
     padding: var(--spacing-md);
@@ -1444,19 +1361,72 @@ export default {
   
   .dashboard-grid {
     grid-template-columns: 1fr;
+    gap: var(--spacing-lg);
+  }
+  
+  .dashboard-section {
+    padding: var(--spacing-lg);
+    overflow: hidden;
   }
   
   .header-content {
     flex-direction: column;
     align-items: flex-start;
+    gap: var(--spacing-md);
+  }
+  
+  .page-title {
+    font-size: var(--font-size-2xl);
   }
   
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-md);
   }
-    .profile-display {
+  
+  .stat-card {
+    padding: var(--spacing-md);
     flex-direction: column;
     text-align: center;
+  }
+  
+  .profile-display {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--spacing-md);
+  }
+  
+  .wallet-card {
+    padding: var(--spacing-md);
+  }
+  
+  .wallet-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+  }
+  
+  .wallet-actions {
+    align-self: flex-end;
+  }
+  
+  .address-text {
+    font-size: var(--font-size-xs);
+  }
+  
+  .form-input,
+  .form-select,
+  .form-textarea {
+    font-size: 16px; /* Evita el zoom en iOS */
+  }
+  
+  .modal-content {
+    margin: var(--spacing-md);
+    max-width: calc(100vw - 2rem);
+  }
+  
+  .form-actions {
+    flex-direction: column;
   }
   
   .posts-pagination {
@@ -1468,9 +1438,24 @@ export default {
     min-width: auto;
     flex: 1;
   }
+    .danger-zone {
+    .danger-warning {
+      flex-direction: column;
+      text-align: center;
+      
+      .warning-icon {
+        align-self: center;
+      }
+    }
+  }
+  
+  .btn-danger {
+    width: 100%;
+    padding: var(--spacing-md);
+  }
 }
 
-// Styles for followers section
+// Sección de Seguidores
 .followers-content {
   display: flex;
   flex-direction: column;
@@ -1533,9 +1518,37 @@ export default {
   color: var(--color-text-secondary);
 }
 
-.load-more-btn {
-  align-self: center;
+.followers-summary {
+  text-align: center;
+  padding: var(--spacing-md);
+  border-top: 1px solid var(--color-border-light);
   margin-top: var(--spacing-md);
+}
+
+.summary-text {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.avatar-placeholder {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--color-border-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.wallet-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--spacing-md);
+  gap: var(--spacing-sm);
 }
 
 .empty-state {
@@ -1549,13 +1562,14 @@ export default {
     opacity: 0.5;
   }
   
-  .empty-title {
+  h3 {
     font-size: var(--font-size-lg);
     font-weight: 600;
     margin-bottom: var(--spacing-xs);
     color: var(--color-text);
   }
-    .empty-description {
+  
+  p {
     font-size: var(--font-size-sm);
     line-height: 1.5;
   }
@@ -1564,7 +1578,7 @@ export default {
 // Danger Zone Styles
 .danger-zone {
   border: 2px solid #dc3545;
-  border-radius: var(--border-radius);
+  border-radius: var(--radius-md);
   background: rgba(220, 53, 69, 0.05);
   
   .danger-title {
@@ -1606,54 +1620,39 @@ export default {
         font-size: var(--font-size-sm);
         line-height: 1.5;
         margin: 0;
-      }
-    }
-  }
-  
-  .btn-danger {
-    background: #dc3545;
-    color: white;
-    border: 2px solid #dc3545;
-    padding: var(--spacing-sm) var(--spacing-lg);
-    border-radius: var(--border-radius-sm);
-    font-weight: 600;
-    font-size: var(--font-size-sm);
-    cursor: pointer;
-    transition: all 0.3s ease;
-    
-    &:hover {
-      background: #c82333;
-      border-color: #c82333;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
-    }
-    
-    &:active {
-      transform: translateY(0);
-    }
-    
-    &:focus {
-      outline: none;
-      box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.25);
-    }
+      }    }
   }
 }
 
-@media (max-width: 768px) {
-  .danger-zone {
-    .danger-warning {
-      flex-direction: column;
-      text-align: center;
-      
-      .warning-icon {
-        align-self: center;
-      }
-    }
-    
-    .btn-danger {
-      width: 100%;
-      padding: var(--spacing-md);
-    }
+// Botón de peligro - fuera de danger-zone para uso global
+.btn-danger {
+  background: #dc3545;
+  color: white;
+  border: 2px solid #dc3545;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  
+  &:hover {
+    background: #c82333;
+    border-color: #c82333;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+  
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.25);
   }
 }
 </style>

@@ -70,10 +70,13 @@ export default {
     mostrar: {
       type: Boolean,
       default: false
+    },
+    userRole: {
+      type: String,
+      default: ''
     }
   },
-  emits: ['cerrar'],
-  setup(props, { emit }) {
+  emits: ['cerrar'],  setup(props, { emit }) {
     const router = useRouter()
     const toast = useToast()
     const authStore = useAuthStore()
@@ -81,7 +84,8 @@ export default {
     const passwordConfirm = ref('')
     const procesando = ref(false)
     
-    const userRole = computed(() => authStore.usuarioActual?.role)
+    // Usar la prop userRole directamente o obtener del store como fallback
+    const userRole = computed(() => props.userRole || authStore.usuarioActual?.role)
     
     const cerrar = () => {
       passwordConfirm.value = ''
