@@ -531,9 +531,7 @@ export default {
         return monedasSoportadas.value
       }
       return monedasSoportadas.value.filter(m => !monedasUsadas.includes(m))
-    })
-
-    // Métodos
+    })    // Métodos
     const actualizarDatos = async () => {
       await dashboardStore.inicializarDashboard()
       toast.success('Datos actualizados')
@@ -541,9 +539,39 @@ export default {
 
     const getCurrencyIcon = (currency) => {
       const icons = {
-        'ETH': '⟠',
+        // Layer 1 Blockchains
         'BTC': '₿',
-        'USDT': '₮'
+        'ETH': '⟠', 
+        'BNB': '🟡',
+        'ADA': '♠',
+        'SOL': '◉',
+        'DOT': '●',
+        'AVAX': '🔺',
+        'MATIC': '🔷',
+        'ATOM': '⚛',
+        'LTC': 'Ł',
+        'XRP': '◊',
+        'TRX': '🔺',
+        
+        // Stablecoins
+        'USDT': '₮',
+        'USDC': '⚪',
+        'BUSD': '🟡',
+        'DAI': '◈',
+        
+        // DeFi Tokens
+        'UNI': '🦄',
+        'LINK': '🔗',
+        'AAVE': '👻',
+        'COMP': '🏛',
+        
+        // Layer 2
+        'ARB': '🔷',
+        'OP': '🔴',
+        
+        // Meme Coins
+        'DOGE': '🐕',
+        'SHIB': '🐕'
       }
       return icons[currency] || '💰'
     }

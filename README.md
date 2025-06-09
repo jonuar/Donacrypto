@@ -9,7 +9,8 @@ Una plataforma descentralizada de donaciones para creadores de contenido que per
 - 🔐 **Autenticación segura** con JWT y bcrypt
 - 👤 **Perfiles duales** para creadores y seguidores  
 - 📝 **Sistema de publicaciones** con feed personalizado
-- 💰 **Gestión de wallets** (BTC, ETH, USDT) con códigos QR
+- 💰 **Gestión de wallets expandida** con soporte para 24+ criptomonedas
+- 📱 **Códigos QR automáticos** para todas las wallets
 - 👥 **Red social** - seguir/dejar de seguir creadores
 - 🔍 **Exploración y búsqueda** de creadores
 - 📱 **Interfaz responsiva** optimizada para móviles

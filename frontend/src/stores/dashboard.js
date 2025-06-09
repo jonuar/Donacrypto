@@ -40,15 +40,48 @@ export const useDashboardStore = defineStore('dashboard', {
     walletPredeterminada: (state) => {
       return state.wallets.find(w => w.is_default) || state.wallets[0]
     },
+      // Monedas soportadas
+    monedasSoportadas: () => [
+      // Layer 1 Blockchains principales
+      "BTC",    // Bitcoin
+      "ETH",    // Ethereum
+      "BNB",    // Binance Smart Chain
+      "ADA",    // Cardano
+      "SOL",    // Solana
+      "DOT",    // Polkadot
+      "AVAX",   // Avalanche
+      "MATIC",  // Polygon
+      "ATOM",   // Cosmos
+      "LTC",    // Litecoin
+      "XRP",    // Ripple
+      "TRX",    // Tron
+      
+      // Stablecoins
+      "USDT",   // Tether
+      "USDC",   // USD Coin
+      "BUSD",   // Binance USD
+      "DAI",    // Dai
+      
+      // DeFi Tokens populares
+      "UNI",    // Uniswap
+      "LINK",   // Chainlink
+      "AAVE",   // Aave
+      "COMP",   // Compound
+      
+      // Layer 2 y Scaling
+      "ARB",    // Arbitrum
+      "OP",     // Optimism
+      
+      // Meme Coins populares
+      "DOGE",   // Dogecoin
+      "SHIB",   // Shiba Inu
+    ],
     
-    // Monedas soportadas
-    monedasSoportadas: () => ['ETH', 'BTC', 'USDT'],
-    
-    // Validar si tiene todas las wallets
+    // Validar si tiene todas las wallets principales
     tieneTodasLasWallets: (state) => {
-      const monedasSoportadas = ['ETH', 'BTC', 'USDT']
+      const monedasPrincipales = ['ETH', 'BTC', 'USDT'] // Solo requerimos las principales
       const monedasActuales = state.wallets.map(w => w.currency_type)
-      return monedasSoportadas.every(moneda => monedasActuales.includes(moneda))
+      return monedasPrincipales.every(moneda => monedasActuales.includes(moneda))
     }
   },
 

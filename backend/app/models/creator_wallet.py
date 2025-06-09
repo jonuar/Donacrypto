@@ -4,7 +4,41 @@ from typing import Dict, Any
 class CreatorWallet:
     """Modelo para gestionar las direcciones de wallet de los creadores"""
 
-    SUPPORTED_CURRENCIES: list[str] = ["ETH", "BTC", "USDT"]
+    SUPPORTED_CURRENCIES: list[str] = [
+        # Layer 1 Blockchains principales
+        "BTC",    # Bitcoin
+        "ETH",    # Ethereum
+        "BNB",    # Binance Smart Chain
+        "ADA",    # Cardano
+        "SOL",    # Solana
+        "DOT",    # Polkadot
+        "AVAX",   # Avalanche
+        "MATIC",  # Polygon
+        "ATOM",   # Cosmos
+        "LTC",    # Litecoin
+        "XRP",    # Ripple
+        "TRX",    # Tron
+        
+        # Stablecoins
+        "USDT",   # Tether
+        "USDC",   # USD Coin
+        "BUSD",   # Binance USD
+        "DAI",    # Dai
+        
+        # DeFi Tokens populares
+        "UNI",    # Uniswap
+        "LINK",   # Chainlink
+        "AAVE",   # Aave
+        "COMP",   # Compound
+        
+        # Layer 2 y Scaling
+        "ARB",    # Arbitrum
+        "OP",     # Optimism
+        
+        # Meme Coins populares
+        "DOGE",   # Dogecoin
+        "SHIB",   # Shiba Inu
+    ]
 
     def __init__(self, creator_email: str, wallet_address: str, currency_type: str) -> None:
         if currency_type not in self.SUPPORTED_CURRENCIES:
