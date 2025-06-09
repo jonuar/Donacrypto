@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
 // Función para obtener token desde cualquier almacenamiento
 const obtenerToken = () => {
@@ -19,7 +19,8 @@ const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json'
-  }
+  },
+  withCredentials: false
 })
 
 // Interceptor para agregar token automáticamente
@@ -46,5 +47,11 @@ api.interceptors.response.use(
     return Promise.reject(errorRespuesta)
   }
 )
+
+// Interceptor para logging en desarrollo
+api.interceptors.request.use(request => {
+  console.log('API Request:', request.baseURL + request.url)
+  return request
+})
 
 export default api

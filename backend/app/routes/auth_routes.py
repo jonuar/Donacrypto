@@ -100,8 +100,11 @@ def register():
             return jsonify({"error": "Error al registrar usuario"}), 500
 
     except Exception as e:
-        current_app.logger.error(f"[register] Error: {e}")
-        return jsonify({"error": "Error interno del servidor"}), 500
+        current_app.logger.error(f"[register] Error detallado: {str(e)}")
+        return jsonify({
+            "error": "Error interno del servidor",
+            "details": str(e) if app.debug else None
+        }), 500
 
 
 @auth_bp.route("/login", methods=["POST"])

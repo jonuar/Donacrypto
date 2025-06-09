@@ -1,5 +1,4 @@
 import { fileURLToPath, URL } from 'node:url'
-
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
@@ -33,6 +32,22 @@ export default defineConfig({
       }
     }
   },
+  // ===== CONFIGURACIÓN DE BUILD PARA PRODUCCIÓN =====
+  build: {
+    outDir: 'dist',
+    assetsDir: 'assets',
+    sourcemap: false,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['vue', 'vue-router', 'pinia'],
+          ui: ['vue-toastification'],
+          utils: ['axios', 'qrcode']
+        }
+      }
+    },
+    chunkSizeWarningLimit: 1000
+  },
   // ===== CONFIGURACIÓN DEL SERVIDOR DE DESARROLLO =====
   server: {
     port: 3000,        // Puerto específico para el frontend
@@ -40,4 +55,9 @@ export default defineConfig({
     open: true,        // Abre automáticamente el navegador
     strictPort: true,  // Falla si el puerto no está disponible
   },
+  // ===== CONFIGURACIÓN PARA PREVIEW =====
+  preview: {
+    port: 4173,
+    host: true
+  }
 })

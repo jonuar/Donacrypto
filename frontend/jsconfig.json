@@ -14,8 +14,7 @@
     "paths": {
       "@/*": ["./src/*"]
     },
-    "lib": ["esnext", "dom", "dom.iterable"],
-    "types": ["vite/client"]
+    "lib": ["esnext", "dom", "dom.iterable"]
   },
   "include": [
     "src/**/*",

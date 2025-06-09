@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: donacrypto-backend
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn --bind 0.0.0.0:$PORT wsgi:application
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: FLASK_DEBUG
+        value: false
+      - key: FRONTEND_URL
+        value: https://donacrypto.onrender.com
+      - key: ALLOWED_ORIGINS
+        value: https://donacrypto.onrender.com

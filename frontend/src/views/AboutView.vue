@@ -114,7 +114,6 @@
         <div class="footer-content">
           <div class="footer-links">
             <router-link to="/" class="footer-link">Inicio</router-link>
-            <router-link to="/about" class="footer-link">Acerca de</router-link>
             <router-link to="/login" class="footer-link">Iniciar sesión</router-link>
             <router-link to="/register" class="footer-link">Registrarse</router-link>
           </div>
