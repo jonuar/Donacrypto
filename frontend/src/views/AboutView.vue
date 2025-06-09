@@ -1,7 +1,28 @@
 <template>
   <div class="about-page">
+    <!-- Navbar para usuarios no autenticados -->
+    <nav class="navbar" v-if="!authStore.estaAutenticado">
+      <div class="nav-container">
+        <div class="nav-brand">
+          <router-link to="/" class="brand-link">
+            <span class="brand-icon">💜</span>
+            <span class="brand-text">DonaCrypto</span>
+          </router-link>
+        </div>
+        <div class="nav-actions">
+          <router-link to="/" class="btn btn-ghost">
+            Inicio
+          </router-link>
+          <router-link to="/login" class="btn btn-ghost">
+            Iniciar sesión
+          </router-link>
+          <router-link to="/register" class="btn btn-primary">
+            Registrarse
+          </router-link>
+        </div>
+      </div>
+    </nav>
 
-    
     <main class="main-content">
       <div class="about-hero">
         <h1>Acerca de Nosotros</h1>
@@ -63,7 +84,7 @@
               <div class="step-number">1</div>
               <div class="step-content">
                 <h4>Regístrate como Creador</h4>
-                <p>Crea tu perfil y configura tus wallets de criptomonedas (ETH, BTC, USDT)</p>
+                <p>Crea tu perfil y configura tus wallets de criptomonedas (24 criptomonedas soportadas: BTC, ETH, BNB, ADA, SOL, USDT, USDC y más)</p>
               </div>
             </div>
             
@@ -86,12 +107,38 @@
         </div>
       </div>
     </main>
+
+    <!-- Footer para usuarios no autenticados -->
+    <footer class="footer" v-if="!authStore.estaAutenticado">
+      <div class="footer-container">
+        <div class="footer-content">
+          <div class="footer-links">
+            <router-link to="/" class="footer-link">Inicio</router-link>
+            <router-link to="/about" class="footer-link">Acerca de</router-link>
+            <router-link to="/login" class="footer-link">Iniciar sesión</router-link>
+            <router-link to="/register" class="footer-link">Registrarse</router-link>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>&copy; 2024 DonaCrypto. Plataforma de donaciones descentralizada.</p>
+        </div>
+      </div>
+    </footer>
   </div>
 </template>
 
 <script>
+import { useAuthStore } from '@/stores/auth'
+
 export default {
-  name: 'AboutView'
+  name: 'AboutView',
+  setup() {
+    const authStore = useAuthStore()
+    
+    return {
+      authStore
+    }
+  }
 }
 </script>
 
@@ -99,9 +146,144 @@ export default {
 .about-page {
   min-height: 100vh;
   background: var(--color-background);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Navbar styles */
+.navbar {
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border-light);
+  padding: var(--spacing-md) 0;
+}
+
+.nav-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-lg);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+}
+
+.brand-link {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  text-decoration: none;
+  color: var(--color-text);
+  font-weight: 600;
+  font-size: var(--font-size-lg);
+}
+
+.brand-icon {
+  font-size: 1.5rem;
+}
+
+.nav-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: center;
+}
+
+.btn {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--color-text-secondary);
+}
+
+.btn-ghost:hover {
+  background: var(--color-background);
+  color: var(--color-text);
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: var(--color-primary-dark);
+}
+
+/* Footer styles */
+.footer {
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border-light);
+  margin-top: auto;
+}
+
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+}
+
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.footer-brand {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: var(--spacing-sm);
+  font-weight: 600;
+  font-size: var(--font-size-lg);
+  color: var(--color-text);
+  
+}
+
+.footer-links {
+  display: flex;
+  gap: var(--spacing-lg);
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.footer-link {
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  font-size: var(--font-size-sm);
+  transition: color 0.2s ease;
+}
+
+.footer-link:hover {
+  color: var(--color-primary);
+}
+
+.footer-bottom {
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--color-border-light);
+  text-align: center;
+}
+
+.footer-bottom p {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
 }
 
 .main-content {
+  flex: 1;
   max-width: 800px;
   margin: 0 auto;
   padding: var(--spacing-2xl) var(--spacing-lg);
@@ -220,6 +402,31 @@ export default {
 }
 
 @media (max-width: 768px) {
+  .nav-container {
+    padding: 0 var(--spacing-md);
+  }
+  
+  .nav-actions {
+    gap: var(--spacing-sm);
+  }
+  
+  .btn {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--font-size-sm);
+  }
+  
+  .footer-content {
+    flex-direction: column;
+    gap: var(--spacing-md);
+    text-align: center;
+  }
+  
+  .footer-links {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--spacing-md);
+  }
+  
   .benefit-item,
   .step-item {
     flex-direction: column;
