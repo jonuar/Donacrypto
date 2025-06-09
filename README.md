@@ -2,6 +2,8 @@
 
 Una plataforma descentralizada de donaciones para creadores de contenido que permite recibir donaciones en criptomonedas directamente en sus wallets, con funcionalidades completas de red social.
 
+
+
 ## ✨ Características
 
 - 🔐 **Autenticación segura** con JWT y bcrypt
@@ -12,6 +14,36 @@ Una plataforma descentralizada de donaciones para creadores de contenido que per
 - 🔍 **Exploración y búsqueda** de creadores
 - 📱 **Interfaz responsiva** optimizada para móviles
 - 🛡️ **Seguridad avanzada** con eliminación de cuenta y cambio de contraseña
+
+## 📸 Capturas de Pantalla
+
+### 🖥️ Versión Web
+
+<div align="center">
+
+#### Página Principal
+<img src="docs/images/web-home.png" alt="Página Principal Web" width="700">
+
+#### Dashboard del Creador
+<img src="docs/images/web-creator-dashboard.png" alt="Dashboard del Creador Web" width="700">
+
+#### Registro de Usuario
+<img src="docs/images/web-register.png" alt="Registro Web" width="700">
+
+#### Perfil Público del Creador
+<img src="docs/images/web-follower-creator-pulic-profile.png" alt="Perfil Público del Creador Web" width="700">
+
+</div>
+
+### 📱 Versión Móvil
+
+<div align="center">
+
+| Dashboard del Creador | Perfil Público | Feed del Usuario | Home del Seguidor |
+|----------------------|----------------|------------------|-------------------|
+| <img src="docs/images/mobile-creator-dashboard.png" alt="Dashboard Móvil" width="200"> | <img src="docs/images/mobile-creator-public-profile.png" alt="Perfil Móvil" width="200"> | <img src="docs/images/mobile-user-feed.png" alt="Feed Móvil" width="200"> | <img src="docs/images/mobile-follower-home.png" alt="Home Móvil" width="200"> |
+
+</div>
 
 ## 🛠️ Stack Tecnológico
 
@@ -65,7 +97,7 @@ donacrypto/
 │       ├── routes/            # Endpoints de la API
 │       ├── decorators/        # Middleware personalizado
 │       └── utils/             # Utilidades
-├── frontend/                   # Aplicación Vue.js
+├── frontend/                  # Aplicación Vue.js
 │   ├── src/
 │   │   ├── components/        # Componentes reutilizables
 │   │   ├── views/             # Páginas de la aplicación
