@@ -22,7 +22,7 @@
           <div class="profile-content">
             <div class="profile-avatar">
               <img 
-                :src="creador.avatar_url || '/placeholder-avatar.png'" 
+                :src="creador.avatar_url || '/images/placeholder-avatar.png'" 
                 :alt="creador.username"
                 class="avatar-image"
               >

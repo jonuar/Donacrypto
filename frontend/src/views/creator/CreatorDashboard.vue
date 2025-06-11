@@ -198,7 +198,7 @@
           <div v-else class="profile-display">
             <div class="profile-avatar">
               <img 
-                :src="usuarioActual?.avatar_url || '/placeholder-avatar.png'" 
+                :src="usuarioActual?.avatar_url || '/images/placeholder-avatar.png'" 
                 :alt="usuarioActual?.username"
                 class="avatar-image"
               >

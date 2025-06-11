@@ -4,7 +4,7 @@
         <div class="creator-info" v-if="showCreator">
           <router-link :to="`/creator/${post.creator_username}`" class="creator-link">
             <img 
-              :src="post.creator_avatar || '/placeholder-avatar.png'" 
+              :src="post.creator_avatar || '/images/placeholder-avatar.png'" 
               :alt="post.creator_username"
               class="creator-avatar"
             >
