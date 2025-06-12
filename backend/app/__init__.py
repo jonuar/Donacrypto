@@ -54,12 +54,12 @@ def create_app():
 
     # MongoDB config - Usar MONGO_URI de variables de entorno
     mongo_uri = os.getenv("MONGO_URI")
-    # if not mongo_uri:
-    #     if os.getenv('FLASK_ENV') == 'production':
-    #         raise ValueError("MONGO_URI debe estar configurada como variable de entorno en producción")
-    #     else:
-    #         mongo_uri = "mongodb://localhost:27017/db_plataforma_donaciones"
-    #         logger.warning("Usando MongoDB local por defecto - NO usar en producción")
+    if not mongo_uri:
+        if os.getenv('FLASK_ENV') == 'production':
+            raise ValueError("MONGO_URI debe estar configurada como variable de entorno en producción")
+        else:
+            mongo_uri = "mongodb://localhost:27017/db_plataforma_donaciones"
+            logger.warning("Usando MongoDB local por defecto - NO usar en producción")
     
     # app.config["MONGO_URI"] = mongo_uri    # Inicializa extensiones
     # mongo.init_app(app)
