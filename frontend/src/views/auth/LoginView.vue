@@ -200,6 +200,9 @@ export default {
 <style lang="scss" scoped>
 .login-form {
   width: 100%;
+  max-width: 100%;
+  margin: 0 auto; 
+  padding: 0 var(--spacing-md); 
 }
 
 .form-header {
@@ -224,6 +227,7 @@ export default {
   flex-direction: column;
   gap: var(--spacing-lg);
   margin-bottom: var(--spacing-xl);
+  width: 100%; 
 }
 
 .password-field {
@@ -232,14 +236,14 @@ export default {
 
   & .input-field {
   width: 100%;
-  padding-right: 50px; /* Espacio para el botón */
+  padding-right: 50px;
   box-sizing: border-box;
   }
 }
 
 .password-toggle {
   position: absolute;
-  right: 12px; /* Según el padding del input */
+  right: 12px; 
   top: 50%;
   transform: translateY(-50%);
   background: none;
@@ -248,8 +252,8 @@ export default {
   font-size: var(--font-size-lg);
   color: var(--color-text-secondary);
   transition: var(--transition);
-  z-index: 2; /* Encima del input */
-  padding: 4px; /* Área de click más grande */
+  z-index: 2;
+  padding: 4px; 
   border-radius: 4px;
   display: flex;
   align-items: center;
@@ -315,21 +319,25 @@ export default {
 }
 
 @media (max-width: 768px) {
-  .form-options {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--spacing-sm);
+  .login-form {
+    padding: 0 var(--spacing-md);
   }
 
-  .password-field .input-field {
-    padding-right: 45px; /* Menos espacio en móvil */
+  .form-header, 
+  .form-footer {
+    padding: 0 var(--spacing-sm);
   }
-  
-  .password-toggle {
-    right: 10px;
-    width: 28px;
-    height: 28px;
-    font-size: var(--font-size-base);
+
+  .input-group,
+  .form-options,
+  .btn {
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .password-field {
+    width: 100%;
+    margin: 0 auto;
   }
 }
 </style>

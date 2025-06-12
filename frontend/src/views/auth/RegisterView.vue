@@ -335,6 +335,9 @@ export default {
 
 .register-form {
   width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0 var(--spacing-md);
 }
 
 .form-header {
@@ -378,6 +381,7 @@ export default {
   flex-direction: column;
   gap: var(--spacing-lg);
   margin-bottom: var(--spacing-xl);
+  width: 100%;
 }
 
 .form-row {
@@ -537,29 +541,37 @@ export default {
 }
 
 @media (max-width: 768px) {
+  .register-form {
+    padding: 0 var(--spacing-md);
+  }
+
   .form-row {
     grid-template-columns: 1fr;
+    width: 100%;
   }
 
   .role-selector {
     grid-template-columns: 1fr;
+    width: 100%;
+  }
+
+  .input-group,
+  .form-options,
+  .btn,
+  .checkbox-group {
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .password-field {
+    width: 100%;
+    margin: 0 auto;
   }
 
   .role-option {
-    text-align: center;
-    flex-direction: column;
-    gap: var(--spacing-xs);
-  }
-
-  .password-field .input-field {
-    padding-right: 45px; /* Menos espacio en móvil */
-  }
-  
-  .password-toggle {
-    right: 10px;
-    width: 28px;
-    height: 28px;
-    font-size: var(--font-size-base);
+    width: 100%;
+    margin: 0 auto;
+    box-sizing: border-box;
   }
 }
 </style>
