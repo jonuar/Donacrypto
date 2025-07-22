@@ -52,14 +52,19 @@ def create_app():
     jwt_expires = int(os.getenv("JWT_ACCESS_TOKEN_EXPIRES", "86400"))  # 24 horas por defecto
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(seconds=jwt_expires)
 
-    # MongoDB config - Usar MONGO_URI de variables de entorno
+    # MongoDB config
     mongo_uri = os.getenv("MONGO_URI")
     if not mongo_uri:
         if os.getenv('FLASK_ENV') == 'production':
-            raise ValueError("MONGO_URI debe estar configurada como variable de entorno en producción")
+            raise ValueError("MONGO_URI debe estar configurada en producción")
         else:
             mongo_uri = "mongodb://localhost:27017/db_plataforma_donaciones"
-            logger.warning("Usando MongoDB local por defecto - NO usar en producción")
+            logger.warning("Usando MongoDB local - NO USAR EN PRODUCCIÓN")
+
+    app.config.update({
+    "MONGO_URI": mongo_uri,
+    "MONGODB_DB": os.getenv("MONGO_DB_NAME", "db_plataforma_donaciones")
+    })
     
     # app.config["MONGO_URI"] = mongo_uri    # Inicializa extensiones
     # mongo.init_app(app)
