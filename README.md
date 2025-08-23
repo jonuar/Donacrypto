@@ -1,7 +1,7 @@
 # DonaCrypto
 
 ## 🌎 English
-A decentralized donation platform for content creators that allows them to receive cryptocurrency donations directly to their wallets, with full social network features.
+A decentralized donation platform for content creators that allows them to receive cryptocurrency donations directly to their wallets, presents full social network features.
 
 ## ✨ Features
 - 🔐 **Secure Authentication** with JWT and bcrypt
