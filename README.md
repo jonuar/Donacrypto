@@ -111,7 +111,6 @@ donacrypto/
 ```
 
 ## 🔒 Security Features
-
 - ✅ JWT Authentication with secure tokens
 - ✅ Password hashing with bcrypt
 - ✅ Role-based route protection
@@ -132,7 +131,6 @@ donacrypto/
 
 
 ## 📡 API Endpoints
-
 ### Authentication
 ```http
 POST /auth/register    # User registration
